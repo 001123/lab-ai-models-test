@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hoa hướng dương — từ hạt giống đến ngày nở hoa | step-5-preview</title>
+<style>
+  :root{
+    --bg:#0b1114;
+    --panel:#121b1e;
+    --panel-2:#0e1618;
+    --line:#22343a;
+    --ink:#eef6f2;
+    --muted:#93a9a6;
+    --sun:#ffc21a;
+    --sun-2:#ff8a2b;
+    --leaf:#5bb96a;
+    --leaf-2:#2f7a44;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%}
+  body{
+    background:
+      radial-gradient(1100px 620px at 78% -12%, rgba(255,194,26,0.16) 0%, rgba(255,194,26,0) 60%),
+      radial-gradient(900px 700px at 12% 8%, rgba(91,185,106,0.14) 0%, rgba(91,185,106,0) 62%),
+      linear-gradient(180deg,#0d1618 0%, var(--bg) 70%);
+    color:var(--ink);
+    font-family:Inter,"Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",Arial,sans-serif;
+    padding:26px 18px 40px;
+    display:flex;flex-direction:column;align-items:center;
+    -webkit-font-smoothing:antialiased;
+  }
+  header{width:min(1180px,100%);text-align:center;margin-bottom:18px}
+  header h1{
+    margin:0;font-size:clamp(21px,2.6vw,32px);line-height:1.2;letter-spacing:0.2px;font-weight:800;
+  }
+  header h1 em{
+    font-style:normal;
+    background:linear-gradient(92deg,var(--sun) 0%,var(--sun-2) 60%,#ffe9a8 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  header p{margin:8px auto 0;max-width:760px;color:var(--muted);font-size:14.5px;line-height:1.55}
+  .badge{
+    display:inline-flex;align-items:center;gap:9px;margin-top:12px;font-size:12px;color:#d6e7de;
+    background:rgba(255,255,255,0.04);border:1px solid var(--line);padding:6px 13px;border-radius:999px;
+  }
+  .badge i{width:8px;height:8px;border-radius:50%;background:var(--sun);box-shadow:0 0 12px var(--sun)}
+
+  main{width:min(1180px,100%);display:grid;grid-template-columns:minmax(0,1.55fr) minmax(280px,0.95fr);gap:18px;align-items:start}
+  @media (max-width:960px){ main{grid-template-columns:1fr} }
+
+  .card{
+    background:linear-gradient(180deg,rgba(255,255,255,0.035),rgba(255,255,255,0) 150px),var(--panel);
+    border:1px solid var(--line);border-radius:20px;box-shadow:0 24px 70px rgba(0,0,0,0.45);
+    overflow:hidden;
+  }
+  .stage-wrap{padding:12px 12px 0}
+  svg#scene{display:block;width:100%;height:auto;border-radius:14px;background:#8ec9f0}
+
+  /* ---------- control dock ---------- */
+  .dock{padding:14px 16px 16px;border-top:1px solid var(--line);background:var(--panel-2)}
+  .dock .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .dock .row + .row{margin-top:12px}
+  button,select,input[type=checkbox]{font:inherit}
+  .btn{
+    display:inline-flex;align-items:center;gap:7px;border-radius:11px;padding:9px 14px;font-size:14px;
+    background:#1a282d;color:var(--ink);border:1px solid #2b4149;cursor:pointer;transition:transform 0.12s ease,filter 0.12s ease;
+  }
+  .btn:hover{filter:brightness(1.15)}
+  .btn:active{transform:translateY(1px)}
+  .btn.primary{background:linear-gradient(180deg,var(--sun),#e8a400);color:#1b1400;border-color:#f0b800;font-weight:750}
+  .btn.ghost{background:transparent}
+  .btn:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--sun);outline-offset:2px}
+  select{background:#1a282d;color:var(--ink);border:1px solid #2b4149;border-radius:11px;padding:9px 10px;font-size:14px}
+  .toggle{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;color:#cbdad4;background:#162326;border:1px solid #2b4149;border-radius:11px;padding:8px 12px;cursor:pointer}
+  .toggle input{accent-color:var(--sun);width:15px;height:15px}
+  .timeline{flex:1 1 260px;display:flex;flex-direction:column;gap:6px;min-width:220px}
+  .timeline .head{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+  .timeline .head b{color:var(--sun)}
+  input[type=range]{width:100%;accent-color:var(--sun);height:22px;cursor:pointer}
+  .chips{display:flex;gap:7px;flex-wrap:wrap}
+  .chip{
+    border:1px solid #2b4149;background:#141f22;color:#bdd1c9;border-radius:999px;
+    padding:6px 11px;font-size:12.5px;cursor:pointer;transition:0.15s;
+  }
+  .chip:hover{filter:brightness(1.2)}
+  .chip.active{background:linear-gradient(180deg,var(--sun),#e9a600);color:#1b1400;border-color:#f0b800;font-weight:700}
+  .chip .num{opacity:0.7;margin-right:5px;font-variant-numeric:tabular-nums}
+
+  /* ---------- info aside ---------- */
+  aside{padding:16px 16px 18px}
+  aside h2{margin:0 0 4px;font-size:17px}
+  aside .lead{margin:0 0 12px;color:#b9cec7;font-size:13.5px;line-height:1.6}
+  .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:0 0 14px}
+  .stat{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:9px 11px}
+  .stat span{display:block;font-size:11.5px;color:var(--muted);letter-spacing:0.3px;text-transform:uppercase}
+  .stat b{font-size:19px;font-weight:800;color:var(--sun);font-variant-numeric:tabular-nums}
+  .stat b small{font-size:12px;font-weight:600;color:#cbb98a;margin-left:3px}
+  .phase{border:1px solid var(--line);border-radius:14px;padding:12px;background:linear-gradient(180deg,#16211f,#0f191b);margin-bottom:14px}
+  .phase h3{margin:0;font-size:15px;display:flex;align-items:center;gap:8px}
+  .phase h3 i{width:9px;height:9px;border-radius:50%;background:var(--leaf);box-shadow:0 0 10px var(--leaf)}
+  .phase p{margin:7px 0 0;font-size:13px;color:#bdd1c9;line-height:1.55}
+  .progress{height:7px;border-radius:99px;background:#0b1416;border:1px solid var(--line);overflow:hidden;margin-top:11px}
+  .progress i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--leaf),var(--sun));transition:width 0.08s linear}
+  .steps{display:flex;flex-direction:column;gap:6px}
+  .step{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border-radius:11px;border:1px solid transparent;background:#0f191b;opacity:0.5;transition:0.2s}
+  .step em{
+    font-style:normal;flex:0 0 22px;height:22px;border-radius:7px;display:grid;place-items:center;
+    background:#1b2b2b;color:#9fbdb2;font-size:12px;font-weight:700;
+  }
+  .step p{margin:0;font-size:12.5px;color:#a9c0b8;line-height:1.45}
+  .step b{display:block;font-size:13.5px;color:var(--ink);margin-bottom:2px}
+  .step.active{opacity:1;border-color:#33514a;background:linear-gradient(180deg,#182623,#101b19)}
+  .step.active em{background:var(--sun);color:#1b1400}
+  .step.done em{background:var(--leaf-2);color:#eafff0}
+  .note{margin:14px 0 0;font-size:12px;color:#7f958f;line-height:1.6}
+  .note b{color:#a9c0b8}
+  footer{margin-top:16px;color:#5c6f6a;font-size:12px;text-align:center;line-height:1.6}
+
+  @media (prefers-reduced-motion: reduce){
+    .progress i{transition:none}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🌻 Hoa hướng dương — <em>từ hạt giống đến ngày nở hoa</em></h1>
+  <p>Mô phỏng sinh trưởng thuần <b>&lt;svg&gt;</b> + vanilla JS, một file duy nhất, không CDN, mở trực tiếp vẫn chạy.
+     Hạt đĩa xếp theo <b>góc vàng 137.507764°</b>, cành lá theo <b>xoắn ốc Fibonacci</b>.</p>
+  <div class="badge"><i></i> model: step-5-preview · harness: opencode · effort: high · 25-09-2026 · attempt-1</div>
+</header>
+
+<main>
+  <!-- ============================ STAGE ============================ -->
+  <section class="card">
+    <div class="stage-wrap">
+      <svg id="scene" viewBox="0 0 960 640" xmlns="http://www.w3.org/2000/svg" role="img"
+           aria-label="Mô phỏng hoa hướng dương lớn lên từ hạt giống bằng SVG">
+        <defs>
+          <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1">
+            <stop id="skyTop" offset="0" stop-color="#63aee6"/>
+            <stop id="skyMid" offset=".55" stop-color="#a8d8f5"/>
+            <stop id="skyBot" offset="1" stop-color="#dff1ff"/>
+          </linearGradient>
+          <linearGradient id="soilG" x1="0" y1="0" x2="0" y2="1">
+            <stop id="soilTopC" offset="0" stop-color="#5b3d26"/>
+            <stop id="soilBotC" offset="1" stop-color="#1d130b"/>
+          </linearGradient>
+          <linearGradient id="hillFar" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#8fc4a3"/><stop offset="1" stop-color="#6ba98a"/>
+          </linearGradient>
+          <linearGradient id="hillNear" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#5da070"/><stop offset="1" stop-color="#37784f"/>
+          </linearGradient>
+          <linearGradient id="grassG" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#69c274"/><stop offset="1" stop-color="#3d8c4a"/>
+          </linearGradient>
+          <radialGradient id="sunG" cx=".5" cy=".5" r=".5">
+            <stop offset="0" stop-color="#fffdf0"/>
+            <stop offset=".35" stop-color="#ffe066"/>
+            <stop offset=".72" stop-color="#ffb61a"/>
+            <stop offset="1" stop-color="#ff8f00"/>
+          </radialGradient>
+          <radialGradient id="sunHaloG" cx=".5" cy=".5" r=".5">
+            <stop offset="0" stop-color="#ffe98a" stop-opacity=".55"/>
+            <stop offset=".55" stop-color="#ffd54a" stop-opacity=".16"/>
+            <stop offset="1" stop-color="#ffd54a" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="diskG" cx=".5" cy=".42" r=".72">
+            <stop id="diskC0" offset="0" stop-color="#6d4310"/>
+            <stop id="diskC1" offset=".55" stop-color="#4a2a08"/>
+            <stop id="diskC2" offset="1" stop-color="#221203"/>
+          </radialGradient>
+          <linearGradient id="ringG" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#ffd84d"/><stop offset="1" stop-color="#e08a12"/>
+          </linearGradient>
+          <linearGradient id="petalG1" x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0" stop-color="#f59a00"/><stop offset=".45" stop-color="#ffc821"/><stop offset="1" stop-color="#fff3a8"/>
+          </linearGradient>
+          <linearGradient id="petalG2" x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0" stop-color="#e88f06"/><stop offset=".5" stop-color="#ffbb12"/><stop offset="1" stop-color="#ffe98d"/>
+          </linearGradient>
+          <linearGradient id="petalG3" x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0" stop-color="#d97f06"/><stop offset=".5" stop-color="#f9ad0f"/><stop offset="1" stop-color="#ffdc5e"/>
+          </linearGradient>
+          <linearGradient id="leafG" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#2f8a3d"/><stop offset=".6" stop-color="#5cbe62"/><stop offset="1" stop-color="#8ada86"/>
+          </linearGradient>
+          <linearGradient id="leafDarkG" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#1d5a2c"/><stop offset="1" stop-color="#3f8f4a"/>
+          </linearGradient>
+          <linearGradient id="stemG" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#256e2e"/><stop offset=".42" stop-color="#5fbe63"/><stop offset="1" stop-color="#1f6529"/>
+          </linearGradient>
+          <filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+            <feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="#000" flood-opacity=".28"/>
+          </filter>
+          <filter id="glowF" x="-60%" y="-60%" width="220%" height="220%">
+            <feGaussianBlur stdDeviation="6" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <clipPath id="soilClip"><rect x="0" y="474" width="960" height="166"/></clipPath>
+          <clipPath id="skyClip"><rect x="0" y="0" width="960" height="474"/></clipPath>
+        </defs>
+
+        <!-- ---------- sky ---------- -->
+        <g clip-path="url(#skyClip)">
+          <rect x="0" y="0" width="960" height="474" fill="url(#skyG)"/>
+          <g id="stars" opacity="0"></g>
+          <g id="sunGrp">
+            <circle id="sunHalo" r="150" fill="url(#sunHaloG)"/>
+            <g id="sunRays"></g>
+            <circle id="sunCore" r="46" fill="url(#sunG)" filter="url(#soft)"/>
+          </g>
+          <g id="clouds"></g>
+          <g id="hillsBack"></g>
+          <g id="hillsFront"></g>
+        </g>
+
+        <!-- ---------- soil ---------- -->
+        <g id="soilLayer">
+          <rect x="0" y="474" width="960" height="166" fill="url(#soilG)"/>
+          <rect id="soilTopLine" x="0" y="474" width="960" height="5" fill="#6f4c2e"/>
+          <g id="grassStrip" clip-path="url(#soilClip)"></g>
+          <g id="soilDecor" clip-path="url(#soilClip)"></g>
+          <g id="moisture" clip-path="url(#soilClip)" opacity="0.5"></g>
+          <!-- seed + roots live underground -->
+          <g id="rootsG"></g>
+          <g id="seedGrp">
+            <g id="seedBodyG">
+              <ellipse id="seedBody" rx="9" ry="6.5" fill="#e7d4a8" stroke="#a5813f" stroke-width="1.2"/>
+              <path id="seedCrack" d="M0 -5.4 L1.6 -1 L-1.4 1.6 L1 5.4" fill="none" stroke="#7d5a24" stroke-width="1.1" stroke-linecap="round"/>
+            </g>
+            <path id="radicle" fill="none" stroke="#f0dcae" stroke-width="3" stroke-linecap="round" d="M0 5 Q 3 16 0 30" />
+            <path id="shoot" fill="none" stroke="#8fd18a" stroke-width="3.4" stroke-linecap="round" d="M0 0 Q -2 -14 0 -26"/>
+            <g id="cotyledons">
+              <g id="cotyL"><path d="M0 0 C -10 -6 -18 -4 -21 1 C -16 7 -7 7 0 0 Z" fill="#a8dc7a" stroke="#4d8a35" stroke-width="1"/></g>
+              <g id="cotyR"><path d="M0 0 C 10 -6 18 -4 21 1 C 16 7 7 7 0 0 Z" fill="#93d06a" stroke="#427f2f" stroke-width="1"/></g>
+            </g>
+          </g>
+        </g>
+
+        <!-- ---------- the plant (above ground) ---------- -->
+        <g id="plant">
+          <g id="leavesBack"></g>
+          <path id="stem" fill="none" stroke="url(#stemG)" stroke-width="0" stroke-linecap="round" d="M430 474 L430 474"/>
+          <g id="stemHairs"></g>
+          <g id="leavesFront"></g>
+          <g id="tip"></g>
+          <g id="head" opacity="0">
+            <g id="sepalsG"></g>
+            <g id="petalsBackG"></g>
+            <g id="petalsMidG"></g>
+            <circle id="diskBack" r="1" fill="url(#diskG)"/>
+            <circle id="diskRing" r="1" fill="none" stroke="url(#ringG)" stroke-width="3.4" opacity=".9"/>
+            <g id="floretsG"></g>
+            <g id="seedsG"></g>
+            <g id="petalsFrontG"></g>
+            <circle id="diskShine" r="1" fill="#fff" opacity="0"/>
+          </g>
+        </g>
+
+        <!-- ---------- cast & weather ---------- -->
+        <g id="fxG"></g>
+        <g id="castG">
+          <g id="butterfly" opacity="0">
+            <g id="bflyWL"><ellipse rx="11" ry="15" fill="#ffb3d9" opacity=".9"/></g>
+            <g id="bflyWR"><ellipse rx="11" ry="15" fill="#ff9ecd" opacity=".9"/></g>
+            <ellipse rx="2.6" ry="9" fill="#3b2a33"/>
+          </g>
+          <g id="bee1" opacity="0"></g>
+          <g id="bee2" opacity="0"></g>
+        </g>
+        <g id="rainG" clip-path="url(#skyClip)"></g>
+        <rect id="vignette" x="0" y="0" width="960" height="640" fill="none"/>
+
+        <!-- in-scene labels -->
+        <g id="sceneLabels" font-family="Inter, system-ui, sans-serif">
+          <g id="stageTag" opacity="0">
+            <rect id="stageTagBG" x="14" y="14" rx="12" ry="12" width="330" height="46"
+                  fill="#ffffff" opacity=".62" stroke="#0d3b1e" stroke-opacity=".18"/>
+            <text id="stageText" x="26" y="34" font-size="17" font-weight="800" fill="#0d3b1e">1 · Hạt giống</text>
+            <text id="stageSub" x="26" y="52" font-size="12.5" fill="#0d3b1e" opacity=".8">trong đất ẩm</text>
+          </g>
+          <g id="ruler" opacity="0">
+            <line x1="918" y1="474" x2="918" y2="98" stroke="#0d3b1e" stroke-width="1.4" opacity=".55"/>
+            <g id="rulerTicks"></g>
+            <text id="rulerUnit" x="880" y="88" font-size="11.5" fill="#0d3b1e" opacity=".7">cm</text>
+          </g>
+        </g>
+      </svg>
+    </div>
+
+    <!-- ---------- control dock ---------- -->
+    <div class="dock">
+      <div class="row">
+        <button id="playBtn" class="btn primary" aria-label="Phát hoặc tạm dừng">⏸ Tạm dừng</button>
+        <button id="replayBtn" class="btn">↺ Xem lại</button>
+        <label class="toggle"><input type="checkbox" id="rainChk"> 🌧 Mưa rào</label>
+        <label class="toggle"><input type="checkbox" id="castChk" checked> 🐝 Ong & bướm</label>
+        <select id="speedSel" aria-label="Tốc độ phát">
+          <option value="0.5">0.5×</option>
+          <option value="1" selected>1×</option>
+          <option value="2">2×</option>
+          <option value="4">4×</option>
+        </select>
+      </div>
+      <div class="row">
+        <div class="timeline">
+          <div class="head"><span id="phaseNow">Giai đoạn 1/7</span><span>Tiến trình <b id="pctOut">0%</b></span></div>
+          <input id="scrub" type="range" min="0" max="1000" value="0" step="1" aria-label="Thanh thời gian sinh trưởng">
+        </div>
+      </div>
+      <div class="row chips" id="chips"></div>
+      <div class="row" style="color:#7f958f;font-size:12px">
+        Phím tắt: <b style="color:#bdd1c9">Space</b> phát/tạm dừng · <b style="color:#bdd1c9">← →</b> tua · <b style="color:#bdd1c9">R</b> xem lại · <b style="color:#bdd1c9">1–7</b> tới giai đoạn
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ INFO ============================ -->
+  <aside class="card">
+    <h2>Vòng đời 80 ngày</h2>
+    <p class="lead">Mô phỏng 7 giai đoạn: hạt giống ngậm nước → rễ đâm → mầm vươn lên → cây non → sinh trưởng → ra nụ → nở hoa trưởng thành. Đầu hoa luôn <b>quay về phía mặt trời</b> và đung đưa theo gió.</p>
+
+    <div class="stats">
+      <div class="stat"><span>Ngày</span><b id="dayOut">0</b></div>
+      <div class="stat"><span>Chiều cao</span><b id="heightOut">0<small>cm</small></b></div>
+      <div class="stat"><span>Lá</span><b id="leafOut">0</b></div>
+      <div class="stat"><span>Đĩa hoa</span><b id="diaOut">0<small>cm</small></b></div>
+      <div class="stat"><span>Hạt đĩa</span><b id="seedOut">0</b></div>
+      <div class="stat"><span>Cánh hoa</span><b id="petalOut">0</b></div>
+    </div>
+
+    <div class="phase">
+      <h3><i></i><span id="phaseName">Giai đoạn 1 — Hạt giống</span></h3>
+      <p id="phaseDesc">Hạt nằm trong đất ẩm, ngậm nước, trương phồng và nứt vỏ.</p>
+      <div class="progress"><i id="bar"></i></div>
+    </div>
+
+    <div class="steps" id="steps"></div>
+
+    <p class="note">
+      <b>Phyllotaxis:</b> mỗi hạt đĩa xoay <b>137.507764°</b> so với hạt trước (góc vàng) nên tự nhiên tạo thành
+      các xoắn ốc Fibonacci <b>13 / 21 / 34</b> — đặc trưng của hoa hướng dương thật.
+      <br><b>Tự vẽ:</b> toàn bộ đất, rễ chùm, lá so le, nụ hoa, ong và cánh hoa được sinh bằng JS, không dùng ảnh ngoài.
+    </p>
+  </aside>
+</main>
+
+<footer>
+  Sinh mới hoàn toàn · single-file <b>index.html</b> · SVG + vanilla JS · không CDN · 25-09-2026
+</footer>
+
+<noscript><p style="color:#fff;text-align:center">Cần bật JavaScript để xem mô phỏng sinh trưởng.</p></noscript>
+
+<script>
+(function(){
+"use strict";
+
+/* ============================================================
+   0. Helpers
+   ============================================================ */
+const $ = id => document.getElementById(id);
+const NS = "http://www.w3.org/2000/svg";
+const clamp01 = v => v < 0 ? 0 : v > 1 ? 1 : v;
+const lerp = (a,b,t) => a + (b-a)*t;
+const smooth = t => { t = clamp01(t); return t*t*(3-2*t); };
+const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5)); // 2.3999632... rad = 137.507764°
+const DEG = 180/Math.PI;
+
+function el(name, attrs, parent){
+  const n = document.createElementNS(NS, name);
+  if(attrs) for(const k in attrs) n.setAttribute(k, attrs[k]);
+  if(parent) parent.appendChild(n);
+  return n;
+}
+function pathLength(p, fallback){
+  try { const L = p.getTotalLength(); return (L && isFinite(L) && L > 1) ? L : fallback; }
+  catch(e){ return fallback; }
+}
+function hex2rgb(h){ return [parseInt(h.slice(1,3),16), parseInt(h.slice(3,5),16), parseInt(h.slice(5,7),16)]; }
+function mixHex(a,b,t){
+  const A = hex2rgb(a), B = hex2rgb(b);
+  return "rgb(" + Math.round(lerp(A[0],B[0],t)) + "," + Math.round(lerp(A[1],B[1],t)) + "," + Math.round(lerp(A[2],B[2],t)) + ")";
+}
+// deterministic pseudo random (so the scene is identical on every load)
+function mulberry(seed){
+  return function(){
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+const rand = mulberry(20260925);
+const rnd = (a,b) => a + rand()*(b-a);
+
+const DAY_SKY   = ["#4fa6e0", "#8fd0f2", "#dff1ff"];
+const GOLD_SKY  = ["#e07a3c", "#f6b56a", "#ffe6bd"];
+const clamp = (v,a,b) => v < a ? a : v > b ? b : v;
+
+/* ============================================================
+   1. Static scenery: sky, sun, clouds, hills, soil, decor
+   ============================================================ */
+(function buildSun(){
+  const rays = $("sunRays");
+  for(let i=0;i<14;i++){
+    const a = i * Math.PI*2/14, l = (i%2 ? 74 : 92), w = (i%2 ? 5 : 7);
+    el("line", {
+      x1: Math.cos(a)*(l*0.55), y1: Math.sin(a)*(l*0.55),
+      x2: Math.cos(a)*l,          y2: Math.sin(a)*l,
+      stroke: "#ffd84d", "stroke-width": w, "stroke-linecap":"round", opacity: 0.85
+    }, rays);
+  }
+  // stars for the low-sun tint (subtle)
+  const stars = $("stars");
+  for(let i=0;i<46;i++){
+    el("circle", { cx: rand()*960, cy: rand()*260, r: rnd(0.5,1.4), fill:"#fff", opacity: rnd(0.15,0.6) }, stars);
+  }
+})();
+
+/* ---- Declarations first (strict mode) ---- */
+const CLOUDS = [];
+let BLOOM_RING;
+
+(function buildClouds(){
+  const g = $("clouds");
+  for(let i=0;i<4;i++){
+    const c = el("g", { opacity: 0.92 }, g);
+    const puff = [[0,0,26],[26,-8,20],[-24,-6,18],[46,4,15],[-44,3,13]];
+    puff.forEach(([x,y,r])=> el("circle",{cx:x,cy:y,r:r,fill:"#ffffff"},c));
+    el("rect",{x:-46,y:6,width:96,height:11,rx:5.5,fill:"#f3fbff"},c);
+    CLOUDS.push({ g, x: rnd(80,880), y: rnd(48,150), s: rnd(0.65,1.15), v: rnd(7,15) });
+  }
+})();
+
+(function buildHills(){
+  const back = $("hillsBack"), front = $("hillsFront");
+  el("path",{ d:"M-20 474 L-20 402 Q 120 342 250 396 Q 360 442 480 392 Q 610 338 730 400 Q 850 456 980 398 L980 474 Z",
+             fill:"url(#hillFar)", opacity:0.85 }, back);
+  el("path",{ d:"M-20 474 L-20 434 Q 150 388 300 430 Q 470 476 620 428 Q 800 372 980 430 L980 474 Z",
+             fill:"url(#hillNear)" }, front);
+  // a couple of distant trees
+  [[130,428,0.9],[862,424,1.05],[520,438,0.7]].forEach(([x,y,s])=>{
+    const t = el("g",{ transform:`translate(${x},${y}) scale(${s})` }, front);
+    el("rect",{x:-2.5,y:-14,width:5,height:16,fill:"#5b4227"},t);
+    el("circle",{cx:0,cy:-22,r:14,fill:"#2f7a44"},t);
+    el("circle",{cx:-9,cy:-14,r:9,fill:"#368a4c"},t);
+    el("circle",{cx:9,cy:-15,r:9,fill:"#368a4c"},t);
+  });
+})();
+
+(function buildGrass(){
+  const g = $("grassStrip");
+  for(let i=0;i<120;i++){
+    const x = rand()*960, h = rnd(7,20), lean = rnd(-7,7);
+    el("path",{ d:`M${x} 476 Q ${x+lean*0.6} ${476-h*0.6} ${x+lean} ${476-h}`,
+                stroke:"url(#grassG)", "stroke-width": rnd(1.6,3), fill:"none", "stroke-linecap":"round",
+                opacity: rnd(0.55,1) }, g);
+  }
+})();
+
+(function buildSoilDecor(){
+  const g = $("soilDecor"), m = $("moisture");
+  // pebbles
+  for(let i=0;i<40;i++){
+    const x = rand()*960, y = rnd(486,626), r = rnd(2,6);
+    el("ellipse",{ cx:x, cy:y, rx:r, ry:r*0.72, fill:"#6b533a", opacity:rnd(0.35,0.8) }, g);
+    el("ellipse",{ cx:x-r*0.25, cy:y-r*0.3, rx:r*0.42, ry:r*0.3, fill:"#9c815f", opacity:0.5 }, g);
+  }
+  // buried treasure-ish: darker speckles
+  for(let i=0;i<70;i++){
+    el("circle",{ cx:rand()*960, cy:rnd(480,632), r:rnd(0.8,2.2), fill:"#3a2717", opacity:0.6 }, g);
+  }
+  // moisture band near the surface (darkens with rain)
+  el("rect",{ x:0, y:474, width:960, height:74, fill:"#2a4a7a", opacity:0.0, id:"wetBand" }, m);
+})();
+
+/* ============================================================
+   2. Root system (revealed progressively with dashoffset)
+   ============================================================ */
+const ROOTS = [];
+function growRoot(x, y, angle, len, depth, width){
+  const x2 = x + Math.cos(angle)*len, y2 = y + Math.sin(angle)*len;
+  const bend = angle + rnd(0.7,1.4);
+  const p = el("path",{
+    d:`M${x} ${y} Q ${(x+x2)/2 + Math.cos(bend)*len*0.22} ${(y+y2)/2 + Math.sin(bend)*len*0.22} ${x2} ${y2}`,
+    fill:"none", stroke:"#e9cfa4", "stroke-width":width, "stroke-linecap":"round", opacity:0.95
+  }, $("rootsG"));
+  const L = pathLength(p, len*1.2);
+  p.setAttribute("stroke-dasharray", L);
+  p.setAttribute("stroke-dashoffset", L);
+  ROOTS.push({ p, L, order: 999 - depth*10 + rand()*2, depth });
+  if(depth > 0){
+    growRoot(x2, y2, angle - rnd(0.35,0.75), len*rnd(0.62,0.8), depth-1, width*0.72);
+    growRoot(x2, y2, angle + rnd(0.3,0.85),  len*rnd(0.55,0.75), depth-1, width*0.68);
+  }
+}
+growRoot(430, 474, Math.PI/2, 54, 3, 7);        // tap root
+growRoot(430, 474, Math.PI/2 + 0.35, 34, 2, 5);
+growRoot(430, 474, Math.PI/2 - 0.35, 34, 2, 5);
+ROOTS.forEach((r,i)=> r.order = i);              // reveal in creation order (main → branches)
+// root hairs
+const HAIRS = [];
+(function(){
+  const g = $("rootsG");
+  for(let i=0;i<26;i++){
+    const y = rnd(500,596), len = rnd(4,9);
+    const p = el("path",{
+      d:`M${rnd(370,490)} ${y} q ${rnd(-3,3)} ${len} 0 ${len}`,
+      stroke:"#f2e0bb", "stroke-width":0.9, fill:"none", opacity:0.7, "stroke-linecap":"round"
+    }, g);
+    HAIRS.push({ p, at: 0.55 + rand()*0.45 });
+  }
+})();
+
+/* ============================================================
+   3. Leaf pool (phyllotactic: 137.5° between successive leaves)
+   ============================================================ */
+const LEAF_COUNT = 15;
+const LEAVES = [];
+function leafPath(){
+  return "M0 0 C 18 -20 46 -30 72 -24 C 86 -14 98 -4 104 2 C 94 8 78 15 62 21 C 42 27 18 22 0 0 Z";
+}
+(function buildLeaves(){
+  for(let i=0;i<LEAF_COUNT;i++){
+    const ang = i * GOLDEN_ANGLE;              // spiral around the stem
+    const back = Math.sin(ang) < 0;            // leaves "behind" the stem
+    const host = back ? $("leavesBack") : $("leavesFront");
+    const g = el("g", { opacity: 0 }, host);
+    el("path",{ d: leafPath(), fill: back ? "url(#leafDarkG)" : "url(#leafG)",
+                stroke:"#1c5522", "stroke-width":1.8 }, g);
+    el("path",{ d:"M3 0 Q 50 -2 100 2", stroke: back ? "#1a5526" : "#ffffff",
+                "stroke-width":1.4, fill:"none", opacity: back ? 0.35 : 0.38 }, g);
+    for(let v=1;v<=4;v++){
+      const x = v*22, yy = -3 + v*1.6;
+      el("path",{ d:`M${x} ${yy} q 10 -${6+v} ${18-2*v} -${12+2*v}`, stroke:"#1c5522",
+                  "stroke-width":1, fill:"none", opacity:0.35 }, g);
+    }
+    el("path",{ d:"M0 0 C 22 4 48 8 74 6", stroke:"#1c5522", "stroke-width":1, fill:"none", opacity:0.45 }, g);
+    LEAVES.push({ g, ang, back, s: 0.055 + (i/(LEAF_COUNT-1))*0.93 });
+  }
+})();
+
+/* ============================================================
+   4. Head: sepals, 3 petal layers, disk, florets, seeds
+   ============================================================ */
+const PETAL_LAYERS = [
+  { host:"petalsBackG",  count:13, len:96,  wid:23, fill:"petalG3", rot:0,          scale:0.94 },
+  { host:"petalsMidG",   count:13, len:112, wid:26, fill:"petalG2", rot:360/13/2,   scale:1.0 },
+  { host:"petalsFrontG", count:8,  len:86,  wid:31, fill:"petalG1", rot:360/13,     scale:1.12 }
+];
+const PETALS = [];
+PETAL_LAYERS.forEach((L,li)=>{
+  for(let i=0;i<L.count;i++){
+    const ang = (i/L.count)*360 + L.rot;
+    const g = el("g", { opacity: 0 }, $(L.host));
+    el("path",{
+      d:`M0 0 C ${-L.wid} -${L.len*0.34} ${-L.wid*0.72} -${L.len*0.86} 0 -${L.len}
+         C ${L.wid*0.72} -${L.len*0.86} ${L.wid} -${L.len*0.34} 0 0 Z`,
+      fill:`url(#${L.fill})`, stroke:"#b96e07", "stroke-width":1.5, "stroke-linejoin":"round"
+    }, g);
+    el("line",{ x1:0, y1:-7, x2:0, y2:-(L.len-9), stroke:"#c47a00", "stroke-width":1.2, opacity:0.45 }, g);
+    el("path",{ d:`M0 -${L.len-4} q -6 6 0 12 q 6 -6 0 -12`, fill:"#fff4b0", opacity:0.8 }, g); // tip highlight
+    PETALS.push({ g, ang, li, i, scale:L.scale, len:L.len, phase:(i/L.count)*0.85 });
+  }
+});
+// sepals: the green cup that holds the bud
+const SEPALS = [];
+(function buildSepals(){
+  const host = $("sepalsG");
+  for(let i=0;i<11;i++){
+    const ang = i*(360/11);
+    const w = el("g",{ transform:`rotate(${ang})` }, host);
+    el("path",{ d:"M0 0 C -13 -16 -12 -40 0 -56 C 12 -40 13 -16 0 0 Z",
+               fill:"#2f7a35", stroke:"#173f1c", "stroke-width":1.4 }, w);
+    SEPALS.push({ g:w, ang });
+  }
+})();
+// florets ring (the little flowers at the rim)
+const FLORETS = [];
+(function buildFlorets(){
+  const g = $("floretsG");
+  for(let i=0;i<66;i++){
+    const a = i/66*Math.PI*2;
+    const c = el("circle",{ cx:0, cy:0, r:0, fill: i%3 ? "#e8b23a" : "#f6dd7a", opacity:0 }, g);
+    FLORETS.push({ c, a });
+  }
+})();
+// seeds: Vogel sunflower model
+const SEED_COUNT = 560;
+const SEEDS = [];
+(function buildSeeds(){
+  const g = $("seedsG");
+  const c = 2.05; // packing constant
+  for(let i=0;i<SEED_COUNT;i++){
+    const r = Math.sqrt((i+0.5)/SEED_COUNT);
+    const a = i * GOLDEN_ANGLE;
+    const shade = i % 4 === 0 ? "#f6dd8a" : (i % 7 === 0 ? "#8a4d0a" : "#2a1503");
+    const s = el("ellipse",{ cx:0, cy:0, rx:0, ry:0, fill:shade, opacity:0,
+                             transform:`rotate(${i*137.5})` }, g);
+    SEEDS.push({ s, r, a, show:(i/SEED_COUNT) });
+  }
+})();
+
+/* ============================================================
+   5. Cast: bees, butterfly, pollen, rain
+   ============================================================ */
+const BEES = [];
+function buildBee(id){
+  const g = $(id);
+  g.innerHTML = "";
+  const wl = el("ellipse",{ cx:-3, cy:-6, rx:7, ry:4.4, fill:"#eaf7ff", opacity:0.75 }, g);
+  const wr = el("ellipse",{ cx:3,  cy:-6, rx:7, ry:4.4, fill:"#eaf7ff", opacity:0.75 }, g);
+  el("ellipse",{ rx:7.5, ry:5.2, fill:"#f4c33a", stroke:"#8a5c05", "stroke-width":1 }, g);
+  el("path",{ d:"M-2.6 -4.8 L-2.6 4.6 M1.8 -4.8 L1.8 4.6", stroke:"#3a2a06", "stroke-width":2 }, g);
+  el("circle",{ cx:6.4, cy:-1.4, r:1.7, fill:"#2b2107" }, g);
+  el("path",{ d:"M0 -5 l 0 -4", stroke:"#3a2a06", "stroke-width":0.9 }, g);
+  el("circle",{ cx:0, cy:-9.4, r:1.1, fill:"#3a2a06" }, g);
+  return { g, wl, wr };
+}
+BEES.push({ ...buildBee("bee1"), phase:0,            spd:1.35, R:118, tilt:0 });
+BEES.push({ ...buildBee("bee2"), phase:Math.PI*0.8,  spd:-0.95, R:86, tilt:0 });
+
+const BUTTERFLY = { g:$("butterfly"), wl:$("bflyWL"), wr:$("bflyWR"), x:-40, y:300 };
+
+const POLLEN = [];
+(function buildPollen(){
+  const g = $("fxG");
+  for(let i=0;i<28;i++){
+    const c = el("circle",{ r:rnd(1.2,2.8), fill:"#ffe9a0", opacity:0 }, g);
+    POLLEN.push({ c, a: rand()*Math.PI*2, rad: rnd(48,120), sp:rnd(0.5,1.6), ph: rand()*6.28 });
+  }
+  // bloom flash ring
+  BLOOM_RING = el("circle",{ cx:0, cy:0, r:0, fill:"none", stroke:"#fff3b0", "stroke-width":3, opacity:0 }, g);
+})();
+
+const RAIN = [];
+(function buildRain(){
+  const g = $("rainG");
+  for(let i=0;i<80;i++){
+    const l = el("line",{ x1:0, y1:0, x2:-3, y2:14, stroke:"#cfeaff", "stroke-width":1.2, opacity:0.6 }, g);
+    RAIN.push({ l, x: rand()*980-10, y: rand()*-300, v: rnd(520,860) });
+  }
+})();
+
+/* stem hairs (trichomes) — deterministic positions */
+const HAIR_PTS = [];
+(function buildHairs(){
+  for(let i=0;i<70;i++){
+    const t = rand(), side = rand() < 0.5 ? -1 : 1;
+    HAIR_PTS.push({ t, len: rnd(3,7), side, lean: side*rnd(4,11) });
+  }
+})();
+
+/* ============================================================
+   6. Stage definitions
+   ============================================================ */
+const STAGES = [
+  { t:0.00, name:"Hạt giống",        sub:"nằm trong đất ẩm, ngậm nước",
+    desc:"Hạt hình trứng nằm sâu 2 cm dưới đất ẩm. Nó ngậm nước, trương phồng gần gấp đôi thể tích rồi nứt vỏ." },
+  { t:0.10, name:"Nảy mầm",          sub:"rễ đâm xuống, chồi vươn lên",
+    desc:"Rễ chính đâm xuyên đất; chồi non cong người đội vỏ hạt trồi lên mặt đất để hấp thụ ánh sáng đầu tiên." },
+  { t:0.24, name:"Cây non",          sub:"hai lá mầm xòe ra",
+    desc:"Hai lá mầm hé mở, cây non bắt đầu quang hợp. Rễ chùm đâm nhánh hai bên để bám lấy đất." },
+  { t:0.40, name:"Sinh trưởng",      sub:"thân vươn cao, lá so le 137.5°",
+    desc:"Giai đoạn sinh trưởng mạnh nhất: thân dày và cao nhanh, mỗi lá mới xoay một góc vàng so với lá trước." },
+  { t:0.62, name:"Ra nụ",            sub:"đỉnh sinh trưởng phình thành nụ",
+    desc:"Phân đoạn đỉnh ngừng kéo dài, phình thành nụ hoa xanh bọc trong đài lá. Mặt hoa ngóc về phía mặt trời." },
+  { t:0.78, name:"Nở hoa",           sub:"cánh hoa bung theo từng tầng",
+    desc:"Nụ nở: ngoài cùng 13 cánh, rồi 13 cánh nữa và 8 cánh trong cùng. Đĩa hoa nâu sẫm lộ ra với vàng óng." },
+  { t:0.93, name:"Hoa trưởng thành", sub:"đĩa đầy hạt, ong tới gây phấn",
+    desc:"Hoa chín: đĩa hoa đầy hạt xếp xoắn ốc, ong và bướm bay quanh. Đầu hoa hơi rũ xuống theo trọng lượng." }
+];
+
+/* ============================================================
+   7. Growth model
+   ============================================================ */
+const CM_PER_PX = 1.9;                       // scale bar for the on-screen ruler
+const BASE = { x:430, y:474 };
+const MAX_CM = 215;
+
+let g = 0;                                   // growth 0..1
+let playing = true;
+let speed = 1;
+let raining = false;
+let castOn = true;
+let t = 0;                                   // seconds (wind / animals)
+let holdUntil = -1;
+let lastT = performance.now();
+let reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+if(reduced) playing = false;
+
+function phases(g){
+  return {
+    seed:  smooth(g/0.10),
+    germ:  smooth((g-0.06)/0.16),
+    seedl: smooth((g-0.22)/0.14),
+    veg:   smooth((g-0.34)/0.24),
+    bud:   smooth((g-0.58)/0.14),
+    bloom: smooth((g-0.72)/0.20),
+    mature:smooth((g-0.90)/0.10)
+  };
+}
+
+function stemHeight(p){
+  let h = 4*p.germ;
+  h = lerp(h, 44, p.seedl);
+  h = lerp(h, 268, p.veg);
+  h = lerp(h, 344, p.bud);
+  h = lerp(h, 392, Math.max(p.bloom*0.85, p.mature*0.6 + p.bloom*0.4));
+  return h;
+}
+
+function stageIndex(g){
+  let i = 0;
+  for(let k=0;k<STAGES.length;k++) if(g >= STAGES[k].t) i = k;
+  return i;
+}
+
+/* ============================================================
+   8. UI wiring
+   ============================================================ */
+const chips = $("chips"), stepsEl = $("steps");
+STAGES.forEach((s,i)=>{
+  const b = document.createElement("button");
+  b.className = "chip";
+  b.innerHTML = `<span class="num">${i+1}</span>${s.name}`;
+  b.addEventListener("click", ()=> jumpTo(i));
+  chips.appendChild(b); s.btn = b;
+
+  const d = document.createElement("div");
+  d.className = "step";
+  d.innerHTML = `<em>${i+1}</em><div><b>${s.name}</b><p>${s.desc}</p></div>`;
+  stepsEl.appendChild(d); s.el = d;
+});
+
+function jumpTo(i){
+  g = clamp01(STAGES[i].t + 0.0005);
+  playing = false; holdUntil = -1;
+  $("playBtn").textContent = "▶ Phát";
+  $("scrub").value = Math.round(g*1000);
+  render(0);
+}
+
+$("playBtn").addEventListener("click", ()=>{
+  if(g >= 1){ g = 0; playing = true; }
+  else playing = !playing;
+  $("playBtn").textContent = playing ? "⏸ Tạm dừng" : "▶ Phát";
+});
+$("replayBtn").addEventListener("click", ()=>{
+  g = 0; playing = true; holdUntil = -1; $("playBtn").textContent = "⏸ Tạm dừng";
+});
+$("scrub").addEventListener("input", e=>{
+  g = e.target.value/1000; playing = false; holdUntil = -1;
+  $("playBtn").textContent = "▶ Phát";
+  render(0);
+});
+$("speedSel").addEventListener("change", e=>{ speed = parseFloat(e.target.value); });
+$("rainChk").addEventListener("change", e=>{ raining = e.target.checked; });
+$("castChk").addEventListener("change", e=>{ castOn = e.target.checked; });
+
+window.addEventListener("keydown", e=>{
+  if(e.target.matches("input,select,textarea")) { if(e.key !== " ") return; }
+  if(e.code === "Space"){ e.preventDefault(); $("playBtn").click(); }
+  else if(e.key === "ArrowRight"){ e.preventDefault(); g = clamp01(g + 0.02); playing = false; $("playBtn").textContent="▶ Phát"; render(0); }
+  else if(e.key === "ArrowLeft"){ e.preventDefault(); g = clamp01(g - 0.02); playing = false; $("playBtn").textContent="▶ Phát"; render(0); }
+  else if(e.key === "r" || e.key === "R"){ $("replayBtn").click(); }
+  else if(/^[1-7]$/.test(e.key)){ jumpTo(parseInt(e.key,10) - 1); }
+});
+
+// ruler ticks
+(function buildRuler(){
+  const g = $("rulerTicks");
+  for(let cm=0; cm<=MAX_CM; cm+=25){
+    const y = BASE.y - cm*CM_PER_PX;
+    if(y < 92) break;
+    el("line",{ x1:918-(cm%50===0?10:5), y1:y, x2:918, y2:y, stroke:"#0d3b1e", "stroke-width":1.4, opacity:0.55 }, g);
+    if(cm % 50 === 0){
+      const tx = el("text",{ x:912, y:y+4, "font-size":11, "text-anchor":"end", fill:"#0d3b1e", opacity:0.75 }, g);
+      tx.textContent = cm;
+    }
+  }
+})();
+
+/* ============================================================
+   9. Render
+   ============================================================ */
+function render(dt){
+  const p = phases(g);
+  const wind = reduced ? 0 : (Math.sin(t*0.62)*0.55 + Math.sin(t*1.53+1.2)*0.28 + Math.sin(t*0.27+0.6)*0.35);
+  const gust = 0.55 + 0.45*Math.sin(t*0.41+0.9);
+
+  /* ---- sky / sun: slow east→west arc, warm near the horizon ---- */
+  const arc = 0.5 + 0.5*Math.sin(t*0.055 - Math.PI/2);        // 0..1
+  const sunX = lerp(90, 830, arc);
+  const sunY = lerp(430, 120, Math.sin(arc*Math.PI));
+  $("sunGrp").setAttribute("transform", `translate(${sunX.toFixed(1)},${sunY.toFixed(1)})`);
+  $("sunRays").setAttribute("transform", `rotate(${(t*9).toFixed(1)}) scale(${(0.92+0.12*gust).toFixed(3)})`);
+  $("sunHalo").setAttribute("r", Math.round(150 - 55*arc));
+  $("sunCore").setAttribute("opacity", (0.35 + 0.65*Math.sin(Math.min(1,arc*1.4)*Math.PI/2)).toFixed(3));
+  const warm = clamp01(1 - sunY/190);
+  $("skyTop").setAttribute("stop-color", mixHex(DAY_SKY[0], GOLD_SKY[0], warm));
+  $("skyMid").setAttribute("stop-color", mixHex(DAY_SKY[1], GOLD_SKY[1], warm));
+  $("skyBot").setAttribute("stop-color", mixHex(DAY_SKY[2], GOLD_SKY[2], warm));
+  $("stars").setAttribute("opacity", (warm*0.25).toFixed(3));
+
+  // clouds drift
+  CLOUDS.forEach((c,i)=>{
+    c.x += c.v*dt;
+    if(c.x > 1080) c.x = -140;
+    c.g.setAttribute("transform", `translate(${c.x.toFixed(1)},${c.y.toFixed(1)}) scale(${c.s.toFixed(3)})`);
+  });
+
+  /* ---- plant skeleton ---- */
+  const h = stemHeight(p);
+  const sway = wind * (reduced ? 0 : (1.6 + h*0.028)) + (reduced?0:Math.sin(t*0.9)*1.1);
+  const hx = BASE.x + sway, hy = BASE.y - h;
+  const mx = (BASE.x + hx)/2 + sway*0.55 + Math.sin(h*0.013)*3;
+  const my = (BASE.y + hy)/2;
+
+  // stem
+  const stemD = h < 1.5 ? "" : `M${BASE.x} ${BASE.y} Q ${mx.toFixed(1)} ${my.toFixed(1)} ${hx.toFixed(1)} ${hy.toFixed(1)}`;
+  const stemW = lerp(3.4, 15.5, smooth(p.germ)*0.35 + p.veg*0.45 + p.bud*0.2);
+  const stem = $("stem");
+  stem.setAttribute("d", stemD || `M${BASE.x} ${BASE.y} L${BASE.x} ${BASE.y}`);
+  stem.setAttribute("stroke-width", Math.max(0, stemW).toFixed(2));
+  stem.setAttribute("opacity", h < 1.5 ? 0 : 1);
+  // stem hairs (trichomes): redraw on the current stem curve each frame
+  if(h > 6){
+    const d = [];
+    for(let i=0;i<HAIR_PTS.length;i++){
+      const q = HAIR_PTS[i], tt = 0.05 + q.t*0.9;
+      const x = lerp(lerp(BASE.x, mx, tt), lerp(mx, hx, tt), tt);
+      const y = lerp(lerp(BASE.y, my, tt), lerp(my, hy, tt), tt);
+      d.push(`M${x.toFixed(1)} ${y.toFixed(1)} q ${(q.len*0.4).toFixed(1)} ${(q.len*0.5).toFixed(1)} ${q.lean.toFixed(1)} ${q.len.toFixed(1)}`);
+    }
+    let hp = $("hairPath");
+    if(!hp){
+      hp = el("path",{ id:"hairPath", stroke:"#d9efc0", "stroke-width":1, fill:"none",
+                       opacity:0.5, "stroke-linecap":"round" }, $("stemHairs"));
+    }
+    hp.setAttribute("d", d.join(" "));
+  } else {
+    $("stemHairs").innerHTML = "";
+  }
+
+  /* ---- roots ---- */
+  const rootProg = smooth(g/0.55);
+  ROOTS.forEach(r=>{
+    const k = clamp01((rootProg*ROOTS.length - r.order)/1.6);
+    if(k <= 0){ r.p.setAttribute("opacity", 0); return; }
+    r.p.setAttribute("opacity", clamp01(k*1.4)*(r.depth===0?1:0.85));
+    r.p.setAttribute("stroke-dashoffset", (r.L*(1-k)).toFixed(2));
+  });
+  HAIRS.forEach(hh=>{
+    hh.p.setAttribute("opacity", (clamp01((rootProg - hh.at)/0.18)*0.8).toFixed(3));
+  });
+
+  /* ---- seed, radicle, shoot ---- */
+  const swell = 1 + p.seed*0.3;
+  const seedOut = smooth((g-0.16)/0.12);
+  const seedY = BASE.y + 4;
+  $("seedGrp").setAttribute("transform", `translate(${BASE.x},${seedY}) scale(${swell.toFixed(3)}) rotate(${(p.germ*14).toFixed(2)})`);
+  $("seedGrp").setAttribute("opacity", (1-seedOut).toFixed(3));
+  $("seedBody").setAttribute("ry", (6.5*p.seed + 6.5*0.4).toFixed(2));
+  $("seedCrack").setAttribute("opacity", clamp01(p.seed*1.2)*(1-p.germ));
+  // radicle grows downward
+  const rad = p.germ;
+  $("radicle").setAttribute("stroke-dasharray", pathLength($("radicle"), 34));
+  $("radicle").setAttribute("stroke-dashoffset", (34*(1-rad)).toFixed(2));
+  $("radicle").setAttribute("d", `M0 ${5*swell} Q ${(4*rad).toFixed(1)} ${(6+12*rad).toFixed(1)} 0 ${(5+26*rad).toFixed(1)}`);
+  $("radicle").setAttribute("opacity", clamp01(rad*1.4).toFixed(3));
+  // shoot pushes up out of the soil
+  const shootH = clamp01(p.germ*1.05) * 34;
+  $("shoot").setAttribute("stroke-dasharray", pathLength($("shoot"), 30));
+  $("shoot").setAttribute("d", `M0 0 Q ${(-(4-p.germ*4)).toFixed(1)} ${(-shootH*0.6).toFixed(1)} ${(Math.sin(p.germ*3)*3).toFixed(1)} ${(-shootH).toFixed(1)}`);
+  $("shoot").setAttribute("stroke-dashoffset", (30*(1-p.germ)).toFixed(2));
+  $("shoot").setAttribute("opacity", (1-smooth((g-0.24)/0.05)).toFixed(3));
+
+  /* ---- cotyledons: open out, then retire ---- */
+  const cotyOpen = smooth((g-0.22)/0.10);
+  const cotyOut = smooth((g-0.34)/0.12);
+  const cotyY = BASE.y - Math.min(h*0.055, 26);
+  $("cotyledons").setAttribute("transform",
+    `translate(${lerp(BASE.x,hx,0.03).toFixed(1)},${cotyY.toFixed(1)}) scale(${(1+p.seedl*0.25).toFixed(3)})`);
+  $("cotyL").setAttribute("transform",
+    `rotate(${lerp(-96, -18, cotyOpen).toFixed(1)}) scale(${(0.5+0.5*cotyOpen).toFixed(3)},1)`);
+  $("cotyR").setAttribute("transform",
+    `scale(-1,1) rotate(${lerp(-96, -18, cotyOpen).toFixed(1)}) scale(${(0.5+0.5*cotyOpen).toFixed(3)},1)`);
+  $("cotyledons").setAttribute("opacity", (cotyOpen*(1-cotyOut)).toFixed(3));
+
+  /* ---- leaves ---- */
+  const leafCount = Math.round(lerp(1, LEAF_COUNT, smooth((g-0.22)/0.72)));
+  const leafGrowth = smooth((g-0.22)/0.16);
+  LEAVES.forEach((L,i)=>{
+    if(i > leafCount || h < 8){ L.g.setAttribute("opacity", 0); return; }
+    const tt = L.s;
+    // point on the quadratic stem
+    const x = lerp(lerp(BASE.x, mx, tt), lerp(mx, hx, tt), tt);
+    const y = lerp(lerp(BASE.y, my, tt), lerp(my, hy, tt), tt);
+    const c = Math.cos(L.ang), d = Math.sin(L.ang);
+    const size = (0.30 + 0.70*smooth((g - (0.24 + i*0.032))/0.14)) * (0.62 + 0.38*p.veg + 0.18*p.mature)
+                 * (0.72 + 0.28*Math.abs(c));
+    if(size <= 0.02){ L.g.setAttribute("opacity", 0); return; }
+    const alive = 1 - smooth((g-0.97)/0.03)*0.35;         // the oldest leaves become a bit spent
+    const side = c < 0 ? -1 : 1;
+    const rot = (-90 + side*lerp(58, 74, clamp01(p.veg))) + (d > 0 ? -6 : 6) + wind*3*Math.abs(c);
+    L.g.setAttribute("transform",
+      `translate(${x.toFixed(1)},${y.toFixed(1)}) scale(${(side*size).toFixed(3)},${size.toFixed(3)}) rotate(${rot.toFixed(2)})`);
+    L.g.setAttribute("opacity", (size*alive).toFixed(3));
+  });
+
+  /* ---- head ---- */
+  const headTilt = clamp((sunX - hx)*0.022, -16, 16) + sway*0.22 + wind*2.2;
+  const droop = p.mature*7;
+  $("head").setAttribute("transform", `translate(${hx.toFixed(1)},${hy.toFixed(1)}) rotate(${(headTilt+droop).toFixed(2)})`);
+  $("head").setAttribute("opacity", clamp01(p.bud*1.4).toFixed(3));
+
+  // disk radius: bud → bloom → mature
+  let diskR = lerp(0.5, 17, p.bud);
+  diskR = lerp(diskR, 42, p.bloom);
+  diskR = lerp(diskR, 46, p.mature);
+  if(g < 0.55) diskR = 0.4;
+  $("diskBack").setAttribute("r", diskR.toFixed(2));
+  $("diskRing").setAttribute("r", (diskR+2.4).toFixed(2));
+  $("diskRing").setAttribute("opacity", clamp01(p.bloom*0.9).toFixed(3));
+  $("diskShine").setAttribute("r", (diskR*0.42).toFixed(2));
+  $("diskShine").setAttribute("opacity", (0.06 + 0.06*p.mature).toFixed(3));
+  $("diskShine").setAttribute("cx", (-diskR*0.18).toFixed(2));
+  $("diskShine").setAttribute("cy", (-diskR*0.2).toFixed(2));
+  // disk colours darken as it matures
+  $("diskC0").setAttribute("stop-color", mixHex("#7a4a12", "#4a2705", p.mature));
+  $("diskC1").setAttribute("stop-color", mixHex("#5a3208", "#301a04", p.mature));
+  $("diskC2").setAttribute("stop-color", mixHex("#33200a", "#150c02", p.mature));
+
+  // sepals flare then push back
+  SEPALS.forEach((s,i)=>{
+    const flare = lerp(0.55, 1.05, p.bud) * (1 - p.bloom*0.25);
+    s.g.setAttribute("transform", `rotate(${(s.ang + wind*2).toFixed(2)}) scale(${(flare*1.05).toFixed(3)},${(flare*(p.bloom>0.4?0.8:1.15)).toFixed(3)})`);
+  });
+  $("sepalsG").setAttribute("opacity", clamp01(p.bud*2).toFixed(3));
+
+  // petals — layered opening
+  const openTotal = clamp01(p.bloom*0.88 + p.mature*0.12);
+  PETALS.forEach(pl=>{
+    const open = smooth(clamp01((openTotal - pl.phase*0.55)/0.6));
+    const sy = lerp(0.06, 1, open) * pl.scale * (1 - 0.12*p.mature*(0.35 + 0.65*((pl.i*0.618)%1)));
+    const sx = lerp(0.55, 1, open) * pl.scale;
+    pl.g.setAttribute("transform",
+      `rotate(${(pl.ang + Math.sin(t*1.25 + pl.i)*1.6*(reduced?0:1) + wind*2).toFixed(2)}) scale(${sx.toFixed(3)},${sy.toFixed(3)})`);
+    pl.g.setAttribute("opacity", (clamp01(open*1.5)*(1-0.0)).toFixed(3));
+  });
+  $("petalsBackG").setAttribute("opacity", smooth((g-0.655)/0.05).toFixed(3));
+  $("petalsMidG").setAttribute("opacity", smooth((g-0.695)/0.05).toFixed(3));
+  $("petalsFrontG").setAttribute("opacity", smooth((g-0.735)/0.05).toFixed(3));
+
+  // florets ring
+  FLORETS.forEach(f=>{
+    const rr = diskR*0.78;
+    f.c.setAttribute("cx", (Math.cos(f.a)*rr).toFixed(2));
+    f.c.setAttribute("cy", (Math.sin(f.a)*rr).toFixed(2));
+    f.c.setAttribute("r", Math.max(0, (diskR*0.055+0.7)).toFixed(2));
+    f.c.setAttribute("opacity", (clamp01(p.bloom*1.1-0.1)*0.9).toFixed(3));
+  });
+
+  // seeds (Vogel) — only when the disk is open
+  const seedOpen = clamp01((p.bloom-0.25)/0.6);
+  let visibleSeeds = 0;
+  if(diskR > 3 && seedOpen > 0){
+    for(let i=0;i<SEED_COUNT;i++){
+      const s = SEEDS[i];
+      const k = clamp01((seedOpen - s.show)/0.5);
+      if(k <= 0){ s.s.setAttribute("opacity", 0); continue; }
+      const R = s.r * diskR * 0.86;
+      const x = Math.cos(s.a)*R, y = Math.sin(s.a)*R;
+      const rx = Math.max(0.25, diskR*0.062*(0.55+s.r*0.7)*k);
+      s.s.setAttribute("cx", x.toFixed(2)); s.s.setAttribute("cy", y.toFixed(2));
+      s.s.setAttribute("rx", rx.toFixed(2)); s.s.setAttribute("ry", (rx*0.8).toFixed(2));
+      s.s.setAttribute("opacity", (0.55 + 0.45*s.r).toFixed(3));
+      visibleSeeds++;
+    }
+  } else {
+    for(let i=0;i<SEED_COUNT;i++) SEEDS[i].s.setAttribute("opacity", 0);
+  }
+
+  /* ---- cast: bees, butterfly, pollen ---- */
+  const beeOn = castOn && p.mature > 0.15;
+  BEES.forEach((b,i)=>{
+    b.phase += dt*b.spd*(reduced?0.4:1);
+    const R = b.R*(0.7+0.3*gust);
+    const bx = hx + Math.cos(b.phase)*R;
+    const by = hy + Math.sin(b.phase*1.3)*R*0.42 - 24;
+    const flap = Math.sin(t*(reduced?9:26)+i)*0.5;
+    b.g.setAttribute("transform", `translate(${bx.toFixed(1)},${by.toFixed(1)}) rotate(${(Math.cos(b.phase)*9).toFixed(1)}) scale(${(Math.cos(b.phase)<0?-1:1)},1)`);
+    b.wl.setAttribute("transform", `scale(1,${(0.65+flap*0.5).toFixed(3)})`);
+    b.wr.setAttribute("transform", `scale(1,${(0.65+0.5-flap*0.5).toFixed(3)})`);
+    b.g.setAttribute("opacity", beeOn ? 1 : 0);
+  });
+  if(castOn && p.veg > 0.25 && p.bloom < 0.5){
+    BUTTERFLY.x += dt*46;
+    if(BUTTERFLY.x > 1020) BUTTERFLY.x = -60;
+    BUTTERFLY.y = 210 + Math.sin(BUTTERFLY.x*0.014)*72 + Math.sin(t*3.2)*8;
+    const wf = Math.sin(t*16)*0.55;
+    BUTTERFLY.g.setAttribute("transform", `translate(${BUTTERFLY.x.toFixed(1)},${BUTTERFLY.y.toFixed(1)}) rotate(${(Math.sin(BUTTERFLY.x*0.01)*10).toFixed(1)})`);
+    BUTTERFLY.wl.setAttribute("transform", `scale(${(1-wf).toFixed(3)},1)`);
+    BUTTERFLY.wr.setAttribute("transform", `scale(${(1-wf).toFixed(3)},1)`);
+    BUTTERFLY.g.setAttribute("opacity", clamp01(p.veg*1.5).toFixed(3));
+  } else {
+    BUTTERFLY.g.setAttribute("opacity", 0);
+  }
+
+  // pollen motes drift around the open flower
+  POLLEN.forEach((q,i)=>{
+    q.a += dt*q.sp*0.35;
+    const rad = q.rad*(0.75+0.25*Math.sin(t*0.7+q.ph));
+    const x = hx + Math.cos(q.a)*rad, y = hy + Math.sin(q.a*1.2)*rad*0.6 - 10 + Math.sin(t*1.4+q.ph)*6;
+    q.c.setAttribute("cx", x.toFixed(1)); q.c.setAttribute("cy", y.toFixed(1));
+    q.c.setAttribute("opacity", (clamp01((p.mature-0.2)*2)*(0.25+0.55*Math.abs(Math.sin(t*1.6+q.ph)))).toFixed(3));
+  });
+  // one-shot shimmer ring the moment the disk opens
+  if(p.bloom > 0.02 && p.bloom < 0.6){
+    BLOOM_RING.setAttribute("cx", hx.toFixed(1)); BLOOM_RING.setAttribute("cy", hy.toFixed(1));
+    BLOOM_RING.setAttribute("r", (diskR + (1-p.bloom)*180).toFixed(1));
+    BLOOM_RING.setAttribute("opacity", (p.bloom*0.35).toFixed(3));
+  } else BLOOM_RING.setAttribute("opacity", 0);
+
+  /* ---- rain + wet soil ---- */
+  if(raining){
+    RAIN.forEach(d=>{
+      d.y += d.v*dt;
+      if(d.y > 500) { d.y = -120; d.x = rand()*980-10; }
+      d.l.setAttribute("transform", `translate(${d.x.toFixed(1)},${d.y.toFixed(1)})`);
+    });
+    $("rainG").setAttribute("opacity", 0.85);
+  } else {
+    $("rainG").setAttribute("opacity", 0);
+  }
+  $("wetBand").setAttribute("opacity", raining ? 0.32 : 0);
+  $("moisture").setAttribute("opacity", 1);
+  $("soilTopC").setAttribute("stop-color", raining ? "#3d2a18" : "#5b3d26");
+
+  /* ---- in-scene labels + ruler ---- */
+  const si = stageIndex(g);
+  const stage = STAGES[si];
+  $("stageText").textContent = (si+1) + " · " + stage.name;
+  $("stageSub").textContent = stage.sub + " · ngày " + Math.round(dayOf(g));
+  $("stageTag").setAttribute("opacity", 1);
+  $("ruler").setAttribute("opacity", clamp01(h/120)*0.9);
+
+  /* ---- text panels ---- */
+  const day = dayOf(g);
+  const hcm = h/CM_PER_PX;
+  const dia = diskR*2/CM_PER_PX;
+  $("dayOut").textContent = Math.round(day);
+  $("heightOut").innerHTML = Math.round(hcm) + "<small>cm</small>";
+  $("leafOut").textContent = leafCount;
+  $("diaOut").innerHTML = Math.round(dia) + "<small>cm</small>";
+  $("seedOut").textContent = visibleSeeds;
+  $("petalOut").textContent = Math.round(PETALS.length*clamp01(openTotal*1.4));
+  $("phaseNow").textContent = "Giai đoạn " + (si+1) + "/7";
+  $("pctOut").textContent = Math.round(g*100) + "%";
+  $("phaseName").textContent = "Giai đoạn " + (si+1) + " — " + stage.name;
+  $("phaseDesc").textContent = stage.desc;
+  $("bar").style.width = (g*100).toFixed(1) + "%";
+  if(playing || holdUntil > 0) $("scrub").value = Math.round(g*1000);
+  STAGES.forEach((s,i)=>{
+    s.btn.classList.toggle("active", i === si);
+    s.el.classList.toggle("active", i === si);
+    s.el.classList.toggle("done", i < si);
+  });
+}
+
+function dayOf(g){
+  // 0 → 84 days, slightly accelerating then flattening (like real growth)
+  const e = 0.55 + 0.45*g;
+  return Math.min(84, e*g*84);
+}
+
+/* ============================================================
+   10. Main loop
+   ============================================================ */
+function tick(now){
+  const dt = Math.min(0.05, (now - lastT)/1000);
+  lastT = now;
+  t += dt;
+  if(playing){
+    g += dt*speed*0.042;                    // ~24 s for a full life at 1×
+    if(g >= 1){
+      g = 1;
+      if(holdUntil < 0){ holdUntil = now + 1700; $("playBtn").textContent = "↺ Xem lại"; }
+      else if(now > holdUntil){ g = 0; holdUntil = -1; $("playBtn").textContent = "⏸ Tạm dừng"; }
+      else $("playBtn").textContent = "↺ Xem lại";
+    }
+  }
+  render(dt);
+  requestAnimationFrame(tick);
+}
+
+// initial paint + go
+render(0);
+requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>
