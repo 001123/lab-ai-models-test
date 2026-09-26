@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mô phỏng hoa hướng dương · từ hạt đến hoa trưởng thành</title>
+<meta name="description" content="Mô phỏng vòng đời hoa hướng dương (Helianthus annuus) từ hạt giống đến hoa nở trưởng thành bằng SVG động.">
+<style>
+  *,*::before,*::after{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;color:#e9f1e4;
+    font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans",Arial,sans-serif;
+    background:radial-gradient(1100px 760px at 32% 4%,#1b2a30,#080c0f 72%);
+    display:flex;min-height:100%;
+  }
+  .stage{flex:1 1 auto;min-width:0;display:grid;place-items:center;padding:20px}
+  .frame{width:100%;max-width:720px}
+  svg#scene{
+    width:100%;height:auto;display:block;border-radius:20px;
+    background:#0d1518;box-shadow:0 34px 80px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.07) inset;
+  }
+
+  /* ---------- side panel ---------- */
+  .panel{
+    flex:0 0 372px;width:372px;padding:26px 24px 22px;border-left:1px solid rgba(255,255,255,.08);
+    background:linear-gradient(180deg,rgba(20,30,34,.92),rgba(10,15,18,.92));
+    display:flex;flex-direction:column;gap:18px;overflow:auto;
+  }
+  .eyebrow{margin:0 0 6px;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#8fae5f}
+  h1{margin:0;font-size:23px;line-height:1.2;letter-spacing:-.01em}
+  h1 small{display:block;margin-top:4px;font-size:12.5px;font-weight:500;letter-spacing:.04em;color:#9fb3a4}
+  .badge{
+    display:inline-block;margin-top:12px;padding:5px 10px;border-radius:999px;font-size:11.5px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    color:#ffd88a;background:rgba(255,196,64,.1);border:1px solid rgba(255,196,64,.32);
+  }
+  .rule{height:1px;background:linear-gradient(90deg,rgba(255,255,255,.16),transparent)}
+
+  .now{
+    position:relative;padding:15px 16px 16px;border-radius:14px;
+    background:linear-gradient(160deg,rgba(255,214,102,.13),rgba(255,255,255,.03));
+    border:1px solid rgba(255,214,102,.24);
+  }
+  .now .row{display:flex;align-items:baseline;gap:10px}
+  .now .no{font:700 30px/1 ui-monospace,Menlo,monospace;color:#ffd166}
+  .now h2{margin:0;font-size:16.5px;letter-spacing:.01em}
+  .now .en{display:block;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:#c9a94f;margin-top:3px}
+  .now p{margin:10px 0 0;font-size:13.2px;color:#cbd8cc}
+
+  .stages{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+  .stages li{
+    display:grid;grid-template-columns:26px 1fr;gap:10px;align-items:center;
+    padding:7px 9px;border-radius:9px;font-size:12.8px;color:#8fa396;transition:background .25s,color .25s;
+  }
+  .stages li i{font-style:normal;font:600 11px/1 ui-monospace,Menlo,monospace;opacity:.65;text-align:center}
+  .stages li em{font-style:normal;display:block;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;opacity:.55}
+  .stages li.done{color:#a9bda9}
+  .stages li.on{background:rgba(140,180,90,.15);color:#f2f8ec;box-shadow:inset 2px 0 0 #a5d24e}
+  .stages li.on i{opacity:1;color:#d8ec9a}
+
+  .metrics{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  .metric{padding:11px 12px;border-radius:11px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.07)}
+  .metric span{display:block;font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:#8ba08f}
+  .metric b{display:block;margin-top:3px;font:600 19px/1.15 ui-monospace,Menlo,monospace;color:#eaf3e2}
+  .metric b u{font-style:normal;font-size:11px;color:#93a893;margin-left:3px}
+
+  .bar{height:5px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}
+  .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#7fc24a,#ffd166);transition:width .08s linear}
+
+  .controls{display:flex;flex-direction:column;gap:11px}
+  .btns{display:flex;gap:8px}
+  button{
+    font:inherit;font-size:13px;color:#eaf3e2;cursor:pointer;padding:9px 13px;border-radius:10px;
+    background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);transition:.2s;
+  }
+  button:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.25)}
+  button.primary{background:linear-gradient(180deg,#8fc94f,#5f9c2e);border-color:#7bb63a;color:#0d1509;font-weight:600}
+  button.primary:hover{filter:brightness(1.08)}
+  label.f{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12.5px;color:#a9bcae}
+  select{font:inherit;font-size:12.5px;color:#eaf3e2;background:#16211f;border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:5px 8px}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:99px;background:rgba(255,255,255,.14);outline:none}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;background:#ffd166;border:2px solid #1b2a20;cursor:pointer}
+  input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:50%;background:#ffd166;border:2px solid #1b2a20;cursor:pointer}
+  .ticks{display:flex;justify-content:space-between;font:10.5px/1 ui-monospace,Menlo,monospace;color:#7c8f80;margin-top:-4px}
+  .chk{display:flex;align-items:center;gap:7px;font-size:12.5px;color:#a9bcae;cursor:pointer}
+  .chk input{accent-color:#8fc94f;width:14px;height:14px}
+
+  footer{margin-top:auto;font-size:11.5px;line-height:1.6;color:#77897b;border-top:1px solid rgba(255,255,255,.08);padding-top:13px}
+  footer b{color:#9db3a3;font-weight:600}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+  @media (max-width:980px){
+    body{flex-direction:column}
+    .panel{flex:1 1 auto;width:auto;border-left:0;border-top:1px solid rgba(255,255,255,.08)}
+  }
+</style>
+</head>
+<body>
+<aside class="panel">
+  <div>
+    <p class="eyebrow">Helianthus annuus · vòng đời</p>
+    <h1>Hoa Hướng Dương<small>Sunflower · from seed to full bloom</small></h1>
+    <span class="badge">space-bunny-alpha · effort: extra · harness: cline</span>
+  </div>
+
+  <div class="rule"></div>
+
+  <section class="now" aria-live="polite">
+    <div class="row">
+      <span class="no" id="no">01</span>
+      <div>
+        <h2 id="vn">Hạt giống</h2>
+        <span class="en" id="en">Seed</span>
+      </div>
+    </div>
+    <p id="ds">Một hạt hướng dương nằm sâu dưới lớp đất, chờ nước, nhiệt độ và ánh sáng để bắt đầu.</p>
+  </section>
+
+  <ol class="stages" id="list"></ol>
+
+  <div class="metrics">
+    <div class="metric"><span>Chiều cao</span><b id="mH">0<u>cm</u></b></div>
+    <div class="metric"><span>Số lá</span><b id="mL">0</b></div>
+    <div class="metric"><span>Ngày sinh trưởng</span><b id="mD">0</b></div>
+    <div class="metric"><span>Cánh hoa</span><b id="mP">0</b></div>
+  </div>
+
+  <div class="controls">
+    <div class="bar"><i id="fill"></i></div>
+    <div class="ticks"><span>0s</span><span>15s</span><span>30s</span></div>
+    <input type="range" id="scrub" min="0" max="30" step="0.01" value="0" aria-label="Thời gian mô phỏng">
+    <div class="btns">
+      <button class="primary" id="play" type="button">⏸ Tạm dừng</button>
+      <button id="replay" type="button">↻ Phát lại</button>
+      <label class="chk" style="margin-left:auto"><input type="checkbox" id="loop" checked> Lặp</label>
+    </div>
+    <label class="f">Tốc độ
+      <select id="speed">
+        <option value="0.25">0.25×</option>
+        <option value="0.5">0.5×</option>
+        <option value="1" selected>1×</option>
+        <option value="1.5">1.5×</option>
+        <option value="2">2×</option>
+      </select>
+    </label>
+  </div>
+
+  <footer>
+    <b>Gợi ý:</b> dùng nút <b>Phát lại</b> hoặc kéo thanh thời gian để xem lại từng giai đoạn.
+    Toàn bộ hoạt ảnh là <b>SMIL</b> thuần SVG (không thư viện ngoài) — bảy tầng lớp: hạt → rễ → mầm → lá → nụ → hoa → hạt chín.
+  </footer>
+</aside>
+
+<div class="stage">
+  <div class="frame">
+  <svg id="scene" viewBox="0 0 640 780" xmlns="http://www.w3.org/2000/svg" role="img"
+       aria-labelledby="ttl dsc" preserveAspectRatio="xMidYMid meet">
+    <title id="ttl">Mô phỏng vòng đời hoa hướng dương</title>
+    <desc id="dsc">Một hạt hướng dương nằm trong lớp đất, nảy mầm, vươn thân, đâm lá, nở nụ rồi nở hoa vàng trước khi đĩa hoa chín đầy hạt.</desc>
+    <defs>
+      <linearGradient id="gSky" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#8ec9ee"/><stop offset="0.55" stop-color="#c9e6f6"/>
+        <stop offset="1" stop-color="#f6efd2"/>
+      </linearGradient>
+      <radialGradient id="gSun" cx="0.5" cy="0.5" r="0.5">
+        <stop offset="0" stop-color="#fff6c9"/><stop offset="0.45" stop-color="#ffdf6b"/>
+        <stop offset="1" stop-color="#ffb43c"/>
+      </radialGradient>
+      <linearGradient id="gSoil" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#6b482b"/><stop offset="0.5" stop-color="#54381f"/>
+        <stop offset="1" stop-color="#3a2513"/>
+      </linearGradient>
+      <linearGradient id="gStem" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#3f6d21"/><stop offset="0.4" stop-color="#6ea23a"/>
+        <stop offset="1" stop-color="#3a6620"/>
+      </linearGradient>
+      <linearGradient id="gLeaf" x1="0" y1="1" x2="0.7" y2="0">
+        <stop offset="0" stop-color="#3f7522"/><stop offset="0.55" stop-color="#57962f"/>
+        <stop offset="1" stop-color="#71ad3c"/>
+      </linearGradient>
+      <linearGradient id="gPetal" x1="0" y1="1" x2="0.35" y2="0">
+        <stop offset="0" stop-color="#d98f0d"/><stop offset="0.28" stop-color="#f5bb16"/>
+        <stop offset="0.75" stop-color="#ffdd43"/>
+        <stop offset="1" stop-color="#fff0a0"/>
+      </linearGradient>
+      <linearGradient id="gBud" x1="0" y1="1" x2="0.4" y2="0">
+        <stop offset="0" stop-color="#4a7326"/><stop offset="1" stop-color="#8bb44a"/>
+      </linearGradient>
+      <radialGradient id="gDisc" cx="0.5" cy="0.45" r="0.6">
+        <stop offset="0" stop-color="#7a5320"/><stop offset="0.6" stop-color="#5d3c15"/>
+        <stop offset="1" stop-color="#3d270e"/>
+      </radialGradient>
+
+      <!-- một cánh hoá (ray floret), gốc tại (0,0), đầu hướng -y -->
+      <path id="petal" d="M0,-4 C10,-26 12,-70 0,-100 C-12,-70 -10,-26 0,-4 Z"/>
+      <!-- một lá: gốc tại (0,0), đầu hướng +x -->
+      <g id="leaf">
+        <path d="M0,0 C14,-30 54,-48 86,-30 C108,-18 114,10 96,28 C74,50 30,44 0,0 Z" fill="url(#gLeaf)"/>
+        <path d="M2,0 C36,-6 72,-8 108,6" fill="none" stroke="#35601d" stroke-width="2.2" opacity="0.75"/>
+        <path d="M28,-6 C34,-16 44,-24 56,-28 M52,-6 C58,-16 68,-22 80,-24 M74,-2 C80,-10 88,-14 96,-14"
+              fill="none" stroke="#35601d" stroke-width="1.4" opacity="0.5"/>
+      </g>
+      <!-- lá mầm (cotyledon) -->
+      <path id="coty" d="M0,0 C8,-16 30,-24 44,-14 C52,-8 50,4 40,10 C24,18 6,10 0,0 Z"/>
+      <!-- vòng 13 hoa đĩa, bán kính 34 -->
+      <g id="ring13">
+        <ellipse cx="34" cy="0" rx="4.6" ry="6.2" transform="rotate(-90 34 0)"/>
+        <ellipse cx="30.1" cy="15.8" rx="4.6" ry="6.2" transform="rotate(-62.31 30.1 15.8)"/>
+        <ellipse cx="19.3" cy="28" rx="4.6" ry="6.2" transform="rotate(-34.62 19.3 28)"/>
+        <ellipse cx="4.1" cy="33.8" rx="4.6" ry="6.2" transform="rotate(-6.92 4.1 33.8)"/>
+        <ellipse cx="-12.1" cy="31.8" rx="4.6" ry="6.2" transform="rotate(20.77 -12.1 31.8)"/>
+        <ellipse cx="-25.4" cy="22.5" rx="4.6" ry="6.2" transform="rotate(48.46 -25.4 22.5)"/>
+        <ellipse cx="-33" cy="8.1" rx="4.6" ry="6.2" transform="rotate(76.15 -33 8.1)"/>
+        <ellipse cx="-33" cy="-8.1" rx="4.6" ry="6.2" transform="rotate(103.85 -33 -8.1)"/>
+        <ellipse cx="-25.4" cy="-22.5" rx="4.6" ry="6.2" transform="rotate(131.54 -25.4 -22.5)"/>
+        <ellipse cx="-12.1" cy="-31.8" rx="4.6" ry="6.2" transform="rotate(159.23 -12.1 -31.8)"/>
+        <ellipse cx="4.1" cy="-33.8" rx="4.6" ry="6.2" transform="rotate(186.92 4.1 -33.8)"/>
+        <ellipse cx="19.3" cy="-28" rx="4.6" ry="6.2" transform="rotate(214.62 19.3 -28)"/>
+        <ellipse cx="30.1" cy="-15.8" rx="4.6" ry="6.2" transform="rotate(242.31 30.1 -15.8)"/>
+      </g>
+      <!-- một con ong, đầu hướng +x -->
+      <g id="bee">
+        <ellipse cx="0" cy="0" rx="9" ry="6.4" fill="#2b2118"/>
+        <path d="M-2,-6.3 A9,6.4 0 0 1 2,-6.3 L2,6.3 A9,6.4 0 0 1 -2,6.3 Z" fill="#f4c430"/>
+        <path d="M-6.5,-4.4 A9,6.4 0 0 1 -3.5,-6 A9,6.4 0 0 1 -6,6 A9,6.4 0 0 1 -9,3 Z" fill="#2b2118"/>
+        <circle cx="8.6" cy="0" r="3.4" fill="#1d1610"/>
+        <path d="M10,-2.6 L14,-6 M10,2.6 L14,6" stroke="#1d1610" stroke-width="1.1" fill="none" stroke-linecap="round"/>
+        <ellipse cx="1" cy="-7" rx="6" ry="3" fill="#dff1ff" opacity="0.72" transform="rotate(-24 1 -7)"/>
+      </g>
+    </defs>
+    <!-- ================= BẦU TRỜI ================= -->
+    <rect x="0" y="0" width="640" height="606" fill="url(#gSky)"/>
+
+    <!-- mặt trời đi từ bình minh (trái) qua đỉnh trời tới hoàng hôn (phải) -->
+    <g>
+      <animateMotion dur="30s" repeatCount="indefinite" path="M 20 545 Q 320 -360 620 545"/>
+      <circle r="86" fill="url(#gSun)" opacity="0.22"/>
+      <g opacity="0.85">
+        <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="30s" repeatCount="indefinite"/>
+        <path d="M-2.6,-32 L0,-58 L2.6,-32 Z" fill="#ffd257"/>
+        <path d="M-2.6,-32 L0,-58 L2.6,-32 Z" fill="#ffd257" transform="rotate(30)"/>
+        <path d="M-2.6,-32 L0,-58 L2.6,-32 Z" fill="#ffd257" transform="rotate(60)"/>
+        <path d="M-2.6,-32 L0,-58 L2.6,-32 Z" fill="#ffd257" transform="rotate(90)"/>
+        <path d="M-2.6,-32 L0,-58 L2.6,-32 Z" fill="#ffd257" transform="rotate(120)"/>
+        <path d="M-2.6,-32 L0,-58 L2.6,-32 Z" fill="#ffd257" transform="rotate(150)"/>
+        <path d="M-2.6,-32 L0,-58 L2.6,-32 Z" fill="#ffd257" transform="rotate(180)"/>
+        <path d="M-2.6,-32 L0,-58 L2.6,-32 Z" fill="#ffd257" transform="rotate(210)"/>
+        <path d="M-2.6,-32 L0,-58 L2.6,-32 Z" fill="#ffd257" transform="rotate(240)"/>
+        <path d="M-2.6,-32 L0,-58 L2.6,-32 Z" fill="#ffd257" transform="rotate(270)"/>
+        <path d="M-2.6,-32 L0,-58 L2.6,-32 Z" fill="#ffd257" transform="rotate(300)"/>
+        <path d="M-2.6,-32 L0,-58 L2.6,-32 Z" fill="#ffd257" transform="rotate(330)"/>
+      </g>
+      <circle r="27" fill="url(#gSun)"/>
+    </g>
+    <!-- vệt nắng ấm phủ lên cảnh -->
+    <g opacity="0.16" style="mix-blend-mode:screen">
+      <animateMotion dur="30s" repeatCount="indefinite" path="M 20 545 Q 320 -360 620 545"/>
+      <circle r="210" fill="url(#gSun)"/>
+    </g>
+
+    <!-- mây trôi -->
+    <g fill="#ffffff" opacity="0.82">
+      <g transform="translate(-260 120)">
+        <animateTransform attributeName="transform" type="translate" from="-260 120" to="900 120" dur="26s" repeatCount="indefinite"/>
+        <ellipse cx="0" cy="0" rx="44" ry="20"/><ellipse cx="30" cy="6" rx="32" ry="15"/>
+        <ellipse cx="-28" cy="8" rx="28" ry="13"/>
+      </g>
+      <g transform="translate(200 62)" opacity="0.6">
+        <animateTransform attributeName="transform" type="translate" from="200 62" to="900 62" dur="34s" repeatCount="indefinite"/>
+        <ellipse cx="0" cy="0" rx="34" ry="15"/><ellipse cx="26" cy="5" rx="24" ry="11"/>
+      </g>
+    </g>
+
+    <!-- đồng cỏ nền -->
+    <path d="M0,588 C120,577 200,592 300,583 C420,572 520,591 640,581 L640,608 L0,608 Z" fill="#93c470" opacity="0.75"/>
+    <path d="M0,598 C140,591 260,601 380,594 C500,587 580,601 640,595 L640,610 L0,610 Z" fill="#6fa84e"/>
+
+    <!-- ================= LỚP ĐẤT ================= -->
+    <path d="M0,604 C90,596 150,609 240,602 C320,595 400,607 470,601 C540,595 600,605 640,599 L640,780 L0,780 Z"
+          fill="url(#gSoil)"/>
+    <path d="M0,604 C90,596 150,609 240,602 C320,595 400,607 470,601 C540,595 600,605 640,599 L640,607
+             C600,613 540,603 470,609 C400,615 320,603 240,610 C150,617 90,604 0,612 Z" fill="#7c5731"/>
+    <path d="M0,662 C100,653 200,668 300,660 C400,652 520,667 640,658 L640,780 L0,780 Z" fill="#33200f" opacity="0.55"/>
+    <g fill="#8a7050" opacity="0.5">
+      <ellipse cx="58" cy="706" rx="11" ry="7"/><ellipse cx="152" cy="742" rx="8" ry="5"/>
+      <ellipse cx="248" cy="694" rx="10" ry="6"/><ellipse cx="392" cy="726" rx="9" ry="5.5"/>
+      <ellipse cx="498" cy="688" rx="12" ry="6.5"/><ellipse cx="566" cy="752" rx="8" ry="5"/>
+      <ellipse cx="96" cy="766" rx="10" ry="6"/><ellipse cx="346" cy="702" rx="7" ry="4.5"/>
+      <ellipse cx="452" cy="768" rx="9" ry="5.5"/><ellipse cx="212" cy="770" rx="8" ry="5"/>
+      <ellipse cx="612" cy="712" rx="7" ry="4.5"/>
+    </g>
+    <g fill="#2c1b0c" opacity="0.45">
+      <ellipse cx="126" cy="672" rx="16" ry="4"/><ellipse cx="304" cy="700" rx="20" ry="4.5"/>
+      <ellipse cx="534" cy="676" rx="18" ry="4"/><ellipse cx="66" cy="736" rx="14" ry="3.5"/>
+    </g>
+
+    <!-- bụi cỏ trên mặt đất -->
+    <g stroke="#4f8a2c" stroke-width="3" fill="none" stroke-linecap="round">
+      <g transform="translate(74 601)">
+        <animateTransform attributeName="transform" type="rotate" values="-3;3;-3" dur="3s" repeatCount="indefinite" additive="sum"/>
+        <path d="M0,0 C-3,-16 -10,-24 -16,-30"/><path d="M0,0 C1,-18 0,-28 -3,-38"/><path d="M0,0 C4,-15 10,-22 16,-27"/>
+      </g>
+      <g transform="translate(158 604)">
+        <animateTransform attributeName="transform" type="rotate" values="3;-3;3" dur="3.75s" repeatCount="indefinite" additive="sum"/>
+        <path d="M0,0 C-2,-13 -8,-20 -13,-25"/><path d="M0,0 C2,-15 1,-24 -2,-31"/>
+      </g>
+      <g transform="translate(516 600)">
+        <animateTransform attributeName="transform" type="rotate" values="-2;4;-2" dur="3.3s" repeatCount="indefinite" additive="sum"/>
+        <path d="M0,0 C-3,-17 -9,-26 -14,-32"/><path d="M0,0 C2,-19 1,-29 -2,-40"/><path d="M0,0 C5,-14 11,-20 17,-24"/>
+      </g>
+      <g transform="translate(586 603)">
+        <animateTransform attributeName="transform" type="rotate" values="3;-4;3" dur="2.5s" repeatCount="indefinite" additive="sum"/>
+        <path d="M0,0 C-2,-12 -7,-18 -12,-23"/><path d="M0,0 C3,-13 2,-21 -1,-28"/>
+      </g>
+    </g>
+
+    <!-- bóng đổ của cây trên mặt đất -->
+    <g transform="translate(320 606)">
+      <g transform="scale(0.18 0.18)">
+        <animateTransform attributeName="transform" type="scale" from="0.18 0.18" to="1 1" dur="6s" begin="4s" fill="freeze"/>
+        <ellipse rx="66" ry="12" fill="#2a1a0c" opacity="0.34"/>
+      </g>
+    </g>
+    <!-- ================= GIAI ĐOẠN 1: HẠT ================= -->
+    <g transform="translate(320 660) rotate(-18)">
+      <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.07;0.48;0.66" dur="8s" fill="freeze"/>
+      <!-- vỏ hạt nứt ra hai nửa -->
+      <g transform="translate(-1 1)">
+        <animateTransform attributeName="transform" type="translate" from="-1 1" to="-4.5 2.5" dur="1s" begin="0.9s" fill="freeze"/>
+        <g transform="rotate(0)">
+          <animateTransform attributeName="transform" type="rotate" from="0" to="-12" dur="1s" begin="0.9s" fill="freeze"/>
+          <path d="M0,-4.5 C-6,-6 -9,-3 -9,0 C-9,3 -6,6 0,4.5 Z" fill="#3d2a18"/>
+          <path d="M-0.5,-4.6 C-4,-5.6 -7,-4.2 -8.5,-2.2" stroke="#8a6a3e" stroke-width="1.1" fill="none" opacity="0.8"/>
+        </g>
+      </g>
+      <g transform="translate(1 1)">
+        <animateTransform attributeName="transform" type="translate" from="1 1" to="4.5 2.5" dur="1s" begin="0.9s" fill="freeze"/>
+        <g transform="rotate(0)">
+          <animateTransform attributeName="transform" type="rotate" from="0" to="12" dur="1s" begin="0.9s" fill="freeze"/>
+          <path d="M0,-4.5 C6,-6 9,-3 9,0 C9,3 6,6 0,4.5 Z" fill="#3d2a18"/>
+          <path d="M0.5,-4.6 C4,-5.6 7,-4.2 8.5,-2.2" stroke="#8a6a3e" stroke-width="1.1" fill="none" opacity="0.8"/>
+        </g>
+      </g>
+    </g>
+
+    <!-- rễ chính (rễ cấp 1) đi xuống -->
+    <g fill="none" stroke="#efe3c6" stroke-width="3.4" stroke-linecap="round"
+       stroke-dasharray="1" stroke-dashoffset="1">
+      <path d="M320,664 C314,690 327,716 319,764" pathLength="1">
+        <animate attributeName="stroke-dashoffset" from="1" to="0" dur="1.5s" begin="1.3s" fill="freeze"/>
+      </path>
+    </g>
+    <!-- rễ bên -->
+    <g fill="none" stroke="#dccdaa" stroke-width="2.1" stroke-linecap="round"
+       stroke-dasharray="1" stroke-dashoffset="1" opacity="0.95">
+      <path d="M317,692 C302,701 292,716 288,737" pathLength="1">
+        <animate attributeName="stroke-dashoffset" from="1" to="0" dur="1.7s" begin="2.9s" fill="freeze"/>
+      </path>
+      <path d="M323,707 C339,715 351,729 355,749" pathLength="1">
+        <animate attributeName="stroke-dashoffset" from="1" to="0" dur="1.7s" begin="3.5s" fill="freeze"/>
+      </path>
+      <path d="M320,725 C306,737 298,751 296,767" pathLength="1">
+        <animate attributeName="stroke-dashoffset" from="1" to="0" dur="1.6s" begin="4.1s" fill="freeze"/>
+      </path>
+      <path d="M320,743 C332,751 342,761 347,775" pathLength="1">
+        <animate attributeName="stroke-dashoffset" from="1" to="0" dur="1.5s" begin="4.7s" fill="freeze"/>
+      </path>
+    </g>
+    <!-- rễ tơ -->
+    <g fill="none" stroke="#cdbe9c" stroke-width="1.1" stroke-linecap="round"
+       stroke-dasharray="1" stroke-dashoffset="1" opacity="0.75">
+      <path d="M296,724 C288,731 283,740 280,750" pathLength="1"><animate attributeName="stroke-dashoffset" from="1" to="0" dur="1.2s" begin="5.6s" fill="freeze"/></path>
+      <path d="M341,736 C350,742 356,751 359,761" pathLength="1"><animate attributeName="stroke-dashoffset" from="1" to="0" dur="1.2s" begin="6.2s" fill="freeze"/></path>
+      <path d="M310,756 C304,764 301,771 300,778" pathLength="1"><animate attributeName="stroke-dashoffset" from="1" to="0" dur="1.1s" begin="6.8s" fill="freeze"/></path>
+      <path d="M330,758 C338,765 342,772 343,778" pathLength="1"><animate attributeName="stroke-dashoffset" from="1" to="0" dur="1.1s" begin="7.4s" fill="freeze"/></path>
+    </g>
+
+    <!-- ================= GIAI ĐOẠN 2-3: CHỒI MẦM ================= -->
+    <!-- chồi đẩy vỏ hạt, đi xuyên lên mặt đất -->
+    <path d="M320,656 C316,636 330,618 324,600" fill="none" stroke="#d9ec8f" stroke-width="4"
+          stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1">
+      <animate attributeName="stroke-dashoffset" from="1" to="0" dur="1.5s" begin="2.3s" fill="freeze"/>
+      <animate attributeName="stroke" values="#f2f7c4;#a8cc55;#6ea23a" dur="3s" begin="2.3s" fill="freeze"/>
+    </path>
+
+    <!-- cây trên mặt đất, đung đưa theo gió -->
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        values="-0.9 320 606; 1 320 606; -0.5 320 606; 0.35 320 606; -0.9 320 606"
+        keyTimes="0;0.28;0.55;0.8;1" dur="7.5s" repeatCount="indefinite"
+        calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1"/>
+
+      <!-- thân chính, vẽ dần từ gốc lên ngọn -->
+      <path d="M324,600 C318,556 328,518 322,468 C316,422 328,378 322,338 C318,300 324,272 320,248"
+            fill="none" stroke="url(#gStem)" stroke-width="2.5" stroke-linecap="round"
+            pathLength="1" stroke-dasharray="1 2" stroke-dashoffset="1">
+        <animate attributeName="stroke-dashoffset" from="1" to="0" dur="8.4s" begin="3.9s"
+                 calcMode="spline" keySplines="0.45 0 0.35 1" fill="freeze"/>
+        <animate attributeName="stroke-width" from="2.5" to="13" dur="9s" begin="4s" fill="freeze"/>
+      </path>
+      <!-- phần thân dày ở gốc -->
+      <g transform="translate(322 604)">
+        <g transform="scale(1 0.04)">
+          <animateTransform attributeName="transform" type="scale" from="1 0.04" to="1 1" dur="4.4s"
+                            begin="3.4s" calcMode="spline" keySplines="0.3 0 0.3 1" fill="freeze"/>
+          <path d="M-7,0 C-8,-40 -6,-74 -2.5,-104 L2.5,-104 C6,-74 8,-40 7,0 Z" fill="url(#gStem)"/>
+        </g>
+      </g>
+      <!-- hai lá mầm (cotyledon) mở ra đón nắng -->
+      <g transform="translate(324 597)">
+        <g transform="scale(0)">
+          <animateTransform attributeName="transform" type="scale" from="0" to="1" dur="1.4s" begin="4.4s"
+                            calcMode="spline" keySplines="0.2 0.85 0.3 1" fill="freeze"/>
+          <use href="#coty" transform="rotate(-38)" fill="#8fc246"/>
+          <use href="#coty" transform="rotate(-142) scale(0.94)" fill="#7cb03c"/>
+        </g>
+      </g>
+
+      <!-- lá thật, mọc so le từ dưới lên -->
+      <g transform="translate(322 560)">
+        <g transform="scale(0)">
+          <animateTransform attributeName="transform" type="scale" from="0" to="1" dur="1.8s" begin="6.4s"
+                            calcMode="spline" keySplines="0.2 0.85 0.3 1" fill="freeze"/>
+          <g transform="rotate(-152)">
+            <g>
+              <animateTransform attributeName="transform" type="rotate" values="-16;2;0" dur="2.4s" begin="6.4s" fill="freeze"/>
+              <use href="#leaf"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(324 512)">
+        <g transform="scale(0)">
+          <animateTransform attributeName="transform" type="scale" from="0" to="1" dur="1.8s" begin="7.6s"
+                            calcMode="spline" keySplines="0.2 0.85 0.3 1" fill="freeze"/>
+          <g transform="rotate(-24)">
+            <g>
+              <animateTransform attributeName="transform" type="rotate" values="14;-2;0" dur="2.4s" begin="7.6s" fill="freeze"/>
+              <use href="#leaf" transform="scale(0.92)"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(320 462)">
+        <g transform="scale(0)">
+          <animateTransform attributeName="transform" type="scale" from="0" to="1" dur="1.7s" begin="8.7s"
+                            calcMode="spline" keySplines="0.2 0.85 0.3 1" fill="freeze"/>
+          <g transform="rotate(-160)">
+            <g>
+              <animateTransform attributeName="transform" type="rotate" values="-14;2;0" dur="2.3s" begin="8.7s" fill="freeze"/>
+              <use href="#leaf" transform="scale(0.85)"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(324 412)">
+        <g transform="scale(0)">
+          <animateTransform attributeName="transform" type="scale" from="0" to="1" dur="1.7s" begin="9.7s"
+                            calcMode="spline" keySplines="0.2 0.85 0.3 1" fill="freeze"/>
+          <g transform="rotate(-20)">
+            <g>
+              <animateTransform attributeName="transform" type="rotate" values="12;-2;0" dur="2.3s" begin="9.7s" fill="freeze"/>
+              <use href="#leaf" transform="scale(0.78)"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(320 366)">
+        <g transform="scale(0)">
+          <animateTransform attributeName="transform" type="scale" from="0" to="1" dur="1.6s" begin="10.6s"
+                            calcMode="spline" keySplines="0.2 0.85 0.3 1" fill="freeze"/>
+          <g transform="rotate(-166)">
+            <g>
+              <animateTransform attributeName="transform" type="rotate" values="-12;2;0" dur="2.2s" begin="10.6s" fill="freeze"/>
+              <use href="#leaf" transform="scale(0.7)"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(322 322)">
+        <g transform="scale(0)">
+          <animateTransform attributeName="transform" type="scale" from="0" to="1" dur="1.6s" begin="11.4s"
+                            calcMode="spline" keySplines="0.2 0.85 0.3 1" fill="freeze"/>
+          <g transform="rotate(-14)">
+            <g>
+              <animateTransform attributeName="transform" type="rotate" values="10;-2;0" dur="2.2s" begin="11.4s" fill="freeze"/>
+              <use href="#leaf" transform="scale(0.62)"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(320 288)">
+        <g transform="scale(0)">
+          <animateTransform attributeName="transform" type="scale" from="0" to="1" dur="1.5s" begin="12.2s"
+                            calcMode="spline" keySplines="0.2 0.85 0.3 1" fill="freeze"/>
+          <g transform="rotate(-172)">
+            <g>
+              <animateTransform attributeName="transform" type="rotate" values="-10;2;0" dur="2s" begin="12.2s" fill="freeze"/>
+              <use href="#leaf" transform="scale(0.5)"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <!-- ================= GIAI ĐOẠN 5-7: NỤ VÀ HOA ================= -->
+      <g transform="translate(320 246)">
+        <!-- đầu hoa nghiêng theo mặt trời (heliotropism) -->
+        <animateTransform attributeName="transform" type="rotate" additive="sum"
+          values="-12 0 0; 0 0 0; 12 0 0" dur="30s" repeatCount="indefinite"
+          calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+
+        <g opacity="0">
+          <animate attributeName="opacity" from="0" to="1" dur="0.4s" begin="12.4s" fill="freeze"/>
+
+          <!-- đài hoa (lá bắc) – tồn tại suốt đời, nằm sau các cánh -->
+          <g transform="scale(0.05)" fill="url(#gLeaf)">
+            <animateTransform attributeName="transform" type="scale" from="0.05" to="1" dur="1.6s" begin="12.6s"
+                              calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/>
+            <path d="M0,0 C8,-11 26,-15 42,-7 L47,0 L42,7 C26,15 8,11 0,0 Z" id="bract2"/>
+            <use href="#bract2" transform="rotate(0) translate(0,-28)"/>
+            <use href="#bract2" transform="rotate(30) translate(0,-28)"/>
+            <use href="#bract2" transform="rotate(60) translate(0,-28)"/>
+            <use href="#bract2" transform="rotate(90) translate(0,-28)"/>
+            <use href="#bract2" transform="rotate(120) translate(0,-28)"/>
+            <use href="#bract2" transform="rotate(150) translate(0,-28)"/>
+            <use href="#bract2" transform="rotate(180) translate(0,-28)"/>
+            <use href="#bract2" transform="rotate(210) translate(0,-28)"/>
+            <use href="#bract2" transform="rotate(240) translate(0,-28)"/>
+            <use href="#bract2" transform="rotate(270) translate(0,-28)"/>
+            <use href="#bract2" transform="rotate(300) translate(0,-28)"/>
+            <use href="#bract2" transform="rotate(330) translate(0,-28)"/>
+          </g>
+
+          <!-- NỤ: các lá bắc ôm kín, nụ tan dần khi hoa nở -->
+          <g transform="scale(0.05)" fill="#5c8a2c">
+            <animateTransform attributeName="transform" type="scale" from="0.05" to="1" dur="1.6s" begin="12.6s"
+                              calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/>
+            <g opacity="1">
+              <animate attributeName="opacity" from="1" to="0" dur="1.1s" begin="16.2s" fill="freeze"/>
+              <path d="M0,0 C8,-11 26,-15 42,-7 L47,0 L42,7 C26,15 8,11 0,0 Z" id="bract"/>
+              <use href="#bract" transform="rotate(0) translate(0,-9) scale(0.62)"/>
+              <use href="#bract" transform="rotate(40) translate(0,-9) scale(0.62)"/>
+              <use href="#bract" transform="rotate(80) translate(0,-9) scale(0.62)"/>
+              <use href="#bract" transform="rotate(120) translate(0,-9) scale(0.62)"/>
+              <use href="#bract" transform="rotate(160) translate(0,-9) scale(0.62)"/>
+              <use href="#bract" transform="rotate(200) translate(0,-9) scale(0.62)"/>
+              <use href="#bract" transform="rotate(240) translate(0,-9) scale(0.62)"/>
+              <use href="#bract" transform="rotate(280) translate(0,-9) scale(0.62)"/>
+              <use href="#bract" transform="rotate(320) translate(0,-9) scale(0.62)"/>
+              <g>
+                <animateTransform attributeName="transform" type="scale" from="1 0.3" to="1 1" dur="1.1s" begin="12.6s"
+                                  calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/>
+                <path d="M0,-36 C17,-31 24,-6 20,13 C17,26 8,33 0,33 C-8,33 -17,26 -20,13 C-24,-6 -17,-31 0,-36 Z" fill="url(#gBud)"/>
+                <path d="M0,-36 C-5,-14 -5,10 0,31" fill="none" stroke="#3f6a22" stroke-width="1.6" opacity="0.45"/>
+              </g>
+            </g>
+          </g>
+
+          <!-- vòng cánh ngoài (24 cánh), nở theo vòng xoắn -->
+          <g>
+  <g transform="rotate(0)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.5s" begin="16.40s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(15)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.5s" begin="16.44s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(30)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.5s" begin="16.48s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(45)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.5s" begin="16.52s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(60)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.5s" begin="16.56s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(75)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.5s" begin="16.60s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(90)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.5s" begin="16.64s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(105)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.5s" begin="16.68s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(120)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.5s" begin="16.72s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(135)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.5s" begin="16.76s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(150)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.5s" begin="16.80s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(165)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.5s" begin="16.84s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(180)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.5s" begin="16.88s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(195)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.5s" begin="16.92s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(210)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.5s" begin="16.96s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(225)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.5s" begin="17.00s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(240)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.5s" begin="17.04s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(255)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.5s" begin="17.08s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(270)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.5s" begin="17.12s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(285)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.5s" begin="17.16s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(300)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.5s" begin="17.20s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(315)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.5s" begin="17.24s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(330)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.5s" begin="17.28s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(345)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.5s" begin="17.32s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+            <g transform="scale(0.68)">
+  <g transform="rotate(7.5)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.4s" begin="17.00s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(22.5)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.4s" begin="17.04s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(37.5)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.4s" begin="17.08s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(52.5)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.4s" begin="17.11s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(67.5)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.4s" begin="17.15s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(82.5)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.4s" begin="17.19s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(97.5)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.4s" begin="17.23s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(112.5)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.4s" begin="17.27s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(127.5)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.4s" begin="17.30s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(142.5)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.4s" begin="17.34s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(157.5)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.4s" begin="17.38s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(172.5)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.4s" begin="17.42s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(187.5)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.4s" begin="17.46s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(202.5)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.4s" begin="17.49s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(217.5)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.4s" begin="17.53s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(232.5)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.4s" begin="17.57s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(247.5)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.4s" begin="17.61s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(262.5)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.4s" begin="17.65s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(277.5)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.4s" begin="17.68s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(292.5)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.4s" begin="17.72s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(307.5)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.4s" begin="17.76s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(322.5)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.4s" begin="17.80s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(337.5)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.4s" begin="17.84s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+  <g transform="rotate(352.5)"><g transform="translate(0,-30) scale(0.02)"><animateTransform attributeName="transform" type="scale" from="0.02" to="1" dur="1.4s" begin="17.87s" calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/><use href="#petal" fill="url(#gPetal)" stroke="#e0a512" stroke-width="1.1" stroke-linejoin="round"/></g></g>
+            </g>
+          </g>
+          <!-- ĐĨA HOA: hàng trăm hoa nhỏ xếp theo xoắn ốc Fibonacci -->
+          <g transform="scale(0.1)">
+            <animateTransform attributeName="transform" type="scale" from="0.1" to="1" dur="2s" begin="17.4s"
+                              calcMode="spline" keySplines="0.2 0.8 0.3 1" fill="freeze"/>
+            <circle r="39" fill="url(#gDisc)"/>
+            <g fill="#e8bd4a">
+              <animate attributeName="fill" from="#e8bd4a" to="#4a2d0d" dur="7s" begin="21.5s" fill="freeze"/>
+              <use href="#ring13"/>
+              <use href="#ring13" transform="scale(0.76) rotate(13.8)"/>
+              <use href="#ring13" transform="scale(0.55) rotate(27.7)"/>
+              <use href="#ring13" transform="scale(0.36) rotate(6.9)"/>
+              <use href="#ring13" transform="scale(0.19) rotate(20.8)"/>
+            </g>
+            <circle r="5" fill="#6d4a1b" opacity="0.7"/>
+            <!-- hạt chín dần ở vòng ngoài của đĩa hoa -->
+            <circle r="31" fill="none" stroke="#31200b" stroke-width="10" stroke-dasharray="2.4 5.2" opacity="0">
+              <animate attributeName="opacity" from="0" to="0.45" dur="6s" begin="22.5s" fill="freeze"/>
+            </circle>
+          </g>
+        </g>
+      </g>
+
+      <!-- ONG TỚI THỤ PHẤN -->
+      <g transform="translate(320 246)">
+        <g opacity="0">
+          <animate attributeName="opacity" from="0" to="1" dur="0.8s" begin="19.5s" fill="freeze"/>
+          <g>
+            <animateMotion dur="7.5s" repeatCount="indefinite" rotate="auto"
+              path="M168,26 C150,-64 -46,-92 -104,-30 C-152,22 -74,86 22,72 C104,60 190,96 168,26 Z"/>
+            <g>
+              <animateTransform attributeName="transform" type="rotate" values="-7;7;-7" dur="1.5s"
+                repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+              <g transform="translate(1 -5)">
+                <g>
+                  <animateTransform attributeName="transform" type="scale" values="1 1;1 0.3;1 1"
+                                    dur="0.15s" repeatCount="indefinite"/>
+                  <ellipse cx="0" cy="-3" rx="6.5" ry="3" fill="#eaf7ff" opacity="0.7"/>
+                </g>
+              </g>
+              <use href="#bee" transform="scale(1.1)"/>
+            </g>
+          </g>
+        </g>
+        <g opacity="0">
+          <animate attributeName="opacity" from="0" to="1" dur="0.8s" begin="21s" fill="freeze"/>
+          <g transform="translate(0 58)">
+            <animateMotion dur="10.5s" repeatCount="indefinite" rotate="auto"
+              path="M-150,10 C-140,-40 -60,-56 -20,-24 C10,-2 -10,40 -60,44 C-110,48 -160,40 -150,10 Z"/>
+            <g>
+              <animateTransform attributeName="transform" type="rotate" values="6;-6;6" dur="1.875s"
+                repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+              <g transform="translate(1 -5)">
+                <g>
+                  <animateTransform attributeName="transform" type="scale" values="1 1;1 0.3;1 1"
+                                    dur="0.1875s" repeatCount="indefinite"/>
+                  <ellipse cx="0" cy="-3" rx="6.5" ry="3" fill="#eaf7ff" opacity="0.7"/>
+                </g>
+              </g>
+              <use href="#bee" transform="scale(0.92)"/>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+  </svg>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var TOTAL = 30;                       // độ dài một vòng mô phỏng (giây)
+  var svg  = document.getElementById('scene');
+  var $    = function (id) { return document.getElementById(id); };
+
+  var STAGES = [
+    { t: 0,    vn: 'Hạt giống',     en: 'Seed',        ds: 'Một hạt hướng dương nằm sâu dưới lớp đất, chờ nước, nhiệt độ và ánh sáng để bắt đầu.' },
+    { t: 1.3,  vn: 'Nảy mầm',       en: 'Germination', ds: 'Rễ chính ăn sâu xuống đất, vỏ hạt nứt ra và chồi mầm bắt đầu đẩy lên.' },
+    { t: 2.3,  vn: 'Mầm vươn lên',  en: 'Emergence',   ds: 'Chồi mầm xuyên qua lớp đất, bám rễ chặt và rưới lên ánh sáng.' },
+    { t: 4.4,  vn: 'Hai lá mầm',    en: 'Cotyledons',  ds: 'Hai lá mầm mở ra đón nắng – đây là “lộc trắng” của cây non.' },
+    { t: 6.4,  vn: 'Sinh trưởng',  en: 'Vegetative',  ds: 'Cây ra lá thật từng đôi một so le, thân đứng vững và dày dần.' },
+    { t: 12.6, vn: 'Kết nụ',        en: 'Budding',     ds: 'Đỉnh chồi co lại thành nụ, lá bắc xanh ôm kín chặt.' },
+    { t: 16.4, vn: 'Nở hoa',        en: 'Blooming',    ds: 'Cánh hoá vàng ụa ra theo vòng xoắn ốc, đĩa hoa nở rộng ở chính giữa.' },
+    { t: 19.5, vn: 'Trưởng thành',  en: 'Full bloom',  ds: 'Đầu hoa nghiêng theo mặt trời để tối đa hoá ánh sáng, ong bay tới thụ phấn.' },
+    { t: 22.5, vn: 'Hạt chín',      en: 'Seed head',   ds: 'Đĩa hoa chuyển nâu, hạt chín đầy sẽ rơi xuống đất gieo thành cây mới.' }
+  ];
+  var LEAF_TIMES = [6.4, 7.6, 8.7, 9.7, 10.6, 11.4, 12.2];
+
+  /* ---------- dựng danh sách giai đoạn ---------- */
+  var list = $('list'), lis = [];
+  STAGES.forEach(function (s, i) {
+    var li = document.createElement('li');
+    li.innerHTML = '<i>' + (i + 1 < 10 ? '0' : '') + (i + 1) + '</i><div>' + s.vn + '<em>' + s.en + '</em></div>';
+    list.appendChild(li);
+    lis.push(li);
+  });
+
+  /* ---------- đồng hồ chủ ---------- */
+  var t = 0, playing = true, loop = true, speed = 1, last = performance.now();
+  var elNo = $('no'), elVn = $('vn'), elEn = $('en'), elDs = $('ds');
+  var elH = $('mH'), elL = $('mL'), elD = $('mD'), elP = $('mP');
+  var elFill = $('fill'), elScrub = $('scrub'), btnPlay = $('play');
+  var cache = {};
+
+  function set(id, el, val) { if (cache[id] !== val) { cache[id] = val; el.innerHTML = val; } }
+
+  function stageIndex(time) {
+    var i = 0;
+    for (var k = 0; k < STAGES.length; k++) { if (time >= STAGES[k].t) i = k; }
+    return i;
+  }
+
+  function render(time) {
+    var i = stageIndex(time), s = STAGES[i];
+    set('no', elNo, (i + 1 < 10 ? '0' : '') + (i + 1));
+    if (cache.vn !== s.vn) { cache.vn = s.vn; elVn.textContent = s.vn; elEn.textContent = s.en; elDs.textContent = s.ds; }
+    for (var k = 0; k < lis.length; k++) {
+      lis[k].className = k === i ? 'on' : (k < i ? 'done' : '');
+    }
+
+    // chiều cao: 0 -> 218cm, bám theo tiến độ vẽ thân
+    var p = Math.max(0, Math.min(1, (time - 3.9) / 8.6));
+    set('h', elH, (218 * Math.pow(p, 0.8)).toFixed(1) + '<u>cm</u>');
+    var leaves = time >= 4.4 ? 2 : 0;
+    for (var k2 = 0; k2 < LEAF_TIMES.length; k2++) { if (time >= LEAF_TIMES[k2]) leaves++; }
+    set('l', elL, String(leaves));
+    set('d', elD, String(Math.round(1 + (time / TOTAL) * 89)));
+    var pet = time > 16.4 ? Math.round(Math.min(1, (time - 16.4) / 3) * 48) : 0;
+    set('p', elP, String(pet));
+
+    var pct = (time / TOTAL) * 100;
+    elFill.style.width = pct + '%';
+    if (document.activeElement !== elScrub) elScrub.value = String(time);
+  }
+
+  function frame(now) {
+    var dt = Math.min((now - last) / 1000, 0.25);
+    last = now;
+    if (playing) {
+      t += dt * speed;
+      if (t >= TOTAL) { t = loop ? t % TOTAL : TOTAL; if (!loop) { playing = false; syncBtn(); } }
+    }
+    svg.setCurrentTime(t);
+    render(t);
+    requestAnimationFrame(frame);
+  }
+
+  function syncBtn() { btnPlay.textContent = playing ? '⏸ Tạm dừng' : '▶ Tiếp tục'; }
+
+  /* ---------- điều khiển ---------- */
+  btnPlay.addEventListener('click', function () { playing = !playing; last = performance.now(); syncBtn(); });
+  $('replay').addEventListener('click', function () { t = 0; playing = true; last = performance.now(); syncBtn(); });
+  $('loop').addEventListener('change', function (e) { loop = e.target.checked; });
+  $('speed').addEventListener('change', function (e) { speed = parseFloat(e.target.value) || 1; });
+  elScrub.addEventListener('input', function (e) { t = parseFloat(e.target.value) || 0; });
+  document.addEventListener('visibilitychange', function () { last = performance.now(); });
+
+  /* ---------- khởi động ---------- */
+  svg.pauseAnimations();                  // JS làm đồng hồ chủ để tua/khoá được
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce) { t = TOTAL; playing = false; syncBtn(); }
+  svg.setCurrentTime(t);
+  render(t);
+  requestAnimationFrame(function (now) { last = now; requestAnimationFrame(frame); });
+})();
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
