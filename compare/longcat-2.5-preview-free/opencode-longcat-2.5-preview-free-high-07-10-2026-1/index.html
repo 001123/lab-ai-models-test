@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hoa Hướng Dương - Từ Hạt Đến Nở Hoa</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: #fff;
+        }
+        h1 {
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(255, 200, 50, 0.5);
+            font-size: 2.5em;
+        }
+        .subtitle {
+            margin-bottom: 30px;
+            color: #ffd700;
+            font-size: 1.2em;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            max-width: 900px;
+            width: 100%;
+        }
+        svg {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 12px 24px;
+            font-size: 1em;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+        .btn-stage {
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            color: #1a1a2e;
+        }
+        .btn-stage:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+        .btn-stage.active {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: #fff;
+        }
+        .btn-auto {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            color: #fff;
+        }
+        .btn-auto:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(78, 205, 196, 0.5);
+        }
+        .stage-info {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 1.1em;
+            color: #ffd700;
+            min-height: 30px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ff6b6b);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        @keyframes sway {
+            0%, 100% { transform: rotate(-2deg); }
+            50% { transform: rotate(2deg); }
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .sunflower-group {
+            transform-origin: center bottom;
+            animation: sway 4s ease-in-out infinite;
+        }
+        .petal {
+            animation: pulse 2s ease-in-out infinite;
+        }
+        .leaf {
+            animation: float 3s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <h1>Hoa Hướng Dương</h1>
+    <p class="subtitle">Từ hạt giống đến nở hoa - Hành trình phát triển</p>
+    
+    <div class="container">
+        <svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+            <!-- Sky Background -->
+            <defs>
+                <linearGradient id="skyGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" style="stop-color:#87CEEB;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#E0F6FF;stop-opacity:1" />
+                </linearGradient>
+                <linearGradient id="groundGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" style="stop-color:#8B4513;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#654321;stop-opacity:1" />
+                </linearGradient>
+                <radialGradient id="sunGradient" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#FFA500;stop-opacity:0" />
+                </radialGradient>
+                <radialGradient id="centerGradient" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" style="stop-color:#8B4513;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#654321;stop-opacity:1" />
+                </radialGradient>
+            </defs>
+            
+            <!-- Sky -->
+            <rect width="800" height="400" fill="url(#skyGradient)" />
+            
+            <!-- Sun -->
+            <circle cx="650" cy="100" r="80" fill="url(#sunGradient)" opacity="0.8" />
+            <circle cx="650" cy="100" r="40" fill="#FFD700" />
+            
+            <!-- Clouds -->
+            <g opacity="0.8">
+                <ellipse cx="150" cy="80" rx="60" ry="30" fill="#fff" />
+                <ellipse cx="200" cy="70" rx="50" ry="25" fill="#fff" />
+                <ellipse cx="100" cy="70" rx="40" ry="20" fill="#fff" />
+            </g>
+            
+            <!-- Ground -->
+            <rect y="400" width="800" height="200" fill="url(#groundGradient)" />
+            
+            <!-- Grass -->
+            <g fill="#228B22">
+                <path d="M0,400 Q50,380 100,400 Q150,380 200,400 Q250,380 300,400 Q350,380 400,400 Q450,380 500,400 Q550,380 600,400 Q650,380 700,400 Q750,380 800,400 L800,420 L0,420 Z" />
+            </g>
+            
+            <!-- Sunflower Group -->
+            <g class="sunflower-group" id="sunflower">
+                <!-- Stem -->
+                <path id="stem" d="M400,550 Q400,450 400,350" stroke="#228B22" stroke-width="8" fill="none" stroke-linecap="round" />
+                
+                <!-- Leaves -->
+                <g id="leaves" class="leaf">
+                    <path d="M400,480 Q350,460 320,480 Q350,500 400,480" fill="#32CD32" />
+                    <path d="M400,480 Q450,460 480,480 Q450,500 400,480" fill="#32CD32" />
+                    <path d="M400,420 Q350,400 320,420 Q350,440 400,420" fill="#32CD32" />
+                    <path d="M400,420 Q450,400 480,420 Q450,440 400,420" fill="#32CD32" />
+                </g>
+                
+                <!-- Flower Head -->
+                <g id="flowerHead" transform="translate(400, 280)">
+                    <!-- Petals -->
+                    <g id="petals">
+                        <!-- Outer ring of petals -->
+                        <g class="petals">
+                            <ellipse cx="0" cy="-60" rx="15" ry="40" fill="#FFD700" transform="rotate(0)" />
+                            <ellipse cx="0" cy="-60" rx="15" ry="40" fill="#FFD700" transform="rotate(30)" />
+                            <ellipse cx="0" cy="-60" rx="15" ry="40" fill="#FFD700" transform="rotate(60)" />
+                            <ellipse cx="0" cy="-60" rx="15" ry="40" fill="#FFD700" transform="rotate(90)" />
+                            <ellipse cx="0" cy="-60" rx="15" ry="40" fill="#FFD700" transform="rotate(120)" />
+                            <ellipse cx="0" cy="-60" rx="15" ry="40" fill="#FFD700" transform="rotate(150)" />
+                            <ellipse cx="0" cy="-60" rx="15" ry="40" fill="#FFD700" transform="rotate(180)" />
+                            <ellipse cx="0" cy="-60" rx="15" ry="40" fill="#FFD700" transform="rotate(210)" />
+                            <ellipse cx="0" cy="-60" rx="15" ry="40" fill="#FFD700" transform="rotate(240)" />
+                            <ellipse cx="0" cy="-60" rx="15" ry="40" fill="#FFD700" transform="rotate(270)" />
+                            <ellipse cx="0" cy="-60" rx="15" ry="40" fill="#FFD700" transform="rotate(300)" />
+                            <ellipse cx="0" cy="-60" rx="15" ry="40" fill="#FFD700" transform="rotate(330)" />
+                        </g>
+                        <!-- Inner ring of petals -->
+                        <g class="petals">
+                            <ellipse cx="0" cy="-45" rx="12" ry="30" fill="#FFA500" transform="rotate(15)" />
+                            <ellipse cx="0" cy="-45" rx="12" ry="30" fill="#FFA500" transform="rotate(45)" />
+                            <ellipse cx="0" cy="-45" rx="12" ry="30" fill="#FFA500" transform="rotate(75)" />
+                            <ellipse cx="0" cy="-45" rx="12" ry="30" fill="#FFA500" transform="rotate(105)" />
+                            <ellipse cx="0" cy="-45" rx="12" ry="30" fill="#FFA500" transform="rotate(135)" />
+                            <ellipse cx="0" cy="-45" rx="12" ry="30" fill="#FFA500" transform="rotate(165)" />
+                            <ellipse cx="0" cy="-45" rx="12" ry="30" fill="#FFA500" transform="rotate(195)" />
+                            <ellipse cx="0" cy="-45" rx="12" ry="30" fill="#FFA500" transform="rotate(225)" />
+                            <ellipse cx="0" cy="-45" rx="12" ry="30" fill="#FFA500" transform="rotate(255)" />
+                            <ellipse cx="0" cy="-45" rx="12" ry="30" fill="#FFA500" transform="rotate(285)" />
+                            <ellipse cx="0" cy="-45" rx="12" ry="30" fill="#FFA500" transform="rotate(315)" />
+                            <ellipse cx="0" cy="-45" rx="12" ry="30" fill="#FFA500" transform="rotate(345)" />
+                        </g>
+                    </g>
+                    
+                    <!-- Center -->
+                    <circle cx="0" cy="0" r="35" fill="url(#centerGradient)" />
+                    
+                    <!-- Seeds pattern in center -->
+                    <g id="seeds">
+                        <circle cx="0" cy="-20" r="3" fill="#4a3728" />
+                        <circle cx="15" cy="-15" r="3" fill="#4a3728" />
+                        <circle cx="-15" cy="-15" r="3" fill="#4a3728" />
+                        <circle cx="20" cy="0" r="3" fill="#4a3728" />
+                        <circle cx="-20" cy="0" r="3" fill="#4a3728" />
+                        <circle cx="15" cy="15" r="3" fill="#4a3728" />
+                        <circle cx="-15" cy="15" r="3" fill="#4a3728" />
+                        <circle cx="0" cy="20" r="3" fill="#4a3728" />
+                        <circle cx="10" cy="-10" r="2" fill="#5a4738" />
+                        <circle cx="-10" cy="-10" r="2" fill="#5a4738" />
+                        <circle cx="10" cy="10" r="2" fill="#5a4738" />
+                        <circle cx="-10" cy="10" r="2" fill="#5a4738" />
+                    </g>
+                </g>
+            </g>
+            
+            <!-- Seed (Stage 1) -->
+            <g id="seed" transform="translate(400, 520)">
+                <ellipse cx="0" cy="0" rx="12" ry="18" fill="#8B4513" />
+                <ellipse cx="0" cy="0" rx="8" ry="14" fill="#A0522D" />
+                <path d="M-5,-10 Q0,-15 5,-10" stroke="#654321" stroke-width="1" fill="none" />
+            </g>
+            
+            <!-- Sprout (Stage 2) -->
+            <g id="sprout" transform="translate(400, 520)" style="display: none;">
+                <path d="M0,0 Q0,-30 0,-50" stroke="#228B22" stroke-width="4" fill="none" />
+                <path d="M0,-30 Q-15,-40 -25,-35 Q-15,-25 0,-30" fill="#32CD32" />
+                <path d="M0,-30 Q15,-40 25,-35 Q15,-25 0,-30" fill="#32CD32" />
+            </g>
+            
+            <!-- Young Plant (Stage 3) -->
+            <g id="youngPlant" transform="translate(400, 520)" style="display: none;">
+                <path d="M0,0 Q0,-80 0,-120" stroke="#228B22" stroke-width="6" fill="none" />
+                <path d="M0,-60 Q-25,-70 -40,-60 Q-25,-50 0,-60" fill="#32CD32" />
+                <path d="M0,-60 Q25,-70 40,-60 Q25,-50 0,-60" fill="#32CD32" />
+                <path d="M0,-90 Q-20,-100 -35,-90 Q-20,-80 0,-90" fill="#32CD32" />
+                <path d="M0,-90 Q20,-100 35,-90 Q20,-80 0,-90" fill="#32CD32" />
+                <circle cx="0" cy="-130" r="15" fill="#90EE90" />
+            </g>
+            
+            <!-- First Bloom (Stage 4) -->
+            <g id="firstBloom" transform="translate(400, 520)" style="display: none;">
+                <path d="M0,0 Q0,-100 0,-150" stroke="#228B22" stroke-width="8" fill="none" />
+                <path d="M0,-70 Q-30,-80 -50,-70 Q-30,-60 0,-70" fill="#32CD32" />
+                <path d="M0,-70 Q30,-80 50,-70 Q30,-60 0,-70" fill="#32CD32" />
+                <path d="M0,-110 Q-25,-120 -40,-110 Q-25,-100 0,-110" fill="#32CD32" />
+                <path d="M0,-110 Q25,-120 40,-110 Q25,-100 0,-110" fill="#32CD32" />
+                <g transform="translate(0, -160)">
+                    <g>
+                        <ellipse cx="0" cy="-25" rx="8" ry="20" fill="#FFD700" transform="rotate(0)" />
+                        <ellipse cx="0" cy="-25" rx="8" ry="20" fill="#FFD700" transform="rotate(45)" />
+                        <ellipse cx="0" cy="-25" rx="8" ry="20" fill="#FFD700" transform="rotate(90)" />
+                        <ellipse cx="0" cy="-25" rx="8" ry="20" fill="#FFD700" transform="rotate(135)" />
+                        <ellipse cx="0" cy="-25" rx="8" ry="20" fill="#FFD700" transform="rotate(180)" />
+                        <ellipse cx="0" cy="-25" rx="8" ry="20" fill="#FFD700" transform="rotate(225)" />
+                        <ellipse cx="0" cy="-25" rx="8" ry="20" fill="#FFD700" transform="rotate(270)" />
+                        <ellipse cx="0" cy="-25" rx="8" ry="20" fill="#FFD700" transform="rotate(315)" />
+                    </g>
+                    <circle cx="0" cy="0" r="15" fill="url(#centerGradient)" />
+                </g>
+            </g>
+            
+            <!-- Mature Bloom (Stage 5) - Full sunflower -->
+            <g id="matureBloom" transform="translate(400, 520)" style="display: none;">
+                <path d="M0,0 Q0,-120 0,-200" stroke="#228B22" stroke-width="10" fill="none" />
+                <path d="M0,-80 Q-35,-90 -55,-80 Q-35,-70 0,-80" fill="#32CD32" />
+                <path d="M0,-80 Q35,-90 55,-80 Q35,-70 0,-80" fill="#32CD32" />
+                <path d="M0,-130 Q-30,-140 -50,-130 Q-30,-120 0,-130" fill="#32CD32" />
+                <path d="M0,-130 Q30,-140 50,-130 Q30,-120 0,-130" fill="#32CD32" />
+                <path d="M0,-170 Q-25,-180 -40,-170 Q-25,-160 0,-170" fill="#32CD32" />
+                <path d="M0,-170 Q25,-180 40,-170 Q25,-160 0,-170" fill="#32CD32" />
+                <g transform="translate(0, -220)">
+                    <g class="petals">
+                        <ellipse cx="0" cy="-50" rx="12" ry="35" fill="#FFD700" transform="rotate(0)" />
+                        <ellipse cx="0" cy="-50" rx="12" ry="35" fill="#FFD700" transform="rotate(20)" />
+                        <ellipse cx="0" cy="-50" rx="12" ry="35" fill="#FFD700" transform="rotate(40)" />
+                        <ellipse cx="0" cy="-50" rx="12" ry="35" fill="#FFD700" transform="rotate(60)" />
+                        <ellipse cx="0" cy="-50" rx="12" ry="35" fill="#FFD700" transform="rotate(80)" />
+                        <ellipse cx="0" cy="-50" rx="12" ry="35" fill="#FFD700" transform="rotate(100)" />
+                        <ellipse cx="0" cy="-50" rx="12" ry="35" fill="#FFD700" transform="rotate(120)" />
+                        <ellipse cx="0" cy="-50" rx="12" ry="35" fill="#FFD700" transform="rotate(140)" />
+                        <ellipse cx="0" cy="-50" rx="12" ry="35" fill="#FFD700" transform="rotate(160)" />
+                        <ellipse cx="0" cy="-50" rx="12" ry="35" fill="#FFD700" transform="rotate(180)" />
+                        <ellipse cx="0" cy="-50" rx="12" ry="35" fill="#FFD700" transform="rotate(200)" />
+                        <ellipse cx="0" cy="-50" rx="12" ry="35" fill="#FFD700" transform="rotate(220)" />
+                        <ellipse cx="0" cy="-50" rx="12" ry="35" fill="#FFD700" transform="rotate(240)" />
+                        <ellipse cx="0" cy="-50" rx="12" ry="35" fill="#FFD700" transform="rotate(260)" />
+                        <ellipse cx="0" cy="-50" rx="12" ry="35" fill="#FFD700" transform="rotate(280)" />
+                        <ellipse cx="0" cy="-50" rx="12" ry="35" fill="#FFD700" transform="rotate(300)" />
+                        <ellipse cx="0" cy="-50" rx="12" ry="35" fill="#FFD700" transform="rotate(320)" />
+                        <ellipse cx="0" cy="-50" rx="12" ry="35" fill="#FFD700" transform="rotate(340)" />
+                    </g>
+                    <g class="petals">
+                        <ellipse cx="0" cy="-35" rx="10" ry="25" fill="#FFA500" transform="rotate(10)" />
+                        <ellipse cx="0" cy="-35" rx="10" ry="25" fill="#FFA500" transform="rotate(30)" />
+                        <ellipse cx="0" cy="-35" rx="10" ry="25" fill="#FFA500" transform="rotate(50)" />
+                        <ellipse cx="0" cy="-35" rx="10" ry="25" fill="#FFA500" transform="rotate(70)" />
+                        <ellipse cx="0" cy="-35" rx="10" ry="25" fill="#FFA500" transform="rotate(90)" />
+                        <ellipse cx="0" cy="-35" rx="10" ry="25" fill="#FFA500" transform="rotate(110)" />
+                        <ellipse cx="0" cy="-35" rx="10" ry="25" fill="#FFA500" transform="rotate(130)" />
+                        <ellipse cx="0" cy="-35" rx="10" ry="25" fill="#FFA500" transform="rotate(150)" />
+                        <ellipse cx="0" cy="-35" rx="10" ry="25" fill="#FFA500" transform="rotate(170)" />
+                        <ellipse cx="0" cy="-35" rx="10" ry="25" fill="#FFA500" transform="rotate(190)" />
+                        <ellipse cx="0" cy="-35" rx="10" ry="25" fill="#FFA500" transform="rotate(210)" />
+                        <ellipse cx="0" cy="-35" rx="10" ry="25" fill="#FFA500" transform="rotate(230)" />
+                        <ellipse cx="0" cy="-35" rx="10" ry="25" fill="#FFA500" transform="rotate(250)" />
+                        <ellipse cx="0" cy="-35" rx="10" ry="25" fill="#FFA500" transform="rotate(270)" />
+                        <ellipse cx="0" cy="-35" rx="10" ry="25" fill="#FFA500" transform="rotate(290)" />
+                        <ellipse cx="0" cy="-35" rx="10" ry="25" fill="#FFA500" transform="rotate(310)" />
+                        <ellipse cx="0" cy="-35" rx="10" ry="25" fill="#FFA500" transform="rotate(330)" />
+                        <ellipse cx="0" cy="-35" rx="10" ry="25" fill="#FFA500" transform="rotate(350)" />
+                    </g>
+                    <circle cx="0" cy="0" r="30" fill="url(#centerGradient)" />
+                    <g>
+                        <circle cx="0" cy="-15" r="2.5" fill="#4a3728" />
+                        <circle cx="10" cy="-10" r="2.5" fill="#4a3728" />
+                        <circle cx="-10" cy="-10" r="2.5" fill="#4a3728" />
+                        <circle cx="15" cy="0" r="2.5" fill="#4a3728" />
+                        <circle cx="-15" cy="0" r="2.5" fill="#4a3728" />
+                        <circle cx="10" cy="10" r="2.5" fill="#4a3728" />
+                        <circle cx="-10" cy="10" r="2.5" fill="#4a3728" />
+                        <circle cx="0" cy="15" r="2.5" fill="#4a3728" />
+                        <circle cx="7" cy="-7" r="2" fill="#5a4738" />
+                        <circle cx="-7" cy="-7" r="2" fill="#5a4738" />
+                        <circle cx="7" cy="7" r="2" fill="#5a4738" />
+                        <circle cx="-7" cy="7" r="2" fill="#5a4738" />
+                        <circle cx="0" cy="0" r="2" fill="#5a4738" />
+                    </g>
+                </g>
+            </g>
+            
+            <!-- Decorative elements -->
+            <g opacity="0.6">
+                <circle cx="100" cy="300" r="3" fill="#FFD700" />
+                <circle cx="150" cy="350" r="2" fill="#FFD700" />
+                <circle cx="650" cy="320" r="3" fill="#FFD700" />
+                <circle cx="700" cy="280" r="2" fill="#FFD700" />
+            </g>
+        </svg>
+        
+        <div class="controls">
+            <button class="btn-stage active" data-stage="1">1. Hạt</button>
+            <button class="btn-stage" data-stage="2">2. Nả Mầm</button>
+            <button class="btn-stage" data-stage="3">3. Cây Nhỏ</button>
+            <button class="btn-stage" data-stage="4">4. Nở Hoa</button>
+            <button class="btn-stage" data-stage="5">5. Hoa Trưởng Thành</button>
+            <button class="btn-auto" id="autoPlay">Tự Động</button>
+        </div>
+        
+        <div class="stage-info" id="stageInfo">Giai đoạn 1: Hạt giống hướng dương</div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </div>
+
+    <script>
+        const stages = ['seed', 'sprout', 'youngPlant', 'firstBloom', 'matureBloom'];
+        const stageNames = [
+            'Giai đoạn 1: Hạt giống hướng dương',
+            'Giai đoạn 2: Nả mầm',
+            'Giai đoạn 3: Cây nhỏ',
+            'Giai đoạn 4: Nở hoa',
+            'Giai đoạn 5: Hoa trưởng thành'
+        ];
+        let currentStage = 1;
+        let autoPlayInterval = null;
+        
+        function showStage(stageNum) {
+            // Hide all stages
+            stages.forEach((stage, index) => {
+                const element = document.getElementById(stage);
+                if (element) {
+                    element.style.display = 'none';
+                }
+            });
+            
+            // Show selected stage
+            const selectedElement = document.getElementById(stages[stageNum - 1]);
+            if (selectedElement) {
+                selectedElement.style.display = 'block';
+            }
+            
+            // Update buttons
+            document.querySelectorAll('.btn-stage').forEach((btn, index) => {
+                btn.classList.toggle('active', index === stageNum - 1);
+            });
+            
+            // Update info
+            const stageInfo = document.getElementById('stageInfo');
+            if (stageInfo) {
+                stageInfo.textContent = stageNames[stageNum - 1];
+            }
+            
+            // Update progress
+            const progressFill = document.getElementById('progressFill');
+            if (progressFill) {
+                progressFill.style.width = ((stageNum / 5) * 100) + '%';
+            }
+            
+            currentStage = stageNum;
+        }
+        
+        // Button click handlers
+        document.querySelectorAll('.btn-stage').forEach(button => {
+            button.addEventListener('click', () => {
+                const stage = parseInt(button.getAttribute('data-stage'));
+                showStage(stage);
+                stopAutoPlay();
+            });
+        });
+        
+        // Auto play
+        const autoPlayBtn = document.getElementById('autoPlay');
+        if (autoPlayBtn) {
+            autoPlayBtn.addEventListener('click', () => {
+                if (autoPlayInterval) {
+                    stopAutoPlay();
+                } else {
+                    startAutoPlay();
+                }
+            });
+        }
+        
+        function startAutoPlay() {
+            autoPlayBtn.textContent = 'Dừng';
+            autoPlayInterval = setInterval(() => {
+                currentStage = currentStage >= 5 ? 1 : currentStage + 1;
+                showStage(currentStage);
+            }, 2000);
+        }
+        
+        function stopAutoPlay() {
+            if (autoPlayInterval) {
+                clearInterval(autoPlayInterval);
+                autoPlayInterval = null;
+                autoPlayBtn.textContent = 'Tự Động';
+            }
+        }
+        
+        // Initialize
+        showStage(1);
+    </script>
+</body>
+</html>

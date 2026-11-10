@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f4f0e6">
+  <title>MỌC — Hành trình hoa hướng dương</title>
+  <style>
+    :root {
+      --paper: #f4f0e6;
+      --ink: #203128;
+      --muted: #788078;
+      --line: #d9d8cc;
+      --green: #284f3a;
+      --lime: #d9ed9d;
+      --yellow: #f6bd32;
+      --panel: #203128;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 8% 2%, rgba(255,255,255,.85), transparent 27rem),
+        var(--paper);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button, input { font: inherit; }
+    button { color: inherit; }
+    button:focus-visible, input:focus-visible {
+      outline: 3px solid #e7ad2f;
+      outline-offset: 4px;
+    }
+
+    .page {
+      width: min(1400px, calc(100% - 64px));
+      margin: 0 auto;
+      padding-bottom: 40px;
+    }
+
+    .site-header {
+      height: 88px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand { display: flex; align-items: center; gap: 13px; }
+    .brand-mark { width: 34px; height: 34px; }
+    .brand-name { font-size: 22px; font-weight: 850; letter-spacing: -.06em; }
+    .brand-sub {
+      margin-left: 15px;
+      padding-left: 20px;
+      border-left: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+
+    .header-tag {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      color: #606b61;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+    }
+
+    .pulse {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #5c8551;
+      box-shadow: 0 0 0 5px rgba(92,133,81,.1);
+    }
+
+    .intro {
+      display: grid;
+      grid-template-columns: 1.25fr .75fr;
+      align-items: end;
+      gap: 40px;
+      padding: 46px 0 36px;
+    }
+
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 15px;
+      color: #6e786d;
+      font-size: 10px;
+      font-weight: 750;
+      letter-spacing: .19em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before { content: ""; width: 25px; height: 1px; background: #8d958b; }
+
+    h1 {
+      margin: 0;
+      max-width: 790px;
+      font-size: clamp(44px, 5vw, 72px);
+      font-weight: 640;
+      line-height: .99;
+      letter-spacing: -.055em;
+    }
+
+    h1 em {
+      color: #537046;
+      font-family: Georgia, "Times New Roman", serif;
+      font-weight: 400;
+    }
+
+    .intro-side { padding-bottom: 4px; }
+    .intro-copy {
+      max-width: 390px;
+      margin: 0 0 24px;
+      color: #687168;
+      font-size: 14px;
+      line-height: 1.75;
+    }
+
+    .intro-stats { display: flex; gap: 28px; }
+    .intro-stat { display: flex; align-items: baseline; gap: 7px; }
+    .intro-stat strong { font-family: Georgia, serif; font-size: 24px; font-weight: 400; }
+    .intro-stat span { color: #7b837a; font-size: 10px; text-transform: uppercase; letter-spacing: .09em; }
+
+    .experience {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 310px;
+      overflow: hidden;
+      border: 1px solid rgba(41,58,45,.13);
+      border-radius: 24px;
+      background: #fbfaf5;
+      box-shadow: 0 22px 60px rgba(45,52,36,.08);
+    }
+
+    .simulation { min-width: 0; display: flex; flex-direction: column; }
+    .scene { position: relative; flex: 1; min-height: 0; overflow: hidden; background: #e9edda; }
+    .garden { display: block; width: 100%; height: 100%; min-height: 520px; }
+
+    .scene-caption {
+      position: absolute;
+      top: 24px;
+      left: 25px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 12px;
+      border: 1px solid rgba(43,63,42,.12);
+      border-radius: 100px;
+      background: rgba(251,250,245,.67);
+      backdrop-filter: blur(8px);
+      color: #4f604f;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .11em;
+      text-transform: uppercase;
+      pointer-events: none;
+    }
+
+    .scene-caption svg { width: 13px; height: 13px; }
+    .weather {
+      position: absolute;
+      top: 25px;
+      right: 25px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #596653;
+      font-size: 10px;
+      font-weight: 650;
+      pointer-events: none;
+    }
+    .weather svg { width: 16px; height: 16px; }
+
+    .controls {
+      display: grid;
+      grid-template-columns: auto minmax(170px, 1fr) auto;
+      align-items: center;
+      gap: 25px;
+      min-height: 105px;
+      padding: 20px 25px;
+      border-top: 1px solid #dedfd4;
+      background: #fbfaf5;
+    }
+
+    .transport { display: flex; align-items: center; gap: 9px; }
+    .play-button {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      height: 44px;
+      padding: 0 17px;
+      border: 0;
+      border-radius: 100px;
+      background: var(--ink);
+      color: white;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 700;
+      transition: transform .2s, background .2s;
+    }
+    .play-button:hover { background: #365641; transform: translateY(-1px); }
+    .play-button svg { width: 14px; height: 14px; fill: currentColor; }
+    .reset-button {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border: 1px solid #d8dbd0;
+      border-radius: 50%;
+      background: transparent;
+      cursor: pointer;
+      transition: background .2s, transform .2s;
+    }
+    .reset-button:hover { background: #eff0e8; transform: rotate(-20deg); }
+    .reset-button svg { width: 16px; height: 16px; }
+
+    .timeline { min-width: 0; }
+    .timeline-top { display: flex; justify-content: space-between; margin-bottom: 9px; }
+    .timeline-label { color: #7a8278; font-size: 9px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
+    .timeline-day { color: #405441; font-size: 10px; font-weight: 750; font-variant-numeric: tabular-nums; }
+    .range-wrap { position: relative; height: 14px; display: flex; align-items: center; }
+    .range-track {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 3px;
+      border-radius: 4px;
+      background: linear-gradient(to right, #557346 0 var(--progress, 0%), #dcded4 var(--progress, 0%) 100%);
+      pointer-events: none;
+    }
+    input[type="range"] {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 20px;
+      margin: 0;
+      appearance: none;
+      -webkit-appearance: none;
+      background: transparent;
+      cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-runnable-track { height: 3px; background: transparent; }
+    input[type="range"]::-moz-range-track { height: 3px; background: transparent; }
+    input[type="range"]::-webkit-slider-thumb {
+      width: 14px;
+      height: 14px;
+      margin-top: -5.5px;
+      appearance: none;
+      -webkit-appearance: none;
+      border: 3px solid #fbfaf5;
+      border-radius: 50%;
+      background: #45653b;
+      box-shadow: 0 0 0 1px #45653b;
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 9px;
+      height: 9px;
+      border: 3px solid #fbfaf5;
+      border-radius: 50%;
+      background: #45653b;
+      box-shadow: 0 0 0 1px #45653b;
+    }
+
+    .speed { display: flex; padding: 3px; border: 1px solid #dcded4; border-radius: 9px; }
+    .speed button {
+      min-width: 35px;
+      height: 29px;
+      padding: 0 7px;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: #899086;
+      cursor: pointer;
+      font-size: 10px;
+      font-weight: 750;
+    }
+    .speed button[aria-pressed="true"] { background: #e7eadc; color: #324a36; }
+
+    .journal {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      padding: 29px 27px 25px;
+      overflow: hidden;
+      background: var(--panel);
+      color: #f4f3e9;
+    }
+
+    .journal::after {
+      content: "";
+      position: absolute;
+      right: -80px;
+      top: 90px;
+      width: 190px;
+      height: 190px;
+      border: 1px solid rgba(255,255,255,.035);
+      border-radius: 50%;
+      box-shadow: 0 0 0 28px rgba(255,255,255,.018), 0 0 0 58px rgba(255,255,255,.014);
+      pointer-events: none;
+    }
+
+    .journal-eyebrow { margin: 0; color: #a8b4a6; font-size: 9px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }
+    .day-row { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; }
+    .day-count { margin: 0; font-family: Georgia, serif; font-size: 38px; font-weight: 400; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+    .phase-number { color: #a5b09f; font-size: 10px; font-weight: 700; letter-spacing: .12em; }
+    .journal h2 { position: relative; margin: 21px 0 10px; font-size: 24px; font-weight: 600; letter-spacing: -.035em; }
+    .phase-description { min-height: 78px; margin: 0; color: #b6c0b3; font-size: 12px; line-height: 1.7; }
+
+    .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 22px 0 24px; }
+    .metric { padding: 12px; border: 1px solid rgba(255,255,255,.1); border-radius: 10px; background: rgba(255,255,255,.025); }
+    .metric-label { display: block; margin-bottom: 5px; color: #96a591; font-size: 8px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+    .metric-value { font-size: 19px; font-weight: 550; font-variant-numeric: tabular-nums; }
+    .metric-value small { margin-left: 2px; color: #a8b5a2; font-size: 10px; font-weight: 500; }
+
+    .stages { display: grid; gap: 4px; margin: 0 -8px; }
+    .stage {
+      display: grid;
+      grid-template-columns: 25px 1fr auto;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      min-height: 38px;
+      padding: 7px 9px;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      color: #91a08d;
+      text-align: left;
+      cursor: pointer;
+      transition: background .2s, color .2s;
+    }
+    .stage:hover { background: rgba(255,255,255,.05); color: #e3e9dd; }
+    .stage[aria-current="step"] { background: rgba(222,239,174,.1); color: #e3efc4; }
+    .stage-index { font-size: 9px; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .stage-dot { width: 5px; height: 5px; margin-right: 6px; display: inline-block; border-radius: 50%; background: currentColor; vertical-align: 1px; }
+    .stage[aria-current="step"] .stage-dot { background: #d9ed9d; box-shadow: 0 0 0 4px rgba(217,237,157,.09); }
+    .stage-name { font-size: 11px; font-weight: 600; }
+    .stage-days { font-size: 8px; letter-spacing: .04em; opacity: .65; }
+
+    .journal-note {
+      display: flex;
+      gap: 9px;
+      align-items: flex-start;
+      margin: auto 0 0;
+      padding-top: 22px;
+      color: #8f9e8a;
+      font-size: 9px;
+      line-height: 1.6;
+    }
+    .journal-note svg { flex: 0 0 auto; width: 14px; height: 14px; margin-top: 1px; }
+
+    .footnote {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 18px 4px 0;
+      color: #8a9086;
+      font-size: 9px;
+      letter-spacing: .04em;
+    }
+    .footnote span:last-child { text-align: right; }
+
+    .sun-rays { transform-origin: 758px 113px; animation: turn 60s linear infinite; }
+    .cloud-one { animation: drift 8s ease-in-out infinite alternate; }
+    .cloud-two { animation: drift 11s ease-in-out infinite alternate-reverse; }
+    .bee-wings { transform-origin: center; animation: flutter .12s ease-in-out infinite alternate; }
+    @keyframes turn { to { transform: rotate(360deg); } }
+    @keyframes drift { to { transform: translateX(13px); } }
+    @keyframes flutter { to { transform: scaleY(.45); } }
+
+    @media (max-width: 1050px) {
+      .page { width: min(940px, calc(100% - 40px)); }
+      .experience { grid-template-columns: minmax(0, 1fr) 275px; }
+      .journal { padding: 25px 20px; }
+      .controls { gap: 15px; padding-inline: 18px; }
+      .play-button span { display: none; }
+      .play-button { width: 44px; padding: 0; justify-content: center; }
+      .garden { min-height: 490px; }
+    }
+
+    @media (max-width: 800px) {
+      .intro { grid-template-columns: 1fr; gap: 23px; padding-top: 35px; }
+      .intro-side { display: flex; justify-content: space-between; align-items: end; gap: 25px; }
+      .intro-copy { margin: 0; }
+      .intro-stats { flex-shrink: 0; }
+      .experience { grid-template-columns: 1fr; }
+      .journal { display: grid; grid-template-columns: 1fr 1fr; column-gap: 28px; }
+      .journal-eyebrow, .day-row, .journal h2, .phase-description, .metrics { grid-column: 1; }
+      .stages { grid-column: 2; grid-row: 1 / span 5; align-self: center; }
+      .journal-note { grid-column: 1 / -1; margin-top: 15px; }
+      .phase-description { min-height: 0; }
+      .garden { min-height: 0; aspect-ratio: 920 / 700; }
+    }
+
+    @media (max-width: 560px) {
+      .page { width: calc(100% - 24px); padding-bottom: 22px; }
+      .site-header { height: 70px; }
+      .brand-sub, .header-tag { display: none; }
+      .intro { padding: 30px 4px 25px; }
+      h1 { font-size: 43px; }
+      .intro-side { display: block; }
+      .intro-copy { font-size: 13px; }
+      .intro-stats { margin-top: 18px; }
+      .experience { border-radius: 17px; }
+      .scene-caption { top: 14px; left: 14px; padding: 7px 9px; font-size: 7px; }
+      .weather { top: 18px; right: 14px; font-size: 8px; }
+      .garden { aspect-ratio: 920 / 790; }
+      .controls { grid-template-columns: auto 1fr; gap: 15px; padding: 16px; }
+      .speed { grid-column: 1 / -1; justify-self: end; margin-top: -4px; }
+      .journal { display: flex; padding: 25px; }
+      .day-row { margin-top: 17px; }
+      .journal h2 { margin-top: 15px; }
+      .metrics { margin: 18px 0; }
+      .stages { display: grid; grid-template-columns: 1fr 1fr; width: 100%; margin: 0; gap: 5px; }
+      .stage { grid-template-columns: 19px 1fr; padding: 8px; }
+      .stage-days { display: none; }
+      .journal-note { margin-top: 19px; }
+      .footnote { display: block; line-height: 1.7; }
+      .footnote span { display: block; }
+      .footnote span:last-child { margin-top: 4px; text-align: left; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; scroll-behavior: auto !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="site-header">
+      <div class="brand">
+        <svg class="brand-mark" viewBox="0 0 36 36" aria-hidden="true">
+          <g fill="#eab73d">
+            <ellipse cx="18" cy="7" rx="4" ry="7"/>
+            <ellipse cx="18" cy="29" rx="4" ry="7"/>
+            <ellipse cx="7" cy="18" rx="7" ry="4"/>
+            <ellipse cx="29" cy="18" rx="7" ry="4"/>
+            <ellipse cx="10.2" cy="10.2" rx="4" ry="7" transform="rotate(-45 10.2 10.2)"/>
+            <ellipse cx="25.8" cy="25.8" rx="4" ry="7" transform="rotate(-45 25.8 25.8)"/>
+            <ellipse cx="25.8" cy="10.2" rx="4" ry="7" transform="rotate(45 25.8 10.2)"/>
+            <ellipse cx="10.2" cy="25.8" rx="4" ry="7" transform="rotate(45 10.2 25.8)"/>
+          </g>
+          <circle cx="18" cy="18" r="6" fill="#294b36"/>
+        </svg>
+        <span class="brand-name">MỌC.</span>
+        <span class="brand-sub">Phòng thí nghiệm xanh</span>
+      </div>
+      <div class="header-tag"><span class="pulse"></span>Mô phỏng sinh trưởng · 01</div>
+    </header>
+
+    <section class="intro" aria-labelledby="page-title">
+      <div>
+        <p class="eyebrow">Helianthus annuus · Hoa hướng dương</p>
+        <h1 id="page-title">Từ một hạt nhỏ,<br>đến <em>vòng tay nắng.</em></h1>
+      </div>
+      <div class="intro-side">
+        <p class="intro-copy">Theo dõi một phép màu thầm lặng của thiên nhiên — từ chiếc hạt ngủ dưới đất đến đóa hoa vàng vươn mình trong nắng.</p>
+        <div class="intro-stats" aria-label="Thông tin mô phỏng">
+          <div class="intro-stat"><strong>84</strong><span>ngày</span></div>
+          <div class="intro-stat"><strong>06</strong><span>giai đoạn</span></div>
+        </div>
+      </div>
+    </section>
+
+    <main class="experience">
+      <section class="simulation" aria-label="Mô phỏng hoa hướng dương">
+        <div class="scene">
+          <svg class="garden" id="garden" viewBox="0 0 920 700" role="img" aria-labelledby="garden-title garden-desc">
+            <title id="garden-title">Hành trình sinh trưởng của hoa hướng dương</title>
+            <desc id="garden-desc">Một hạt dưới đất nảy mầm, phát triển rễ, thân, lá, nụ và nở thành hoa hướng dương.</desc>
+            <defs>
+              <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#e5ecd9"/>
+                <stop offset="1" stop-color="#f4efd5"/>
+              </linearGradient>
+              <linearGradient id="soil" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#846246"/>
+                <stop offset=".5" stop-color="#70503c"/>
+                <stop offset="1" stop-color="#584033"/>
+              </linearGradient>
+              <linearGradient id="stemGreen" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stop-color="#365d32"/>
+                <stop offset=".45" stop-color="#648446"/>
+                <stop offset="1" stop-color="#2e552f"/>
+              </linearGradient>
+              <linearGradient id="leafGreen" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#789952"/>
+                <stop offset=".55" stop-color="#4e783f"/>
+                <stop offset="1" stop-color="#315f35"/>
+              </linearGradient>
+              <linearGradient id="petalGold" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#f9cf48"/>
+                <stop offset=".65" stop-color="#efad22"/>
+                <stop offset="1" stop-color="#d88b18"/>
+              </linearGradient>
+              <radialGradient id="discBrown">
+                <stop offset="0" stop-color="#76502b"/>
+                <stop offset=".72" stop-color="#513722"/>
+                <stop offset="1" stop-color="#34291e"/>
+              </radialGradient>
+              <radialGradient id="sunGlow">
+                <stop offset="0" stop-color="#f5d978" stop-opacity=".45"/>
+                <stop offset="1" stop-color="#f5d978" stop-opacity="0"/>
+              </radialGradient>
+              <pattern id="soilGrain" width="72" height="58" patternUnits="userSpaceOnUse">
+                <circle cx="8" cy="12" r="1.6" fill="#b38b64" opacity=".32"/>
+                <circle cx="38" cy="29" r="2.1" fill="#3e3028" opacity=".23"/>
+                <circle cx="61" cy="8" r="1" fill="#d1aa7d" opacity=".27"/>
+                <ellipse cx="20" cy="49" rx="3" ry="1.3" fill="#46362b" opacity=".2"/>
+                <path d="M51 46l5-2" stroke="#c29a70" stroke-width="1" opacity=".22"/>
+              </pattern>
+              <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
+                <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#283620" flood-opacity=".17"/>
+              </filter>
+              <filter id="blur12"><feGaussianBlur stdDeviation="12"/></filter>
+            </defs>
+
+            <rect width="920" height="390" fill="url(#sky)"/>
+            <circle cx="758" cy="113" r="100" fill="url(#sunGlow)"/>
+            <g class="sun-rays" stroke="#d6b956" stroke-width="1.3" stroke-linecap="round" opacity=".52">
+              <path d="M758 49v-13M758 190v-13M694 113h-13M835 113h-13M713 68l-9-9M812 167l-9-9M803 68l9-9M704 167l9-9"/>
+              <path d="M739 52l-4-9M781 183l-4-9M697 94l-9-4M828 136l-9-4M786 58l6-8M724 176l6-8M824 91l8-6M684 141l8-6" opacity=".55"/>
+            </g>
+            <circle cx="758" cy="113" r="34" fill="#edcf72" opacity=".88"/>
+            <circle cx="748" cy="103" r="23" fill="#f4dc8f" opacity=".5"/>
+
+            <g class="cloud-one" fill="#fffdf2" opacity=".58">
+              <ellipse cx="169" cy="113" rx="53" ry="12"/>
+              <circle cx="153" cy="102" r="18"/>
+              <circle cx="182" cy="105" r="14"/>
+            </g>
+            <g class="cloud-two" fill="#fffdf2" opacity=".38">
+              <ellipse cx="555" cy="183" rx="40" ry="9"/>
+              <circle cx="543" cy="176" r="13"/>
+              <circle cx="565" cy="177" r="10"/>
+            </g>
+
+            <path d="M0 305C115 258 189 287 278 304C371 322 435 264 540 277C646 290 692 327 790 287C843 265 884 274 920 285V396H0Z" fill="#c8d2ae" opacity=".66"/>
+            <path d="M0 342C107 313 166 326 247 344C351 367 430 316 520 326C617 337 657 367 758 340C825 322 870 327 920 341V396H0Z" fill="#aebd91" opacity=".7"/>
+            <g fill="none" stroke="#879c70" stroke-width="2" opacity=".45">
+              <path d="M91 367q-4-20-14-30m14 30q7-24 17-32M812 370q0-21 10-32m-10 32q-8-19-17-25M239 376q0-16 9-25"/>
+            </g>
+
+            <rect y="382" width="920" height="318" fill="url(#soil)"/>
+            <rect y="382" width="920" height="318" fill="url(#soilGrain)"/>
+            <path d="M0 382C80 375 120 387 188 381C264 374 309 386 384 380C459 374 504 386 575 380C657 373 719 388 790 380C846 374 880 379 920 378V397H0Z" fill="#687e4d"/>
+            <path d="M0 390C95 385 132 394 205 389C293 383 344 393 421 388C504 383 569 394 646 387C724 380 803 394 920 385" fill="none" stroke="#9ca66d" stroke-width="3" opacity=".5"/>
+            <path d="M0 533C169 514 284 550 448 532C604 515 746 548 920 526" fill="none" stroke="#ad8060" stroke-width="2" opacity=".15"/>
+            <path d="M0 625C163 605 314 640 485 619C648 600 785 634 920 614" fill="none" stroke="#3c2f28" stroke-width="3" opacity=".16"/>
+
+            <g fill="#b69a78" opacity=".34">
+              <ellipse cx="112" cy="454" rx="12" ry="6" transform="rotate(-18 112 454)"/>
+              <ellipse cx="768" cy="581" rx="9" ry="5" transform="rotate(22 768 581)"/>
+              <ellipse cx="252" cy="622" rx="7" ry="4"/>
+              <ellipse cx="660" cy="443" rx="6" ry="3"/>
+            </g>
+            <g fill="none" stroke="#3e322b" stroke-width="2" opacity=".24" stroke-linecap="round">
+              <path d="M173 522q14-16 28 0t27 0"/>
+              <path d="M699 642q10-12 20 0t20 0"/>
+            </g>
+
+            <g id="rootSystem" fill="none" stroke="#d2b482" stroke-linecap="round" stroke-linejoin="round"></g>
+
+            <g id="seed" filter="url(#softShadow)">
+              <g id="seedLeft">
+                <path d="M459 402C447 400 441 410 444 420C447 430 455 436 460 437Z" fill="#45372a" stroke="#b69c73" stroke-width="1.2"/>
+                <path d="M455 407q-6 12 2 24" fill="none" stroke="#79634a" stroke-width="1.4"/>
+              </g>
+              <g id="seedRight">
+                <path d="M459 402C471 402 477 411 473 422C470 431 464 436 460 437Z" fill="#51402f" stroke="#b69c73" stroke-width="1.2"/>
+                <path d="M464 407q7 11 0 24" fill="none" stroke="#80694c" stroke-width="1.4"/>
+              </g>
+            </g>
+
+            <ellipse id="plantShadow" cx="460" cy="385" rx="47" ry="8" fill="#344c31" opacity="0" filter="url(#blur12)"/>
+            <path id="mainStem" d="M460 382L460 382" fill="none" stroke="url(#stemGreen)" stroke-width="4" stroke-linecap="round"/>
+            <path id="stemHighlight" d="M460 382L460 382" fill="none" stroke="#a2b86c" stroke-width="1.2" stroke-linecap="round" opacity="0"/>
+            <g id="cotyledons"></g>
+            <g id="leaves"></g>
+
+            <g id="bud" opacity="0" filter="url(#softShadow)">
+              <path d="M0 18C-23 12-29-9-18-29C-10-43 11-43 20-28C31-10 23 12 0 18Z" fill="#537542"/>
+              <path d="M0 15C-13 4-14-19-3-35C11-27 16-5 0 15Z" fill="#72904e"/>
+              <path d="M-21 4L-35-6L-24 15M22 4L35-7L25 15M-10-28L-13-42L-1-33" fill="#4d703e" stroke="#4d703e" stroke-width="4" stroke-linejoin="round"/>
+              <path d="M-10-31Q0-42 12-30" fill="none" stroke="#d7a92e" stroke-width="5" stroke-linecap="round" opacity=".65"/>
+            </g>
+
+            <g id="flower" opacity="0" filter="url(#softShadow)">
+              <g fill="#426d37">
+                <path d="M0 13L-14 63L8 37L23 61L22 18Z"/>
+                <path d="M-13 8L-58 31L-35 4L-56-9L-14-12Z"/>
+                <path d="M15 6L58 26L38 0L58-13L17-13Z"/>
+              </g>
+              <g id="outerPetals"></g>
+              <g id="innerPetals"></g>
+              <g id="flowerDisc">
+                <circle r="35" fill="#3d3020"/>
+                <circle r="31.5" fill="url(#discBrown)"/>
+                <g id="discSeeds"></g>
+                <circle r="31.5" fill="none" stroke="#aa7934" stroke-width="1.2" opacity=".65"/>
+              </g>
+            </g>
+
+            <g id="bee" opacity="0" transform="translate(595 144) rotate(-12)">
+              <g class="bee-wings" fill="#f8f5de" stroke="#7d826d" stroke-width=".8" opacity=".85">
+                <ellipse cx="-5" cy="-8" rx="7" ry="11" transform="rotate(-35 -5 -8)"/>
+                <ellipse cx="7" cy="-7" rx="7" ry="11" transform="rotate(35 7 -7)"/>
+              </g>
+              <ellipse rx="13" ry="8" fill="#e2ad2e"/>
+              <path d="M-5-7v14M3-7v14" stroke="#40372a" stroke-width="4"/>
+              <circle cx="11" cy="-1" r="5" fill="#40372a"/>
+              <path d="M13-5q4-7 7-3M10-6q0-7 4-8" fill="none" stroke="#40372a" stroke-width="1"/>
+            </g>
+
+            <g id="rootCallout" opacity="0" font-family="Inter, sans-serif">
+              <path d="M173 510H326L404 475" fill="none" stroke="#d8c39e" stroke-width="1" stroke-dasharray="3 4" opacity=".7"/>
+              <circle cx="404" cy="475" r="3" fill="#d8c39e"/>
+              <text x="173" y="493" fill="#e4d2b1" font-size="10" letter-spacing="1.4">RỄ NON TÌM NƯỚC</text>
+            </g>
+
+            <g id="heightGuide" opacity="0" font-family="Inter, sans-serif">
+              <path id="heightLine" d="M826 382V382" fill="none" stroke="#758569" stroke-width="1" stroke-dasharray="3 5" opacity=".7"/>
+              <path id="heightTicks" d="M820 382h12M820 382h12" fill="none" stroke="#758569" stroke-width="1"/>
+              <text id="heightText" x="812" y="280" fill="#5d6c55" font-size="10" text-anchor="end" letter-spacing=".6">0 cm</text>
+            </g>
+          </svg>
+
+          <div class="scene-caption">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4v16M4 12h16"/></svg>
+            Lát cắt vườn · Nhìn dưới lớp đất
+          </div>
+          <div class="weather">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/></svg>
+            24°C&nbsp;&nbsp;·&nbsp;&nbsp;Đất ẩm 68%
+          </div>
+        </div>
+
+        <div class="controls">
+          <div class="transport">
+            <button class="play-button" id="playButton" type="button" aria-label="Tạm dừng mô phỏng">
+              <svg id="playIcon" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 2h3.5v12H3zM9.5 2H13v12H9.5z"/></svg>
+              <span id="playText">Tạm dừng</span>
+            </button>
+            <button class="reset-button" id="resetButton" type="button" aria-label="Phát lại từ đầu" title="Phát lại từ đầu">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v6h6M5.5 15a7 7 0 1 0 .5-7l-2 2"/></svg>
+            </button>
+          </div>
+          <div class="timeline">
+            <div class="timeline-top">
+              <label class="timeline-label" for="timeline">Tiến trình</label>
+              <span class="timeline-day" id="timelineDay">Ngày 00 / 84</span>
+            </div>
+            <div class="range-wrap">
+              <div class="range-track" id="rangeTrack"></div>
+              <input id="timeline" type="range" min="0" max="1000" value="0" step="1" aria-label="Tiến trình sinh trưởng" aria-valuetext="Ngày 0, giai đoạn hạt">
+            </div>
+          </div>
+          <div class="speed" aria-label="Tốc độ mô phỏng">
+            <button type="button" data-speed="0.5" aria-pressed="false">0.5×</button>
+            <button type="button" data-speed="1" aria-pressed="true">1×</button>
+            <button type="button" data-speed="2" aria-pressed="false">2×</button>
+          </div>
+        </div>
+      </section>
+
+      <aside class="journal" aria-label="Nhật ký sinh trưởng">
+        <p class="journal-eyebrow">Nhật ký sinh trưởng</p>
+        <div class="day-row">
+          <p class="day-count" id="dayCount">Ngày 00</p>
+          <span class="phase-number" id="phaseNumber">01 / 06</span>
+        </div>
+        <h2 id="phaseTitle">Hạt ngủ yên</h2>
+        <p class="phase-description" id="phaseDescription">Dưới lớp đất ấm, chiếc hạt lặng lẽ tích trữ năng lượng. Mọi hành trình đều bắt đầu bằng một sự chờ đợi.</p>
+
+        <div class="metrics">
+          <div class="metric">
+            <span class="metric-label">Chiều cao</span>
+            <span class="metric-value"><span id="heightValue">0</span><small>cm</small></span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Số lá thật</span>
+            <span class="metric-value" id="leafValue">00</span>
+          </div>
+        </div>
+
+        <nav class="stages" id="stages" aria-label="Chọn giai đoạn">
+          <button class="stage" type="button" data-stage="0" aria-current="step">
+            <span class="stage-index">01</span><span class="stage-name"><i class="stage-dot"></i>Hạt</span><span class="stage-days">00—07</span>
+          </button>
+          <button class="stage" type="button" data-stage="1">
+            <span class="stage-index">02</span><span class="stage-name"><i class="stage-dot"></i>Nảy mầm</span><span class="stage-days">08—14</span>
+          </button>
+          <button class="stage" type="button" data-stage="2">
+            <span class="stage-index">03</span><span class="stage-name"><i class="stage-dot"></i>Cây con</span><span class="stage-days">15—35</span>
+          </button>
+          <button class="stage" type="button" data-stage="3">
+            <span class="stage-index">04</span><span class="stage-name"><i class="stage-dot"></i>Nụ hoa</span><span class="stage-days">36—55</span>
+          </button>
+          <button class="stage" type="button" data-stage="4">
+            <span class="stage-index">05</span><span class="stage-name"><i class="stage-dot"></i>Nở hoa</span><span class="stage-days">56—70</span>
+          </button>
+          <button class="stage" type="button" data-stage="5">
+            <span class="stage-index">06</span><span class="stage-name"><i class="stage-dot"></i>Trưởng thành</span><span class="stage-days">71—84</span>
+          </button>
+        </nav>
+
+        <p class="journal-note">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 3a7 7 0 0 0-4 12.7V19h8v-3.3A7 7 0 0 0 12 3Z"/><path d="M9 22h6M9 16h6"/></svg>
+          <span id="phaseFact">Hạt hút nước để đánh thức phôi — mầm cây nhỏ đang ngủ bên trong.</span>
+        </p>
+      </aside>
+    </main>
+
+    <footer class="footnote">
+      <span>Một chu trình được nén trong 24 giây · Kéo thanh tiến trình để khám phá</span>
+      <span>Quan sát chậm lại. Thiên nhiên không bao giờ vội.</span>
+    </footer>
+  </div>
+
+  <script>
+    (() => {
+      const NS = "http://www.w3.org/2000/svg";
+      const $ = id => document.getElementById(id);
+      const clamp = value => Math.max(0, Math.min(1, value));
+      const smooth = value => {
+        const x = clamp(value);
+        return x * x * (3 - 2 * x);
+      };
+      const make = (tag, attrs, parent) => {
+        const el = document.createElementNS(NS, tag);
+        Object.entries(attrs).forEach(([key, value]) => el.setAttribute(key, value));
+        if (parent) parent.appendChild(el);
+        return el;
+      };
+
+      const stages = [
+        {
+          start: 0,
+          title: "Hạt ngủ yên",
+          description: "Dưới lớp đất ấm, chiếc hạt lặng lẽ tích trữ năng lượng. Mọi hành trình đều bắt đầu bằng một sự chờ đợi.",
+          fact: "Hạt hút nước để đánh thức phôi — mầm cây nhỏ đang ngủ bên trong.",
+          point: 0.035
+        },
+        {
+          start: 8 / 84,
+          title: "Nảy mầm",
+          description: "Vỏ hạt hé mở. Rễ non vươn xuống tìm nước, trong khi mầm xanh đầu tiên rụt rè hướng lên ánh sáng.",
+          fact: "Rễ cái mọc trước, neo cây vào đất và tìm kiếm nước cho phần mầm.",
+          point: 0.135
+        },
+        {
+          start: 15 / 84,
+          title: "Vươn mình",
+          description: "Từng chiếc lá mở ra đón nắng. Thân cây mỗi ngày cao thêm, xây nên bộ khung xanh vững vàng.",
+          fact: "Lá là những nhà máy nhỏ, dùng ánh nắng để tạo năng lượng cho cây lớn lên.",
+          point: 0.32
+        },
+        {
+          start: 36 / 84,
+          title: "Kết nụ",
+          description: "Một nụ nhỏ xuất hiện giữa ngọn. Bên trong lớp lá bắp non, những cánh hoa vàng đang dần hình thành.",
+          fact: "Khi còn non, ngọn hoa hướng dương xoay theo quỹ đạo của mặt trởi.",
+          point: 0.535
+        },
+        {
+          start: 56 / 84,
+          title: "Hé nở",
+          description: "Những cánh hoa đầu tiên vươn ra. Sắc vàng lan dần, mở ra vòng xoáy hoàn hảo của hoa hướng dương.",
+          fact: "Mỗi cánh vàng là một hoa lưỡng tính; đĩa nâu gồm hàng trăm hoa nhỏ.",
+          point: 0.745
+        },
+        {
+          start: 71 / 84,
+          title: "Rực nắng",
+          description: "Đĩa hoa mở trọn, nâng đỡ hàng trăm hoa nhỏ xíu. Từ một hạt bé, cây đã trở thành mặt trởi của khu vườn.",
+          fact: "Trưởng thành, đĩa hoa thường hướng về phía đông để đón nắng buổi sớm.",
+          point: 0.94
+        }
+      ];
+
+      const roots = [
+        ["M460 410C457 452 466 493 455 545C448 578 453 615 444 650", 4.2, 0],
+        ["M458 448C437 464 417 485 398 523C388 544 373 554 358 568", 2.8, .12],
+        ["M461 472C487 491 501 517 521 550C531 568 548 579 564 590", 2.8, .18],
+        ["M457 514C431 535 419 567 405 600", 2.2, .28],
+        ["M452 563C474 581 483 608 493 630", 2, .38],
+        ["M415 490C393 489 372 498 352 514", 1.6, .35],
+        ["M399 522C375 526 358 541 339 547", 1.3, .44],
+        ["M498 516C522 508 546 511 568 525", 1.6, .42],
+        ["M522 551C547 547 570 555 589 569", 1.3, .52],
+        ["M406 598C388 605 377 620 366 637", 1.2, .55],
+        ["M454 545C470 547 480 558 488 571", 1.3, .48],
+        ["M385 501C377 485 363 477 348 474", 1.1, .58],
+        ["M543 514C552 496 567 488 583 486", 1.1, .62],
+        ["M449 611C433 620 426 635 419 648", 1.1, .67]
+      ].map(([d, width, delay]) => {
+        const path = make("path", {
+          d, "stroke-width": width, pathLength: 1,
+          "stroke-dasharray": 1, "stroke-dashoffset": 1
+        }, $("rootSystem"));
+        return { path, delay };
+      });
+
+      const leafSpecs = [
+        { at: .23, side: -1, start: .225, size: .58, angle: 9 },
+        { at: .36, side: 1, start: .285, size: .79, angle: -12 },
+        { at: .50, side: -1, start: .35, size: .93, angle: 13 },
+        { at: .63, side: 1, start: .415, size: .86, angle: -16 },
+        { at: .75, side: -1, start: .48, size: .72, angle: 12 },
+        { at: .84, side: 1, start: .54, size: .56, angle: -18 }
+      ];
+
+      const leaves = leafSpecs.map(spec => {
+        const group = make("g", { opacity: 0 }, $("leaves"));
+        make("path", {
+          d: "M0 0C18-31 49-50 78-37C70-7 38 13 0 0Z",
+          fill: "url(#leafGreen)", stroke: "#365e34", "stroke-width": .8
+        }, group);
+        make("path", {
+          d: "M2-1Q36-17 70-33M28-13l-3-17M41-20l2 19M54-26l2-12M19-8l8 9",
+          fill: "none", stroke: "#b1c47b", "stroke-width": 1, opacity: .55,
+          "stroke-linecap": "round"
+        }, group);
+        return { group, ...spec };
+      });
+
+      [-1, 1].forEach(side => {
+        const group = make("g", { "data-cotyledon": side, opacity: 0 }, $("cotyledons"));
+        make("path", {
+          d: "M0 0C8-17 27-24 41-15C35 4 15 9 0 0Z",
+          fill: "#7e9c53", stroke: "#4f743c", "stroke-width": .8
+        }, group);
+        make("path", { d: "M2 0L34-13", stroke: "#c0ce8b", "stroke-width": .8 }, group);
+      });
+
+      const petals = [];
+      function buildPetals(parentId, count, inner) {
+        const parent = $(parentId);
+        for (let i = 0; i < count; i++) {
+          const angle = i * (360 / count) + (inner ? 360 / count / 2 : 0);
+          const group = make("g", { transform: `rotate(${angle})` }, parent);
+          make("ellipse", {
+            cx: 0, cy: inner ? -32 : -39,
+            rx: inner ? 8.5 : 10.5, ry: inner ? 27 : 34,
+            fill: "url(#petalGold)", stroke: "#d99a23", "stroke-width": .65
+          }, group);
+          make("path", {
+            d: inner ? "M0-13V-50" : "M0-14V-63",
+            stroke: "#ffe07a", "stroke-width": .65, opacity: .45
+          }, group);
+          petals.push({ group, angle, delay: (i % 5) * .025 + (inner ? .08 : 0) });
+        }
+      }
+      buildPetals("outerPetals", 20, false);
+      buildPetals("innerPetals", 16, true);
+
+      for (let i = 0; i < 150; i++) {
+        const radius = 29 * Math.sqrt(i / 150);
+        const angle = i * 137.508 * Math.PI / 180;
+        const x = Math.cos(angle) * radius;
+        const y = Math.sin(angle) * radius;
+        make("ellipse", {
+          cx: x.toFixed(2), cy: y.toFixed(2), rx: 1.25, ry: 2.1,
+          transform: `rotate(${i * 137.508 + 35} ${x} ${y})`,
+          fill: i % 3 === 0 ? "#c49342" : i % 3 === 1 ? "#8f642f" : "#ae7c36",
+          stroke: "#382a1c", "stroke-width": .45
+        }, $("discSeeds"));
+      }
+
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      let progress = 0;
+      let playing = !reducedMotion;
+      let speed = 1;
+      let previousTime = null;
+      let currentStage = -1;
+      const duration = 24000;
+
+      function plantPoint(t, height, topX) {
+        return {
+          x: 460 + (topX - 460) * t - Math.sin(t * Math.PI) * 8,
+          y: 382 - height * t
+        };
+      }
+
+      function render() {
+        const day = Math.min(84, Math.floor(progress * 84 + .0001));
+        const stageIndex = stages.findLastIndex(stage => progress >= stage.start);
+        const stage = stages[stageIndex];
+        const stemGrowth = smooth((progress - .12) / .48);
+        const height = 278 * stemGrowth;
+        const topX = 460 + 9 * stemGrowth;
+        const topY = 382 - height;
+        const rootGrowth = smooth((progress - .025) / .31);
+        const bloom = smooth((progress - .655) / .16);
+        const budGrowth = smooth((progress - .42) / .16);
+        const trueHeight = Math.round(180 * smooth((progress - .12) / .60));
+
+        $("dayCount").textContent = `Ngày ${String(day).padStart(2, "0")}`;
+        $("timelineDay").textContent = `Ngày ${String(day).padStart(2, "0")} / 84`;
+        $("heightValue").textContent = trueHeight;
+        $("heightText").textContent = `${trueHeight} cm`;
+        $("timeline").value = Math.round(progress * 1000);
+        $("timeline").setAttribute("aria-valuetext", `Ngày ${day}, giai đoạn ${stage.title}`);
+        $("rangeTrack").style.setProperty("--progress", `${progress * 100}%`);
+
+        if (currentStage !== stageIndex) {
+          currentStage = stageIndex;
+          $("phaseNumber").textContent = `${String(stageIndex + 1).padStart(2, "0")} / 06`;
+          $("phaseTitle").textContent = stage.title;
+          $("phaseDescription").textContent = stage.description;
+          $("phaseFact").textContent = stage.fact;
+          document.querySelectorAll(".stage").forEach((button, index) => {
+            if (index === stageIndex) button.setAttribute("aria-current", "step");
+            else button.removeAttribute("aria-current");
+          });
+        }
+
+        roots.forEach(({ path, delay }) => {
+          const local = smooth((rootGrowth - delay) / (1 - delay));
+          path.style.strokeDashoffset = 1 - local;
+          path.style.opacity = local > 0 ? .38 + local * .42 : 0;
+        });
+
+        const crack = smooth((progress - .055) / .07);
+        $("seedLeft").setAttribute("transform", `translate(${-crack * 4} ${crack * 2}) rotate(${-crack * 9} 459 420)`);
+        $("seedRight").setAttribute("transform", `translate(${crack * 4} ${-crack}) rotate(${crack * 8} 459 420)`);
+        $("seed").style.opacity = 1 - smooth((progress - .17) / .12);
+
+        const stemD = `M460 382C${451 - stemGrowth * 2} ${382 - height * .34},${topX - 12} ${382 - height * .7},${topX} ${topY}`;
+        $("mainStem").setAttribute("d", stemD);
+        $("mainStem").setAttribute("stroke-width", 3 + stemGrowth * 9);
+        $("mainStem").style.opacity = stemGrowth > 0 ? 1 : 0;
+        $("stemHighlight").setAttribute("d", stemD);
+        $("stemHighlight").style.opacity = stemGrowth * .45;
+        $("plantShadow").style.opacity = stemGrowth * .25;
+        $("plantShadow").setAttribute("rx", 25 + stemGrowth * 40);
+
+        const cotyledonGrowth = smooth((progress - .18) / .09);
+        document.querySelectorAll("[data-cotyledon]").forEach(group => {
+          const side = Number(group.dataset.cotyledon);
+          const point = plantPoint(.12, height, topX);
+          const fade = 1 - smooth((progress - .42) / .15);
+          group.setAttribute("transform", `translate(${point.x} ${point.y}) scale(${side * cotyledonGrowth} ${cotyledonGrowth}) rotate(${side * -8})`);
+          group.style.opacity = cotyledonGrowth * fade;
+        });
+
+        let visibleLeaves = 0;
+        leaves.forEach(leaf => {
+          const growth = smooth((progress - leaf.start) / .115);
+          const point = plantPoint(leaf.at, height, topX);
+          const size = growth * leaf.size;
+          leaf.group.setAttribute("transform", `translate(${point.x} ${point.y}) rotate(${leaf.angle}) scale(${leaf.side * size} ${size})`);
+          leaf.group.style.opacity = growth;
+          if (growth > .5) visibleLeaves++;
+        });
+        $("leafValue").textContent = String(visibleLeaves).padStart(2, "0");
+
+        const budOpacity = budGrowth * (1 - smooth((progress - .665) / .08));
+        $("bud").setAttribute("transform", `translate(${topX} ${topY - 8}) scale(${budGrowth * .82})`);
+        $("bud").style.opacity = budOpacity;
+
+        $("flower").setAttribute("transform", `translate(${topX} ${topY - 5}) rotate(-7) scale(${bloom})`);
+        $("flower").style.opacity = bloom > 0 ? 1 : 0;
+        petals.forEach(petal => {
+          const opening = smooth((bloom - petal.delay) / (1 - petal.delay));
+          petal.group.setAttribute("transform", `rotate(${petal.angle}) scale(${.55 + opening * .45} ${opening})`);
+          petal.group.style.opacity = opening;
+        });
+        $("flowerDisc").setAttribute("transform", `scale(${smooth((bloom - .2) / .65)})`);
+
+        const guideOpacity = smooth((progress - .22) / .18) * .8;
+        $("heightGuide").style.opacity = guideOpacity;
+        $("heightLine").setAttribute("d", `M826 382V${topY}`);
+        $("heightTicks").setAttribute("d", `M820 382h12M820 ${topY}h12`);
+        $("heightText").setAttribute("y", Math.max(topY + 20, (382 + topY) / 2));
+
+        $("rootCallout").style.opacity = smooth((progress - .055) / .05) * (1 - smooth((progress - .22) / .08));
+        $("bee").style.opacity = smooth((progress - .9) / .07);
+        if (!reducedMotion && progress > .88) {
+          const orbit = progress * 85;
+          $("bee").setAttribute("transform", `translate(${586 + Math.sin(orbit) * 24} ${143 + Math.cos(orbit * 1.4) * 15}) rotate(-12)`);
+        }
+      }
+
+      function updatePlayButton() {
+        $("playText").textContent = playing ? "Tạm dừng" : progress >= 1 ? "Phát lại" : "Tiếp tục";
+        $("playButton").setAttribute("aria-label", playing ? "Tạm dừng mô phỏng" : "Phát mô phỏng");
+        $("playIcon").innerHTML = playing
+          ? '<path d="M3 2h3.5v12H3zM9.5 2H13v12H9.5z"/>'
+          : '<path d="M4 2.5v11l9-5.5z"/>';
+      }
+
+      function animate(time) {
+        if (previousTime === null) previousTime = time;
+        const delta = Math.min(time - previousTime, 80);
+        previousTime = time;
+        if (playing) {
+          progress = Math.min(1, progress + delta * speed / duration);
+          if (progress >= 1) {
+            playing = false;
+            updatePlayButton();
+          }
+          render();
+        }
+        requestAnimationFrame(animate);
+      }
+
+      $("playButton").addEventListener("click", () => {
+        if (progress >= 1) progress = 0;
+        playing = !playing;
+        previousTime = null;
+        updatePlayButton();
+        render();
+      });
+
+      $("resetButton").addEventListener("click", () => {
+        progress = 0;
+        playing = !reducedMotion;
+        previousTime = null;
+        updatePlayButton();
+        render();
+      });
+
+      $("timeline").addEventListener("input", event => {
+        progress = Number(event.target.value) / 1000;
+        playing = false;
+        previousTime = null;
+        updatePlayButton();
+        render();
+      });
+
+      document.querySelectorAll(".speed button").forEach(button => {
+        button.addEventListener("click", () => {
+          speed = Number(button.dataset.speed);
+          document.querySelectorAll(".speed button").forEach(item => {
+            item.setAttribute("aria-pressed", String(item === button));
+          });
+        });
+      });
+
+      document.querySelectorAll(".stage").forEach(button => {
+        button.addEventListener("click", () => {
+          progress = stages[Number(button.dataset.stage)].point;
+          playing = false;
+          previousTime = null;
+          updatePlayButton();
+          render();
+        });
+      });
+
+      document.addEventListener("keydown", event => {
+        if (event.target !== document.body) return;
+        if (event.code === "Space") {
+          event.preventDefault();
+          $("playButton").click();
+        }
+        if (event.key.toLowerCase() === "r") $("resetButton").click();
+      });
+
+      render();
+      updatePlayButton();
+      requestAnimationFrame(animate);
+    })();
+  </script>
+</body>
+</html>

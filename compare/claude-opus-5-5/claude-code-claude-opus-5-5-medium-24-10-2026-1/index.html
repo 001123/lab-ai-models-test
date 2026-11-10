@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hoa Hướng Dương</title>
+<style>
+  :root {
+    --bg: #f4efe4;
+    --panel: #fffaf0;
+    --ink: #2d2a24;
+    --muted: #7a7266;
+    --accent: #e7a10f;
+    --line: #e2d8c4;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+  main { width: 100%; max-width: 880px; }
+  header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+  h1 { font-size: 22px; margin: 0; letter-spacing: -0.01em; }
+  .meta { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .meta b { color: var(--ink); }
+  .stage-card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 6px 24px rgba(60, 40, 10, 0.08);
+  }
+  svg { display: block; width: 100%; height: auto; }
+  .controls {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 14px 16px 6px;
+  }
+  button {
+    font: inherit;
+    border: 1px solid var(--line);
+    background: #fff;
+    color: var(--ink);
+    border-radius: 999px;
+    padding: 6px 14px;
+    cursor: pointer;
+  }
+  button:hover { border-color: var(--accent); }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; min-width: 88px; }
+  input[type=range] { width: 100%; accent-color: var(--accent); }
+  select { font: inherit; border: 1px solid var(--line); border-radius: 8px; padding: 4px 6px; background: #fff; }
+  .stages {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 6px 16px 16px;
+  }
+  .stages button { font-size: 13px; padding: 4px 10px; color: var(--muted); }
+  .stages button.on { color: var(--ink); border-color: var(--accent); background: #fff3d6; }
+  p.note { color: var(--muted); font-size: 13px; margin: 12px 4px 0; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>🌻 Hoa hướng dương: từ hạt tới lớn</h1>
+    <div class="meta">Ngày <b id="day">0</b> · <span id="stageName">Hạt giống</span></div>
+  </header>
+
+  <div class="stage-card">
+    <svg id="scene" viewBox="0 0 800 600" role="img" aria-label="Mô phỏng hoa hướng dương phát triển">
+      <defs>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#8fcdf0"/>
+          <stop offset="1" stop-color="#e8f5fb"/>
+        </linearGradient>
+        <linearGradient id="soil" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#7a5232"/>
+          <stop offset="1" stop-color="#3f2817"/>
+        </linearGradient>
+        <radialGradient id="sunGlow">
+          <stop offset="0" stop-color="#fff6c2"/>
+          <stop offset="0.45" stop-color="#ffd84a"/>
+          <stop offset="1" stop-color="#ffd84a" stop-opacity="0"/>
+        </radialGradient>
+        <linearGradient id="petal" x1="0" y1="0" x2="0" y2="-1" gradientUnits="objectBoundingBox">
+          <stop offset="0" stop-color="#e8890c"/>
+          <stop offset="0.35" stop-color="#f7b51c"/>
+          <stop offset="1" stop-color="#ffd94a"/>
+        </linearGradient>
+        <radialGradient id="disk">
+          <stop offset="0" stop-color="#6b4a1e"/>
+          <stop offset="0.7" stop-color="#4a2f12"/>
+          <stop offset="1" stop-color="#2f1d0a"/>
+        </radialGradient>
+        <linearGradient id="leafGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#3f8a2e"/>
+          <stop offset="1" stop-color="#6cbf45"/>
+        </linearGradient>
+        <radialGradient id="budGrad" cx="0.4" cy="0.35">
+          <stop offset="0" stop-color="#8fd06a"/>
+          <stop offset="1" stop-color="#3c7f2a"/>
+        </radialGradient>
+      </defs>
+
+      <!-- bầu trời -->
+      <rect width="800" height="600" fill="url(#sky)"/>
+      <g id="sun" transform="translate(670 90)">
+        <circle r="90" fill="url(#sunGlow)"/>
+        <g id="sunRays" stroke="#ffcf3a" stroke-width="3" stroke-linecap="round" opacity="0.7"></g>
+        <circle r="30" fill="#ffd84a"/>
+      </g>
+      <g id="clouds" fill="#fff" opacity="0.9">
+        <g id="cloud1"><ellipse cx="0" cy="0" rx="46" ry="16"/><ellipse cx="-18" cy="-10" rx="22" ry="16"/><ellipse cx="14" cy="-14" rx="26" ry="18"/></g>
+        <g id="cloud2" opacity="0.75"><ellipse cx="0" cy="0" rx="36" ry="12"/><ellipse cx="-12" cy="-8" rx="18" ry="12"/><ellipse cx="10" cy="-10" rx="20" ry="14"/></g>
+      </g>
+      <g id="rain" stroke="#5aa7d6" stroke-width="2" stroke-linecap="round"></g>
+
+      <!-- đất -->
+      <rect y="440" width="800" height="160" fill="url(#soil)"/>
+      <path d="M0 440 Q 200 432 400 440 T 800 438 V 448 H 0 Z" fill="#5b3a20"/>
+      <g id="pebbles" fill="#9b7656" opacity="0.6"></g>
+      <g id="grass" stroke="#5aa03a" stroke-width="2" stroke-linecap="round" fill="none"></g>
+
+      <!-- rễ -->
+      <g id="roots" stroke="#e9d6b0" stroke-linecap="round" fill="none"></g>
+
+      <!-- hạt -->
+      <g id="seed">
+        <g id="seedL"><path d="M0 -6 C -10 -6, -14 0, -12 4 C -8 7, -2 6, 0 6 Z" fill="#2b2b2b"/><path d="M-3 -5 L -4 5 M -8 -4 L -9 4" stroke="#e8e2d0" stroke-width="1.2"/></g>
+        <g id="seedR"><path d="M0 -6 C 10 -6, 14 0, 12 4 C 8 7, 2 6, 0 6 Z" fill="#2b2b2b"/><path d="M3 -5 L 4 5 M 8 -4 L 9 4" stroke="#e8e2d0" stroke-width="1.2"/></g>
+      </g>
+
+      <!-- cây -->
+      <g id="plant">
+        <path id="stem" fill="none" stroke="#4f9a34" stroke-linecap="round"/>
+        <path id="stemHi" fill="none" stroke="#86c95e" stroke-linecap="round" opacity="0.6"/>
+        <g id="leaves"></g>
+        <g id="cotyledons"></g>
+        <g id="head">
+          <g id="petalsBack"></g>
+          <g id="petalsFront"></g>
+          <g id="bud"></g>
+          <circle id="diskC" r="0" fill="url(#disk)"/>
+          <g id="seedsDots"></g>
+        </g>
+      </g>
+
+      <!-- ong -->
+      <g id="bee" opacity="0">
+        <ellipse rx="7" ry="5" fill="#f4c20d"/>
+        <path d="M-2 -5 V5 M2 -5 V5" stroke="#222" stroke-width="2"/>
+        <ellipse cx="-2" cy="-7" rx="5" ry="3.5" fill="#fff" opacity="0.8"/>
+        <ellipse cx="3" cy="-7" rx="5" ry="3.5" fill="#fff" opacity="0.8"/>
+      </g>
+    </svg>
+
+    <div class="controls">
+      <button id="play" class="primary">▶ Chạy</button>
+      <input id="time" type="range" min="0" max="1000" value="0" aria-label="Thời gian">
+      <label>Tốc độ
+        <select id="speed">
+          <option value="0.5">0.5×</option>
+          <option value="1" selected>1×</option>
+          <option value="2">2×</option>
+          <option value="4">4×</option>
+        </select>
+      </label>
+    </div>
+    <div class="stages" id="stages"></div>
+  </div>
+  <p class="note">Kéo thanh thời gian hoặc bấm vào từng giai đoạn. Hạt ở tâm hoa xếp theo góc vàng 137,5° (phyllotaxis) như hoa hướng dương thật.</p>
+</main>
+
+<script>
+(() => {
+  const NS = 'http://www.w3.org/2000/svg';
+  const $ = id => document.getElementById(id);
+  const el = (tag, attrs = {}, parent) => {
+    const n = document.createElementNS(NS, tag);
+    for (const k in attrs) n.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(n);
+    return n;
+  };
+  const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+  const seg = (t, a, b) => clamp((t - a) / (b - a));
+  const ease = x => x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
+  const easeOut = x => 1 - Math.pow(1 - x, 3);
+  const lerp = (a, b, k) => a + (b - a) * k;
+
+  // ---- hằng số cảnh ----
+  const GROUND = 440, BASE_X = 400, BASE_Y = 482;
+  const MAX_LEN = 320, TOTAL_DAYS = 90, DURATION = 30; // giây ở tốc độ 1×
+
+  const STAGES = [
+    { t: 0.00, name: 'Hạt giống' },
+    { t: 0.10, name: 'Nảy mầm' },
+    { t: 0.20, name: 'Cây con' },
+    { t: 0.36, name: 'Sinh trưởng' },
+    { t: 0.62, name: 'Nụ hoa' },
+    { t: 0.76, name: 'Nở hoa' },
+    { t: 0.90, name: 'Kết hạt' },
+  ];
+
+  // ---- nền tĩnh ----
+  for (let i = 0; i < 12; i++) {
+    const a = i / 12 * Math.PI * 2;
+    el('line', { x1: Math.cos(a) * 40, y1: Math.sin(a) * 40, x2: Math.cos(a) * 56, y2: Math.sin(a) * 56 }, $('sunRays'));
+  }
+  let rnd = 7;
+  const rand = () => (rnd = (rnd * 16807) % 2147483647) / 2147483647;
+  for (let i = 0; i < 40; i++) {
+    el('ellipse', { cx: rand() * 800, cy: 455 + rand() * 140, rx: 2 + rand() * 4, ry: 1.5 + rand() * 2.5 }, $('pebbles'));
+  }
+  for (let i = 0; i < 70; i++) {
+    const x = rand() * 800;
+    if (Math.abs(x - BASE_X) < 40) continue;
+    const h = 6 + rand() * 12, lean = (rand() - 0.5) * 8;
+    el('path', { d: `M${x} ${GROUND + 2} q ${lean / 2} ${-h / 2} ${lean} ${-h}` }, $('grass'));
+  }
+  const drops = [];
+  for (let i = 0; i < 26; i++) {
+    drops.push({ x: 280 + rand() * 240, y: rand() * 300, v: 280 + rand() * 120, n: el('line', {}, $('rain')) });
+  }
+
+  // ---- rễ (dùng pathLength để "vẽ" dần) ----
+  const rootDefs = [
+    { d: `M${BASE_X} ${BASE_Y + 4} C ${BASE_X - 4} 520, ${BASE_X + 6} 550, ${BASE_X} 592`, w: 3, a: 0.00, b: 1.0 },
+    { d: `M${BASE_X} 505 C 385 512, 365 515, 340 532`, w: 1.6, a: 0.25, b: 0.7 },
+    { d: `M${BASE_X + 1} 520 C 418 526, 440 530, 470 552`, w: 1.6, a: 0.35, b: 0.8 },
+    { d: `M${BASE_X} 540 C 386 548, 372 560, 352 580`, w: 1.4, a: 0.5, b: 0.9 },
+    { d: `M${BASE_X + 2} 556 C 414 564, 430 576, 446 594`, w: 1.4, a: 0.6, b: 1.0 },
+    { d: `M370 520 C 362 528, 358 536, 356 546`, w: 1, a: 0.6, b: 1.0 },
+    { d: `M440 535 C 446 545, 448 552, 446 562`, w: 1, a: 0.7, b: 1.0 },
+  ];
+  const roots = rootDefs.map(r => ({ ...r, n: el('path', { d: r.d, 'stroke-width': r.w, pathLength: 1, 'stroke-dasharray': 1, 'stroke-dashoffset': 1 }, $('roots')) }));
+
+  // ---- lá ----
+  const leafPath = L => `M0 0 C ${L * .25} ${-L * .38}, ${L * .7} ${-L * .34}, ${L} 0 C ${L * .7} ${L * .3}, ${L * .25} ${L * .3}, 0 0 Z`;
+  const leafDefs = [
+    { h: 95, side: 1, L: 80 }, { h: 130, side: -1, L: 84 },
+    { h: 168, side: 1, L: 78 }, { h: 204, side: -1, L: 70 },
+    { h: 238, side: 1, L: 60 }, { h: 268, side: -1, L: 48 },
+  ];
+  const leaves = leafDefs.map(d => {
+    const g = el('g', {}, $('leaves'));
+    el('path', { d: leafPath(d.L), fill: 'url(#leafGrad)', stroke: '#2f6e22', 'stroke-width': 1 }, g);
+    el('path', { d: `M0 0 Q ${d.L * .5} -2 ${d.L * .95} 0`, stroke: '#a9dd86', 'stroke-width': 1.2, fill: 'none', opacity: .8 }, g);
+    for (let k = 1; k <= 3; k++) {
+      const x = d.L * k * .22;
+      el('path', { d: `M${x} -1 L ${x + d.L * .12} ${-d.L * .14} M${x} 0 L ${x + d.L * .12} ${d.L * .13}`, stroke: '#a9dd86', 'stroke-width': .7, opacity: .6 }, g);
+    }
+    return { ...d, g };
+  });
+
+  // lá mầm
+  const cots = [-1, 1].map(side => {
+    const g = el('g', {}, $('cotyledons'));
+    el('path', { d: 'M0 0 C 8 -11, 24 -11, 30 0 C 24 9, 8 9, 0 0 Z', fill: '#79c24f', stroke: '#3f7f2a', 'stroke-width': 1 }, g);
+    return { side, g };
+  });
+
+  // ---- hoa ----
+  const DISK_R = 40, PETAL_L = 58;
+  const petalD = 'M0 0 C 7 -10, 11 -38, 0 -60 C -11 -38, -7 -10, 0 0 Z';
+  const petals = [];
+  const PETALS_PER_RING = 22;
+  [['petalsBack', 0.5 / PETALS_PER_RING, 0.92], ['petalsFront', 0, 1]].forEach(([id, off, scale], ring) => {
+    for (let i = 0; i < PETALS_PER_RING; i++) {
+      const ang = (i / PETALS_PER_RING + off) * 360;
+      const g = el('g', {}, $(id));
+      el('path', { d: petalD, fill: 'url(#petal)', stroke: '#d6820c', 'stroke-width': .6 }, g);
+      el('path', { d: 'M0 -4 L0 -52', stroke: '#e89a14', 'stroke-width': .7, opacity: .7 }, g);
+      petals.push({ g, ang, ring, scale, delay: rand() * 0.25 });
+    }
+  });
+
+  // nụ: các lá đài bao quanh
+  const sepals = [];
+  for (let i = 0; i < 14; i++) {
+    const g = el('g', {}, $('bud'));
+    el('path', { d: 'M0 0 C 6 -8, 6 -20, 0 -30 C -6 -20, -6 -8, 0 0 Z', fill: '#4f9a34', stroke: '#2f6e22', 'stroke-width': .8 }, g);
+    sepals.push({ g, ang: i / 14 * 360 });
+  }
+  const budBall = el('circle', { r: 0, fill: 'url(#budGrad)' }, $('bud'));
+
+  // hạt xếp theo góc vàng
+  const N_SEEDS = 420, GOLDEN = Math.PI * (3 - Math.sqrt(5));
+  const seedDots = [];
+  for (let i = 1; i <= N_SEEDS; i++) {
+    const r = (DISK_R - 3) * Math.sqrt(i / N_SEEDS), a = i * GOLDEN;
+    const c = el('circle', { cx: (Math.cos(a) * r).toFixed(2), cy: (Math.sin(a) * r).toFixed(2), r: 0 }, $('seedsDots'));
+    seedDots.push({ c, i, frac: i / N_SEEDS });
+  }
+
+  // ---- hình học thân: Bézier bậc 2 ----
+  function stemGeom(len, sway, lean) {
+    const p0 = [BASE_X, BASE_Y];
+    const p2 = [BASE_X + lean + sway, BASE_Y - len];
+    const p1 = [BASE_X + lean * 0.2 - sway * 0.3, BASE_Y - len * 0.55];
+    const at = u => {
+      const m = 1 - u;
+      return [m * m * p0[0] + 2 * m * u * p1[0] + u * u * p2[0], m * m * p0[1] + 2 * m * u * p1[1] + u * u * p2[1]];
+    };
+    const tan = u => {
+      const dx = 2 * (1 - u) * (p1[0] - p0[0]) + 2 * u * (p2[0] - p1[0]);
+      const dy = 2 * (1 - u) * (p1[1] - p0[1]) + 2 * u * (p2[1] - p1[1]);
+      return Math.atan2(dy, dx) * 180 / Math.PI;
+    };
+    return { p0, p1, p2, at, tan, d: `M${p0[0]} ${p0[1]} Q ${p1[0].toFixed(2)} ${p1[1].toFixed(2)} ${p2[0].toFixed(2)} ${p2[1].toFixed(2)}` };
+  }
+
+  // ---- vẽ theo thời gian t ∈ [0,1] ----
+  function render(t, clock) {
+    // hạt rơi xuống, rồi được vùi vào đất
+    const fall = easeOut(seg(t, 0, 0.05));
+    const bury = ease(seg(t, 0.05, 0.1));
+    const seedY = fall < 1 ? lerp(140, GROUND - 6, fall) : lerp(GROUND - 6, BASE_Y, bury);
+    const crack = ease(seg(t, 0.1, 0.17));
+    const seedFade = 1 - seg(t, 0.2, 0.3);
+    $('seed').setAttribute('transform', `translate(${BASE_X} ${seedY}) rotate(${(1 - fall) * 200})`);
+    $('seed').setAttribute('opacity', seedFade);
+    $('seedL').setAttribute('transform', `translate(${-crack * 5} ${-crack * 2}) rotate(${-crack * 25})`);
+    $('seedR').setAttribute('transform', `translate(${crack * 5} ${-crack * 2}) rotate(${crack * 25})`);
+
+    // mưa giai đoạn đầu
+    const rainK = seg(t, 0.04, 0.08) * (1 - seg(t, 0.2, 0.26));
+    $('rain').setAttribute('opacity', rainK);
+    if (rainK > 0) drops.forEach(dp => {
+      const y = (dp.y + clock * dp.v) % 330 + 100;
+      dp.n.setAttribute('x1', dp.x); dp.n.setAttribute('x2', dp.x - 3);
+      dp.n.setAttribute('y1', y); dp.n.setAttribute('y2', y + 12);
+    });
+
+    // rễ
+    const rootP = seg(t, 0.1, 0.55);
+    roots.forEach(r => r.n.setAttribute('stroke-dashoffset', 1 - easeOut(seg(rootP, r.a, r.b))));
+
+    // thân
+    const growth = ease(seg(t, 0.12, 0.7));
+    const len = growth * MAX_LEN;
+    const sway = Math.sin(clock * 1.3) * 4 * growth;
+    const lean = 18 * seg(t, 0.4, 0.9); // nghiêng về phía mặt trời
+    const G = stemGeom(len, sway, lean);
+    const width = 2 + 9 * growth;
+    $('stem').setAttribute('d', G.d);
+    $('stem').setAttribute('stroke-width', width);
+    $('stemHi').setAttribute('d', G.d);
+    $('stemHi').setAttribute('stroke-width', width * 0.3);
+    $('stem').style.display = $('stemHi').style.display = len > 1 ? '' : 'none';
+
+    // lá mầm: đi theo ngọn tới khi cao 70px rồi dừng lại, về sau úa dần
+    const cotH = Math.min(len, 72);
+    const cotGrow = easeOut(seg(len, 40, 72));
+    const cotWither = seg(t, 0.55, 0.8);
+    const cp = G.at(len > 0 ? cotH / len : 0);
+    cots.forEach(c => {
+      const ang = c.side === 1 ? lerp(-80, -15 + cotWither * 50, cotGrow) : lerp(-100, -165 - cotWither * 50, cotGrow);
+      c.g.setAttribute('transform', `translate(${cp[0]} ${cp[1]}) rotate(${ang}) scale(${0.3 + 0.7 * cotGrow})`);
+      c.g.setAttribute('opacity', len > 30 ? 1 - cotWither * 0.7 : 0);
+      c.g.firstChild.setAttribute('fill', cotWither > 0 ? `rgb(${lerp(121, 170, cotWither)},${lerp(194, 160, cotWither)},${lerp(79, 70, cotWither)})` : '#79c24f');
+    });
+
+    // lá thật
+    leaves.forEach(lf => {
+      const k = easeOut(seg(len, lf.h + 4, lf.h + 90));
+      if (k <= 0) { lf.g.setAttribute('opacity', 0); return; }
+      const u = lf.h / len;
+      const p = G.at(u);
+      const base = lf.side === 1 ? -35 : -145;
+      const droop = lf.side * (k * 25 + Math.sin(clock * 1.7 + lf.h) * 3);
+      lf.g.setAttribute('opacity', 1);
+      lf.g.setAttribute('transform', `translate(${p[0].toFixed(2)} ${p[1].toFixed(2)}) rotate(${base + droop}) scale(${0.15 + 0.85 * k})`);
+    });
+
+    // đầu hoa
+    const budK = easeOut(seg(t, 0.6, 0.74));
+    const bloom = ease(seg(t, 0.74, 0.9));
+    const seedK = seg(t, 0.84, 1);
+    const tilt = G.tan(1) + 90 + 12 * bloom;
+    const head = $('head');
+    head.setAttribute('transform', `translate(${G.p2[0].toFixed(2)} ${G.p2[1].toFixed(2)}) rotate(${tilt.toFixed(2)})`);
+    head.setAttribute('opacity', budK > 0 ? 1 : 0);
+
+    // nụ: quả cầu xanh + lá đài khép, lá đài mở dần khi hoa nở
+    const budR = lerp(0, 22, budK) * (1 - bloom * 0.0);
+    budBall.setAttribute('r', budR * (1 - bloom));
+    sepals.forEach(s => {
+      const spread = lerp(25, 95, bloom);
+      const a = s.ang;
+      // khi khép: lá đài chụm lên trên; khi nở: toả tròn sau cánh hoa
+      const rot = lerp(a > 180 ? -spread * (360 - a) / 180 : spread * a / 180, a, bloom);
+      const sc = budK * lerp(0.9, 1.25, bloom);
+      s.g.setAttribute('transform', `rotate(${rot}) translate(0 ${-budR * 0.4}) scale(${sc})`);
+      s.g.setAttribute('opacity', budK);
+    });
+
+    // cánh hoa
+    const diskR = lerp(budR * 0.6, DISK_R, bloom);
+    petals.forEach(p => {
+      const k = ease(clamp((bloom - p.delay) / (1 - p.delay)));
+      const show = bloom > 0;
+      p.g.style.display = show ? '' : 'none';
+      if (!show) return;
+      const flutter = Math.sin(clock * 2 + p.ang) * 2 * k;
+      const rot = lerp(p.ang * 0.15 - 25, p.ang, k) + flutter;
+      const len = (0.25 + 0.75 * k) * p.scale;
+      p.g.setAttribute('transform', `rotate(${rot.toFixed(2)}) translate(0 ${(-diskR * 0.85).toFixed(2)}) scale(${(0.6 + 0.4 * k) * p.scale} ${len.toFixed(3)})`);
+    });
+
+    // đĩa hoa + hạt
+    $('diskC').setAttribute('r', bloom > 0 ? diskR : 0);
+    const nShow = Math.floor(lerp(N_SEEDS * 0.25, N_SEEDS, seedK) * bloom);
+    seedDots.forEach(s => {
+      if (s.i > nShow) { s.c.setAttribute('r', 0); return; }
+      const rr = (0.9 + 1.2 * s.frac) * (0.6 + 0.6 * seedK);
+      s.c.setAttribute('r', rr.toFixed(2));
+      s.c.setAttribute('fill', seedK > 0.3 && s.frac > 0.25 ? '#1c140a' : '#c9921a');
+      s.c.setAttribute('stroke', seedK > 0.3 ? '#8a6a3a' : 'none');
+      s.c.setAttribute('stroke-width', .4);
+    });
+    $('seedsDots').setAttribute('transform', `scale(${(diskR / DISK_R).toFixed(3)})`);
+
+    // ong ghé thăm khi hoa nở
+    const beeK = seg(t, 0.82, 0.86) * (1 - seg(t, 0.97, 1));
+    const bee = $('bee');
+    bee.setAttribute('opacity', beeK);
+    if (beeK > 0) {
+      const bx = G.p2[0] + Math.cos(clock * 1.4) * 120;
+      const by = G.p2[1] + Math.sin(clock * 2.1) * 40 - 10;
+      bee.setAttribute('transform', `translate(${bx} ${by}) scale(${Math.cos(clock * 1.4) < 0 ? -1 : 1} 1)`);
+    }
+
+    // trời, mây, nắng
+    $('sunRays').setAttribute('transform', `rotate(${clock * 8})`);
+    $('cloud1').setAttribute('transform', `translate(${(clock * 12) % 960 - 80} 80)`);
+    $('cloud2').setAttribute('transform', `translate(${(clock * 7 + 500) % 960 - 80} 140)`);
+
+    // thông tin
+    $('day').textContent = Math.round(t * TOTAL_DAYS);
+    let si = 0;
+    STAGES.forEach((s, i) => { if (t >= s.t) si = i; });
+    $('stageName').textContent = STAGES[si].name;
+    stageBtns.forEach((b, i) => b.classList.toggle('on', i === si));
+  }
+
+  // ---- điều khiển ----
+  const stageBtns = STAGES.map(s => {
+    const b = document.createElement('button');
+    b.textContent = s.name;
+    b.onclick = () => { t = s.t + 0.001; slider.value = t * 1000; };
+    $('stages').appendChild(b);
+    return b;
+  });
+
+  const slider = $('time'), playBtn = $('play');
+  let t = 0, playing = false, last = performance.now(), clock = 0;
+  const setPlaying = v => { playing = v; playBtn.textContent = v ? '❚❚ Dừng' : (t >= 1 ? '↺ Lại' : '▶ Chạy'); };
+  playBtn.onclick = () => {
+    if (!playing && t >= 1) t = 0;
+    setPlaying(!playing);
+  };
+  slider.oninput = () => { t = slider.value / 1000; setPlaying(false); };
+
+  function frame(now) {
+    const dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+    clock += dt;
+    if (playing) {
+      t = Math.min(1, t + dt * +$('speed').value / DURATION);
+      slider.value = t * 1000;
+      if (t >= 1) setPlaying(false);
+    }
+    render(t, clock);
+    requestAnimationFrame(frame);
+  }
+  setPlaying(true);
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

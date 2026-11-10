@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Hoa hướng dương - từ hạt đến nở rộ</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 12px;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: linear-gradient(180deg, #7cc8f5 0%, #c9ecff 65%, #eef9de 100%);
+    color: #3a2a10;
+  }
+  .card {
+    width: min(460px, 100%);
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(8px);
+    border-radius: 20px;
+    padding: 18px 18px 20px;
+    box-shadow: 0 12px 32px rgba(40, 80, 120, 0.18);
+    text-align: center;
+  }
+  h1 { margin: 0 0 8px; font-size: 1.15rem; }
+  svg { width: 100%; height: auto; display: block; border-radius: 14px; }
+  .stage { margin: 12px 0; font-weight: 600; min-height: 1.5em; }
+  .controls { display: flex; align-items: center; gap: 10px; }
+  button {
+    border: none;
+    border-radius: 999px;
+    padding: 9px 16px;
+    min-width: 120px;
+    background: #f2a400;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button:hover { filter: brightness(1.06); }
+  input[type="range"] { flex: 1; accent-color: #f2a400; }
+  .time {
+    min-width: 92px;
+    text-align: right;
+    font-size: 0.9rem;
+    font-variant-numeric: tabular-nums;
+  }
+</style>
+</head>
+<body>
+<main class="card">
+  <h1>🌻 Hoa hướng dương: từ hạt đến nở rộ</h1>
+
+  <svg id="scene" viewBox="0 0 400 500" role="img" aria-label="Mô phỏng hoa hướng dương lớn lên từ hạt">
+    <defs>
+      <linearGradient id="soilGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#8b5a2b" />
+        <stop offset="1" stop-color="#4e2f14" />
+      </linearGradient>
+      <linearGradient id="leafGrad" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#6cc463" />
+        <stop offset="1" stop-color="#2e8b3a" />
+      </linearGradient>
+      <radialGradient id="discGrad" cx="50%" cy="50%" r="50%">
+        <stop offset="0" stop-color="#7a4a1d" />
+        <stop offset="1" stop-color="#3b200b" />
+      </radialGradient>
+      <radialGradient id="sunGrad">
+        <stop offset="0" stop-color="#fff7a6" />
+        <stop offset="0.6" stop-color="#ffd54f" />
+        <stop offset="1" stop-color="#ffb300" stop-opacity="0" />
+      </radialGradient>
+    </defs>
+
+    <!-- Mặt trời -->
+    <circle cx="350" cy="58" r="60" fill="url(#sunGrad)" />
+    <circle cx="350" cy="58" r="22" fill="#ffd54f" />
+
+    <!-- Đất -->
+    <path d="M0 462 Q 25 452 50 462 T 100 462 T 150 462 T 200 462 T 250 462 T 300 462 T 350 462 T 400 462 V500 H0 Z" fill="url(#soilGrad)" />
+    <path d="M0 462 Q 25 452 50 462 T 100 462 T 150 462 T 200 462 T 250 462 T 300 462 T 350 462 T 400 462" fill="none" stroke="#5f9e3a" stroke-width="5" stroke-linecap="round" />
+
+    <!-- Rễ (nằm trong đất) -->
+    <g id="roots" fill="none" stroke="#f1d6b0" stroke-width="2" stroke-linecap="round" opacity="0.9"></g>
+
+    <!-- Hạt giống -->
+    <ellipse id="seed" cx="200" cy="470" rx="10" ry="7" fill="#7b4a1f" stroke="#4a2a0c" stroke-width="1" />
+
+    <!-- Cây (thân, lá, đầu hoa) được tạo và cập nhật bằng JS -->
+    <g id="plant"></g>
+  </svg>
+
+  <div class="stage" id="stage"></div>
+
+  <div class="controls">
+    <button id="toggle" type="button">⏸ Tạm dừng</button>
+    <input id="timeline" type="range" min="0" max="1000" value="0" aria-label="Thanh thời gian" />
+    <span class="time" id="time"></span>
+  </div>
+</main>
+
+<script>
+(() => {
+  "use strict";
+
+  const NS = "http://www.w3.org/2000/svg";
+  const DURATION = 14000;      // ms cho toàn bộ vòng đời
+  const GROUND_Y = 462;        // mặt đất
+  const STEM_MAX = 290;        // chiều cao tối đa của thân
+  const DISC_MAX = 36;         // bán kính tối đa của đĩa hoa
+
+  const $ = (id) => document.getElementById(id);
+  const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const easeOut = (t) => 1 - Math.pow(1 - t, 3);
+  const easeInOut = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+
+  const hexMix = (c1, c2, t) => {
+    const parse = (c) => [
+      parseInt(c.slice(1, 3), 16),
+      parseInt(c.slice(3, 5), 16),
+      parseInt(c.slice(5, 7), 16),
+    ];
+    const A = parse(c1);
+    const B = parse(c2);
+    const v = A.map((x, i) => Math.round(lerp(x, B[i], t)));
+    return `rgb(${v[0]},${v[1]},${v[2]})`;
+  };
+
+  const el = (tag, attrs = {}, parent) => {
+    const node = document.createElementNS(NS, tag);
+    for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v);
+    if (parent) parent.appendChild(node);
+    return node;
+  };
+
+  // ---------- Rễ ----------
+  const rootsG = $("roots");
+  const rootEls = [
+    "M200 470 C 196 486 186 494 168 500",
+    "M200 470 C 204 486 214 494 234 500",
+    "M199 474 C 190 480 180 484 160 486",
+    "M201 474 C 210 480 222 482 242 480",
+    "M200 476 L 200 500",
+  ].map((d) => el("path", { d, pathLength: 1 }, rootsG));
+
+  // ---------- Cây ----------
+  const plant = $("plant");
+  const seed = $("seed");
+  const stemEl = el("path", { fill: "none", stroke: "#4f9a3c", "stroke-linecap": "round" }, plant);
+
+  const leafSpecs = [
+    { f: 0.22, side: 1,  start: 0.22, size: 1.1 },
+    { f: 0.40, side: -1, start: 0.34, size: 1.0 },
+    { f: 0.58, side: 1,  start: 0.46, size: 0.9 },
+    { f: 0.76, side: -1, start: 0.56, size: 0.75 },
+  ];
+  const LEAF_D = "M0 0 C 18 -15 46 -13 64 0 C 46 13 18 15 0 0 Z";
+  const leafEls = leafSpecs.map(() =>
+    el("path", { d: LEAF_D, fill: "url(#leafGrad)", stroke: "#2e7d32", "stroke-width": 1 }, plant)
+  );
+
+  // Đầu hoa
+  const headG = el("g", {}, plant);
+  const sepal = el("circle", { cx: 0, cy: 0, r: 0, fill: "#4e8a2a" }, headG);
+
+  const rings = [
+    { n: 20, offset: 0, lenK: 1.0,  outer: true,  stroke: "#c98a00", yellowTo: "#ffc107" },
+    { n: 20, offset: 9, lenK: 0.78, outer: false, stroke: "#d4a017", yellowTo: "#ffe082" },
+  ];
+  const petals = [];
+  rings.forEach((ring, r) => {
+    for (let i = 0; i < ring.n; i++) {
+      petals.push({
+        el: el("path", { stroke: ring.stroke, "stroke-width": 0.8, "stroke-opacity": 0.5 }, headG),
+        ang: ring.offset + (i * 360) / ring.n,
+        lenK: ring.lenK,
+        outer: ring.outer,
+        yellowTo: ring.yellowTo,
+        jit: 0.9 + 0.12 * Math.abs(Math.sin((i + 1) * 1.7 + r * 3)),
+      });
+    }
+  });
+  petals.forEach((pt) => pt.el.setAttribute("transform", `rotate(${pt.ang.toFixed(2)})`));
+
+  const disc = el("circle", { cx: 0, cy: 0, r: 0, fill: "url(#discGrad)" }, headG);
+
+  // Hạt trên đĩa hoa: xếp theo kiểu Fibonacci (góc vàng)
+  const seedDots = el("path", { fill: "#2a1606", opacity: 0.9 }, headG);
+  {
+    const N = 260, R = 32, s = 1.5;
+    const phi = Math.PI * (3 - Math.sqrt(5));
+    let d = "";
+    for (let n = 0; n < N; n++) {
+      const r = R * Math.sqrt((n + 0.5) / N);
+      const a = n * phi;
+      const x = r * Math.cos(a);
+      const y = r * Math.sin(a);
+      d += `M${(x - s).toFixed(2)} ${y.toFixed(2)}a${s} ${s} 0 1 0 ${2 * s} 0a${s} ${s} 0 1 0 ${-2 * s} 0`;
+    }
+    seedDots.setAttribute("d", d);
+  }
+
+  // ---------- Hình dạng cánh hoa ----------
+  const petalD = (r0, L, w) => {
+    const r1 = r0 + L;
+    const m = r0 + L * 0.5;
+    return `M0 ${(-r0).toFixed(2)} C ${w.toFixed(2)} ${(-r0 - L * 0.15).toFixed(2)} ${(w * 1.2).toFixed(2)} ${(-m).toFixed(2)} 0 ${(-r1).toFixed(2)} ` +
+           `C ${(-w * 1.2).toFixed(2)} ${(-m).toFixed(2)} ${(-w).toFixed(2)} ${(-r0 - L * 0.15).toFixed(2)} 0 ${(-r0).toFixed(2)} Z`;
+  };
+
+  // ---------- Giai đoạn ----------
+  const stages = [
+    [0.10, "🌰 Hạt giống nằm yên trong đất ẩm"],
+    [0.25, "💧 Hạt hút nước, rễ bắt đầu đâm xuống"],
+    [0.45, "🌱 Mầm vươn lên, thân non lớn dần"],
+    [0.66, "🍃 Thân cao, lá xanh xòe rộng"],
+    [0.85, "🟢 Nụ hoa hình thành và phồng lên"],
+    [1.01, "🌻 Hoa nở rộ, hướng về phía mặt trời"],
+  ];
+
+  const stageEl = $("stage");
+
+  // ---------- Cập nhật hình theo tiến độ p (0..1) ----------
+  function update(p, t) {
+    // Hạt: mờ dần khi nảy mầm
+    seed.setAttribute("opacity", clamp(1 - (p - 0.04) / 0.08).toFixed(2));
+
+    // Rễ: mọc dần
+    const rootP = easeOut(clamp((p - 0.03) / 0.3));
+    rootEls.forEach((r) => {
+      r.setAttribute("stroke-dasharray", "1 1");
+      r.setAttribute("stroke-dashoffset", (1 - rootP).toFixed(3));
+    });
+
+    // Thân
+    const stemP = easeOut(clamp((p - 0.08) / 0.5));
+    const H = STEM_MAX * stemP;
+    const topY = GROUND_Y - H;
+    stemEl.setAttribute("d", `M200 ${GROUND_Y} L200 ${topY.toFixed(2)}`);
+    stemEl.setAttribute("stroke-width", (2 + 5 * stemP).toFixed(2));
+
+    // Lá
+    leafSpecs.forEach((s, i) => {
+      const g = easeOut(clamp((p - s.start) / 0.18));
+      const y = GROUND_Y - H * s.f;
+      const ang = s.side > 0 ? -35 : -145;
+      leafEls[i].setAttribute(
+        "transform",
+        `translate(200 ${y.toFixed(2)}) rotate(${ang}) scale(${(g * s.size).toFixed(3)})`
+      );
+    });
+
+    // Đầu hoa
+    const budP = easeOut(clamp((p - 0.45) / 0.22));
+    const bloomP = easeInOut(clamp((p - 0.66) / 0.3));
+    const discP = easeOut(clamp((p - 0.55) / 0.3));
+    const discR = DISC_MAX * discP;
+
+    headG.setAttribute("transform", `translate(200 ${topY.toFixed(2)})`);
+    sepal.setAttribute("r", (26 * budP).toFixed(2));
+    disc.setAttribute("r", discR.toFixed(2));
+    seedDots.setAttribute("transform", `scale(${(discR / DISC_MAX).toFixed(3)})`);
+
+    const r0 = discR * 0.8 + 2;
+    petals.forEach((pt) => {
+      const L = lerp(1, 60, bloomP) * pt.lenK * pt.jit;
+      const w = Math.max(2, L * 0.21);
+      pt.el.setAttribute("d", petalD(r0, L, w));
+      pt.el.setAttribute("fill", hexMix("#8bc34a", pt.yellowTo, bloomP));
+      pt.el.setAttribute("fill-opacity", clamp(budP * 1.2).toFixed(2));
+    });
+
+    // Cả cây lay nhẹ theo gió, biên độ tăng theo chiều cao
+    const sway = Math.sin(t * 1.3) * 1.2 * stemP;
+    plant.setAttribute("transform", `rotate(${sway.toFixed(3)} 200 ${GROUND_Y})`);
+
+    // Nhãn giai đoạn
+    const label = (stages.find(([th]) => p < th) || stages[stages.length - 1])[1];
+    stageEl.textContent = label;
+  }
+
+  // ---------- Điều khiển ----------
+  const slider = $("timeline");
+  const btn = $("toggle");
+  const timeEl = $("time");
+
+  let progress = 0;
+  let playing = true;
+  let last = performance.now();
+
+  btn.addEventListener("click", () => {
+    if (progress >= 1) {
+      progress = 0;
+      playing = true;
+    } else {
+      playing = !playing;
+    }
+  });
+
+  slider.addEventListener("input", () => {
+    progress = slider.value / 1000;
+    playing = false;
+  });
+
+  function syncUI() {
+    if (progress >= 1 && !playing) btn.textContent = "↻ Xem lại";
+    else btn.textContent = playing ? "⏸ Tạm dừng" : "▶ Tiếp tục";
+    timeEl.textContent = `${((progress * DURATION) / 1000).toFixed(1)} / ${DURATION / 1000}s`;
+  }
+
+  function frame(now) {
+    const dt = Math.max(0, now - last);
+    last = now;
+    if (playing) {
+      progress = Math.min(1, progress + dt / DURATION);
+      if (progress >= 1) playing = false;
+    }
+    update(progress, now / 1000);
+    slider.value = Math.round(progress * 1000);
+    syncUI();
+    requestAnimationFrame(frame);
+  }
+
+  update(progress, 0);
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

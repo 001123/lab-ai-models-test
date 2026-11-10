@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f3f0e7">
+  <title>Hành trình hoa hướng dương — Từ hạt đến hoa</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #23392d;
+      --muted: #738174;
+      --cream: #f3f0e7;
+      --green: #244d37;
+      --yellow: #f4b844;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      background: radial-gradient(circle at 5% 5%, #faf8f1 0, transparent 40%), var(--cream);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    .page { max-width: 1500px; margin: 0 auto; padding: 28px clamp(18px, 4vw, 64px) 35px; }
+    .masthead { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 25px; }
+    .brand { display: flex; align-items: center; gap: 12px; font-size: 12px; font-weight: 800; letter-spacing: .17em; text-transform: uppercase; }
+    .brand-mark { width: 37px; height: 37px; display: grid; place-items: center; background: #e8c46d; color: #4a3b1b; border-radius: 50%; font-size: 22px; line-height: 1; }
+    .masthead-note, .tiny-label, .eyebrow, .scene-tag, .scene-footer, .control-label, .day-label { font-size: 10px; font-weight: 750; letter-spacing: .19em; text-transform: uppercase; }
+    .masthead-note { color: #7b877a; }
+    .card { display: grid; grid-template-columns: minmax(325px, 35%) minmax(0, 1fr); min-height: 600px; overflow: hidden; border: 1px solid rgba(43, 69, 51, .09); border-radius: 24px; background: #fffdf7; box-shadow: 0 23px 65px rgba(42, 52, 38, .10); }
+    .story { position: relative; display: flex; flex-direction: column; padding: clamp(32px, 4.6vw, 68px) clamp(27px, 3.7vw, 56px) 37px; overflow: hidden; }
+    .story::after { content: "✳"; position: absolute; top: 27px; right: 34px; color: #e5e8d9; font-size: 52px; line-height: 1; }
+    .eyebrow { margin: 0 0 28px; color: #ba883d; }
+    h1 { max-width: 390px; margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(39px, 3.9vw, 62px); font-weight: 400; line-height: 1.04; letter-spacing: -.052em; }
+    h1 em { color: #c48931; font-weight: 400; font-style: italic; }
+    .intro { max-width: 330px; margin: 25px 0 0; color: #778274; font-size: 14px; line-height: 1.8; }
+    .stage-details { margin-top: auto; padding-top: 55px; }
+    .stage-divider { height: 1px; background: #e5e9dc; margin-bottom: 26px; }
+    .stage-meta { display: flex; align-items: center; justify-content: space-between; color: #b08748; }
+    .stage-number { font-family: Georgia, serif; font-size: 50px; font-weight: 400; line-height: 1; letter-spacing: -.07em; }
+    .day-label { color: #a3ab9f; }
+    .stage-name { margin: 17px 0 10px; font-family: Georgia, serif; font-size: 27px; font-weight: 400; letter-spacing: -.03em; }
+    .stage-description { min-height: 72px; max-width: 335px; margin: 0; color: #758074; font-size: 13px; line-height: 1.8; }
+    .needs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+    .needs span { border: 1px solid #e4e8da; border-radius: 99px; padding: 8px 10px; color: #64816a; font-size: 10px; font-weight: 700; letter-spacing: .04em; }
+    .scene { position: relative; min-width: 0; min-height: 600px; overflow: hidden; background: linear-gradient(180deg, #dcece0 0%, #e8eedb 70%, #e5e1bd 100%); }
+    .scene::after { content: ""; position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 85px rgba(44, 90, 55, .07); }
+    .scene svg { display: block; width: 100%; height: 100%; min-height: 600px; }
+    .scene-tag { position: absolute; z-index: 1; top: 30px; left: 34px; display: flex; align-items: center; gap: 10px; color: #47745a; }
+    .scene-tag::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #72a076; box-shadow: 0 0 0 4px rgba(114, 160, 118, .16); }
+    .scene-footer { position: absolute; z-index: 1; right: 33px; bottom: 22px; color: #dfd3aa; font-style: italic; letter-spacing: .12em; text-transform: none; }
+    .controls { display: grid; grid-template-columns: 205px minmax(0, 1fr); align-items: center; gap: 30px; padding: 24px 3px 0; }
+    .play { display: flex; align-items: center; gap: 13px; padding: 0; border: 0; background: none; color: var(--ink); text-align: left; font-size: 13px; font-weight: 750; }
+    .play-icon { width: 45px; height: 45px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 50%; background: var(--green); color: #fff; transition: transform .2s, background .2s; }
+    .play:hover .play-icon { transform: scale(1.07); background: #36714c; }
+    .play:focus-visible, .milestone:focus-visible, .scrubber:focus-visible { outline: 3px solid #c99135; outline-offset: 4px; }
+    .play-icon svg { width: 17px; height: 17px; fill: currentColor; }
+    .pause-shape { display: none; }
+    .play.is-playing .play-shape { display: none; }
+    .play.is-playing .pause-shape { display: block; }
+    .timeline { min-width: 0; }
+    .timeline-top { display: flex; justify-content: space-between; margin-bottom: 12px; color: #869082; }
+    .scrubber { display: block; width: 100%; height: 7px; margin: 0; appearance: none; -webkit-appearance: none; border-radius: 50px; background: linear-gradient(to right, #c9953e var(--fill, 0%), #dce1d3 var(--fill, 0%)); cursor: pointer; }
+    .scrubber::-webkit-slider-thumb { appearance: none; -webkit-appearance: none; width: 19px; height: 19px; border: 4px solid #fffdf7; border-radius: 50%; background: #b77729; box-shadow: 0 1px 6px #74776080; }
+    .scrubber::-moz-range-thumb { width: 11px; height: 11px; border: 4px solid #fffdf7; border-radius: 50%; background: #b77729; box-shadow: 0 1px 6px #74776080; }
+    .milestones { display: flex; justify-content: space-between; gap: 5px; margin-top: 15px; }
+    .milestone { padding: 4px 0; border: 0; background: transparent; color: #929d90; font-size: 11px; font-weight: 650; transition: color .2s; }
+    .milestone:hover, .milestone.active { color: #aa752c; }
+    .bottom-note { display: flex; justify-content: space-between; gap: 16px; margin-top: 28px; color: #a1a99e; font-size: 11px; }
+    @media (max-width: 850px) {
+      .card { grid-template-columns: 1fr; }
+      .story { min-height: 380px; padding: 34px 33px; }
+      .stage-details { padding-top: 38px; }
+      .stage-description { min-height: 0; }
+      .scene, .scene svg { min-height: 480px; }
+      .scene svg { height: 480px; }
+    }
+    @media (max-width: 550px) {
+      .page { padding: 18px 14px 26px; }
+      .masthead { margin-bottom: 17px; }
+      .masthead-note { display: none; }
+      .card { border-radius: 18px; }
+      .story { min-height: 0; padding: 32px 27px 29px; }
+      .story::after { font-size: 37px; }
+      .eyebrow { margin-bottom: 19px; }
+      h1 { max-width: 325px; font-size: clamp(38px, 9vw, 48px); }
+      .intro { margin-top: 14px; }
+      .stage-details { padding-top: 27px; }
+      .stage-divider { margin-bottom: 17px; }
+      .stage-name { margin-top: 8px; }
+      .needs { margin-top: 13px; }
+      .scene, .scene svg { min-height: 350px; }
+      .scene svg { height: 350px; }
+      .scene-tag { top: 17px; left: 19px; font-size: 8px; }
+      .scene-footer { right: 16px; bottom: 12px; font-size: 8px; }
+      .controls { grid-template-columns: 1fr; gap: 22px; padding: 20px 6px 0; }
+      .bottom-note { margin-top: 24px; }
+      .bottom-note span:last-child { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="masthead">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">✳</span> Vườn nhỏ</div>
+      <span class="masthead-note">Một câu chuyện về sự lớn lên</span>
+    </header>
+
+    <div class="card">
+      <section class="story" aria-labelledby="title">
+        <p class="eyebrow">01 — 05 &nbsp; / &nbsp; Nhật ký sinh trưởng</p>
+        <h1 id="title">Từ một hạt nhỏ, đến một <em>mặt trời.</em></h1>
+        <p class="intro">Theo dõi hành trình của hoa hướng dương, từng chút một, từ lòng đất đến khi rực rỡ dưới nắng.</p>
+        <div class="stage-details" aria-live="polite" aria-atomic="true">
+          <div class="stage-divider"></div>
+          <div class="stage-meta"><span class="stage-number" id="stage-number">01</span><span class="day-label" id="day-label">NGÀY 00 / 90</span></div>
+          <h2 class="stage-name" id="stage-name">Hạt giống</h2>
+          <p class="stage-description" id="stage-description">Một hạt bé xíu nằm yên dưới lớp đất ấm, chờ nước và ánh sáng đánh thức sự sống.</p>
+          <div class="needs" aria-label="Điều kiện sinh trưởng"><span>☀ &nbsp; Ánh sáng</span><span>◒ &nbsp; Nước</span><span>✳ &nbsp; Thời gian</span></div>
+        </div>
+      </section>
+
+      <div class="scene" role="img" aria-label="Minh họa SVG tương tác mô phỏng hoa hướng dương lớn lên từ hạt giống, nảy mầm, ra lá và nở hoa">
+        <div class="scene-tag">Một hành trình sống</div>
+        <svg id="garden" viewBox="0 0 1000 640" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <defs>
+            <linearGradient id="soil" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#856b4a"/><stop offset=".52" stop-color="#66533f"/><stop offset="1" stop-color="#4a4638"/></linearGradient>
+            <linearGradient id="stem-color" x1="0" x2="1" y1="0" y2=".3"><stop stop-color="#427944"/><stop offset=".55" stop-color="#77a353"/><stop offset="1" stop-color="#356b43"/></linearGradient>
+            <linearGradient id="leaf-color" x1="0" x2="1" y1="1" y2="0"><stop stop-color="#387a48"/><stop offset=".48" stop-color="#6da553"/><stop offset="1" stop-color="#9cbf62"/></linearGradient>
+            <linearGradient id="petal-color" x1=".5" x2=".5" y1="1" y2="0"><stop stop-color="#c66b22"/><stop offset=".35" stop-color="#eda037"/><stop offset=".82" stop-color="#f9c94f"/><stop offset="1" stop-color="#ffe17e"/></linearGradient>
+            <linearGradient id="petal-back" x1="0" x2="1" y1="1" y2="0"><stop stop-color="#a85c26"/><stop offset=".6" stop-color="#d68129"/><stop offset="1" stop-color="#eeb344"/></linearGradient>
+            <radialGradient id="disc"><stop stop-color="#684321"/><stop offset=".7" stop-color="#4c321d"/><stop offset="1" stop-color="#322b1c"/></radialGradient>
+            <radialGradient id="sun-glow"><stop stop-color="#fff1aa" stop-opacity=".72"/><stop offset="1" stop-color="#fff1aa" stop-opacity="0"/></radialGradient>
+            <clipPath id="underground"><rect x="0" y="475" width="1000" height="165"/></clipPath>
+          </defs>
+
+          <!-- Sky, distant fields and the sun -->
+          <circle cx="827" cy="109" r="131" fill="url(#sun-glow)"/>
+          <circle cx="827" cy="109" r="65" fill="none" stroke="#f6e8ac" stroke-width="1.5" stroke-dasharray="2 10"/>
+          <circle cx="827" cy="109" r="39" fill="#f9df89" opacity=".88"/>
+          <circle cx="827" cy="109" r="30" fill="#ffe8a2"/>
+          <g fill="#ffffff" opacity=".3"><ellipse cx="169" cy="113" rx="75" ry="12"/><ellipse cx="226" cy="105" rx="48" ry="10"/><ellipse cx="690" cy="181" rx="56" ry="8"/></g>
+          <path d="M0 407 Q124 371 246 408 T500 400 T754 407 T1000 395 V490 H0Z" fill="#c7d9ac" opacity=".5"/>
+          <path d="M0 442 Q173 405 335 446 T691 437 T1000 437 V490 H0Z" fill="#a6c595" opacity=".48"/>
+          <g fill="#638b68" opacity=".55"><circle cx="112" cy="362" r="2"/><circle cx="301" cy="242" r="2"/><circle cx="677" cy="312" r="2"/><circle cx="895" cy="344" r="2"/></g>
+          <path d="M0 473 Q250 470 500 475 T1000 471 V640 H0Z" fill="url(#soil)"/>
+          <path d="M0 476 Q260 471 500 475 T1000 474" fill="none" stroke="#d2b382" stroke-width="4" opacity=".7"/>
+          <path d="M0 541 Q170 529 350 546 T680 540 T1000 544 M0 596 Q220 582 410 598 T755 595 T1000 592" fill="none" stroke="#c9ad82" stroke-width="1" opacity=".11"/>
+          <g fill="#d4b88a" opacity=".38"><ellipse cx="102" cy="506" rx="3" ry="1.5"/><ellipse cx="280" cy="567" rx="3" ry="1.5"/><ellipse cx="370" cy="496" rx="2" ry="1"/><ellipse cx="632" cy="527" rx="3" ry="1.5"/><ellipse cx="810" cy="561" rx="4" ry="2"/><ellipse cx="920" cy="510" rx="2" ry="1"/><ellipse cx="156" cy="611" rx="2" ry="1"/><ellipse cx="750" cy="611" rx="2" ry="1"/></g>
+          <g fill="#506b42" opacity=".58"><path d="M198 474 q-5 -16 -12 -19 m12 19 q4 -17 12 -22 m-12 22 q-7 -9 -14 -8" fill="none" stroke="#577f4c" stroke-width="2"/><path d="M770 474 q-3 -18 -12 -23 m12 23 q3 -12 12 -17 m-12 17 q-5 -8 -10 -7" fill="none" stroke="#577f4c" stroke-width="2"/></g>
+
+          <!-- Roots reveal beneath the soil -->
+          <g id="root-system" clip-path="url(#underground)" fill="none" stroke="#d2b48a" stroke-linecap="round" stroke-linejoin="round">
+            <path class="root-path" d="M500 502 C500 526 491 535 494 552 S478 574 479 602" stroke-width="3.5"/>
+            <path class="root-path" d="M496 535 Q475 539 464 555 T435 570" stroke-width="2"/>
+            <path class="root-path" d="M493 554 Q510 560 520 574 T546 590" stroke-width="2"/>
+            <path class="root-path" d="M481 581 Q462 589 454 609" stroke-width="1.5"/>
+            <path class="root-path" d="M521 574 Q536 566 550 568" stroke-width="1.4"/>
+          </g>
+
+          <!-- Seed and the split shell -->
+          <g id="seed" transform="translate(501 494) rotate(-27)">
+            <path d="M0 -19 C12 -16 16 -3 11 9 C7 18 -2 25 -8 17 C-20 2 -15 -14 0 -19Z" fill="#332e26" stroke="#241f1a" stroke-width="2"/>
+            <path d="M0 -15 C7 -9 9 1 5 12 M-6 -12 C-11 -2 -9 9 -5 15" fill="none" stroke="#e0c5a0" stroke-width="3" stroke-linecap="round" opacity=".8"/>
+            <path d="M0 -19 Q-3 -23 -7 -21" fill="none" stroke="#ddc39c" stroke-width="1.5"/>
+          </g>
+          <g id="split-seed" transform="translate(501 493)" opacity="0">
+            <path d="M-2 -7 C-8 -19 -19 -14 -21 0 C-20 14 -11 19 -5 15 Q-14 4 -2 -7Z" fill="#403226" stroke="#cba67a" stroke-width="1.5"/>
+            <path d="M4 -8 C17 -17 23 -7 19 5 C16 15 10 18 4 15 Q13 3 4 -8Z" fill="#403226" stroke="#cba67a" stroke-width="1.5"/>
+            <path d="M-3 -5 Q0 -9 4 -7 Q11 5 3 13 Q-5 17 -10 8Z" fill="#e5d8a9"/>
+          </g>
+
+          <!-- The growing stem -->
+          <path id="stem-shadow" d="M500 478 C485 430 495 402 505 361 C515 317 502 273 520 217" fill="none" stroke="#34623f" stroke-width="19" stroke-linecap="round"/>
+          <path id="stem" d="M500 478 C485 430 495 402 505 361 C515 317 502 273 520 217" fill="none" stroke="url(#stem-color)" stroke-width="15" stroke-linecap="round"/>
+
+          <!-- Seed leaves -->
+          <g id="cotyledons" transform="translate(494 420) scale(0)">
+            <path d="M0 0 C-17 -26 -46 -31 -54 -16 C-55 -3 -25 13 0 0Z" fill="#8aaf62"/>
+            <path d="M0 0 C17 -28 41 -33 49 -19 C52 -6 24 12 0 0Z" fill="#a4c476"/>
+            <path d="M-42 -15 Q-20 -13 0 0 Q22 -16 41 -19" fill="none" stroke="#d0db95" stroke-width="1.5"/>
+          </g>
+          <g id="leaf-one" transform="translate(501 384) scale(0)">
+            <path d="M0 0 C-21 -4 -36 -15 -48 -27 C-65 -45 -78 -66 -83 -81 C-45 -79 -20 -58 -7 -37 Q1 -20 0 0Z" fill="url(#leaf-color)" stroke="#45814b" stroke-width="2"/>
+            <path d="M0 0 Q-42 -46 -81 -78 M-23 -26 q-20 0 -33 -6 M-41 -43 q-2 -17 -1 -25" fill="none" stroke="#c3d881" stroke-width="2" opacity=".8"/>
+          </g>
+          <g id="leaf-two" transform="translate(509 338) scale(0)">
+            <path d="M0 0 C16 -24 38 -46 63 -53 Q77 -57 96 -54 C91 -25 68 -1 40 5 Q17 8 0 0Z" fill="url(#leaf-color)" stroke="#44804b" stroke-width="2"/>
+            <path d="M0 0 Q41 -35 93 -52 M36 -27 Q44 -43 44 -49 M56 -37 Q70 -36 78 -28 M27 -20 Q42 -17 51 -10" fill="none" stroke="#c3d881" stroke-width="2" opacity=".8"/>
+          </g>
+          <g id="leaf-three" transform="translate(516 287) scale(0)">
+            <path d="M0 0 C-16 -20 -30 -35 -54 -41 Q-68 -44 -79 -41 C-68 -8 -34 15 0 0Z" fill="url(#leaf-color)" stroke="#44804b" stroke-width="2"/>
+            <path d="M0 0 Q-41 -31 -77 -40 M-31 -23 Q-33 -34 -31 -37 M-45 -29 Q-53 -24 -57 -16" fill="none" stroke="#c3d881" stroke-width="1.7" opacity=".8"/>
+          </g>
+          <g id="leaf-four" transform="translate(518 253) scale(0)">
+            <path d="M0 0 C15 -20 37 -32 63 -28 C55 -4 26 13 0 0Z" fill="url(#leaf-color)" stroke="#44804b" stroke-width="2"/>
+            <path d="M0 0 Q28 -21 61 -27" fill="none" stroke="#c3d881" stroke-width="1.7"/>
+          </g>
+
+          <!-- Closed flower bud -->
+          <g id="bud" transform="translate(520 217) scale(0)">
+            <path d="M-30 0 Q-34 -42 0 -49 Q33 -41 30 0 Q18 19 0 19 Q-19 17 -30 0Z" fill="#628e4c" stroke="#396e42" stroke-width="3"/>
+            <path d="M-28 -6 Q-38 -28 -31 -40 Q-9 -23 0 8 Q10 -29 32 -40 Q37 -22 26 -6" fill="#78a65a" stroke="#467d49" stroke-width="2"/>
+            <path d="M-13 -41 Q-9 -57 0 -62 Q12 -55 15 -40" fill="#d9a548"/>
+          </g>
+
+          <!-- Bloom: petals and seeds are created as SVG elements below -->
+          <g id="flower" transform="translate(520 217) scale(0)" opacity="0">
+            <circle r="65" fill="#406b3b"/>
+            <g id="sepals"></g>
+            <g id="back-petals"></g>
+            <g id="front-petals"></g>
+            <circle r="53" fill="#a8662b"/>
+            <circle r="49" fill="#e2a445"/>
+            <circle r="44" fill="url(#disc)"/>
+            <g id="seeds"></g>
+            <circle r="41" fill="none" stroke="#e0a546" stroke-width="2" stroke-dasharray="2 5" opacity=".8"/>
+            <circle r="46" fill="none" stroke="#f0bb58" stroke-width="1" opacity=".7"/>
+          </g>
+        </svg>
+        <div class="scene-footer">Helianthus annuus &nbsp; · &nbsp; 01 / 05</div>
+      </div>
+    </div>
+
+    <section class="controls" aria-label="Điều khiển mô phỏng">
+      <button class="play" id="play-button" type="button" aria-label="Phát hành trình">
+        <span class="play-icon" aria-hidden="true"><svg viewBox="0 0 20 20"><path class="play-shape" d="M5 2.5v15L17 10 5 2.5Z"/><path class="pause-shape" d="M4 3h4v14H4zm8 0h4v14h-4z"/></svg></span>
+        <span id="play-text">Phát hành trình</span>
+      </button>
+      <div class="timeline">
+        <div class="timeline-top"><span class="control-label">Kéo để khám phá</span><span class="control-label" id="progress-label">0% hoàn thành</span></div>
+        <input class="scrubber" id="scrubber" type="range" min="0" max="1000" value="0" aria-label="Giai đoạn phát triển của hoa hướng dương">
+        <div class="milestones" aria-label="Chọn giai đoạn">
+          <button class="milestone active" type="button" data-progress="0" aria-current="step">Hạt giống</button>
+          <button class="milestone" type="button" data-progress="0.28">Nảy mầm</button>
+          <button class="milestone" type="button" data-progress="0.48">Mầm non</button>
+          <button class="milestone" type="button" data-progress="0.70">Ra lá</button>
+          <button class="milestone" type="button" data-progress="1">Nở hoa</button>
+        </div>
+      </div>
+    </section>
+    <footer class="bottom-note"><span>Mỗi bông hoa đều bắt đầu từ một hạt giống.</span><span>Một thí nghiệm nhỏ bằng SVG &amp; JavaScript</span></footer>
+  </main>
+
+  <script>
+    (() => {
+      const NS = 'http://www.w3.org/2000/svg';
+      const $ = (id) => document.getElementById(id);
+      const clamp = (n) => Math.max(0, Math.min(1, n));
+      const smooth = (start, end, value) => {
+        const t = clamp((value - start) / (end - start));
+        return t * t * (3 - 2 * t);
+      };
+      const create = (tag, attrs, parent) => {
+        const element = document.createElementNS(NS, tag);
+        for (const [key, value] of Object.entries(attrs)) element.setAttribute(key, value);
+        parent.appendChild(element);
+        return element;
+      };
+
+      const sepals = $('sepals');
+      const backPetals = $('back-petals');
+      const frontPetals = $('front-petals');
+      const seedPattern = $('seeds');
+      const petals = [];
+      for (let i = 0; i < 23; i++) {
+        const angle = i * 360 / 23;
+        create('path', {
+          d: 'M0 -30 Q-18 -54 -9 -87 Q-4 -106 0 -112 Q12 -89 15 -66 Q14 -45 0 -30Z',
+          fill: '#55854a', transform: `rotate(${angle})`
+        }, sepals);
+      }
+      for (let i = 0; i < 23; i++) {
+        const angle = i * 360 / 23 + 360 / 46;
+        const petal = create('path', {
+          d: 'M0 -29 C-14 -49 -17 -80 0 -112 C15 -81 16 -48 0 -29Z',
+          fill: 'url(#petal-back)', stroke: '#ae6a25', 'stroke-width': '.7'
+        }, backPetals);
+        petals.push({ element: petal, angle, delay: i * .004, back: true });
+      }
+      for (let i = 0; i < 23; i++) {
+        const angle = i * 360 / 23;
+        const petal = create('path', {
+          d: 'M0 -31 C-17 -54 -18 -92 0 -130 C19 -94 17 -53 0 -31Z',
+          fill: 'url(#petal-color)', stroke: '#da9638', 'stroke-width': '.9'
+        }, frontPetals);
+        petals.push({ element: petal, angle, delay: i * .004, back: false });
+        create('path', {
+          d: 'M0 -37 Q-2 -77 0 -118', fill: 'none', stroke: '#fff0a6',
+          'stroke-width': '1', opacity: '.42', transform: `rotate(${angle})`
+        }, frontPetals);
+      }
+      // Golden-angle placement produces the familiar interlaced sunflower seed spirals.
+      for (let i = 0; i < 230; i++) {
+        const radius = 39 * Math.sqrt((i + .5) / 230);
+        const angle = i * 2.399963229728653;
+        const x = radius * Math.cos(angle);
+        const y = radius * Math.sin(angle);
+        create('ellipse', {
+          cx: x.toFixed(2), cy: y.toFixed(2), rx: i % 7 === 0 ? '2.4' : '2', ry: '1.35',
+          fill: i % 5 === 0 ? '#dda04a' : i % 3 === 0 ? '#b87d3a' : '#93632e',
+          opacity: (0.68 + .28 * radius / 39).toFixed(2),
+          transform: `rotate(${(angle * 180 / Math.PI).toFixed(1)} ${x.toFixed(2)} ${y.toFixed(2)})`
+        }, seedPattern);
+      }
+
+      const stem = $('stem');
+      const stemShadow = $('stem-shadow');
+      const stemLength = stem.getTotalLength();
+      [stem, stemShadow].forEach(path => {
+        path.style.strokeDasharray = stemLength;
+        path.style.strokeDashoffset = stemLength;
+      });
+      const roots = [...document.querySelectorAll('.root-path')].map(path => {
+        const length = path.getTotalLength();
+        path.style.strokeDasharray = length;
+        path.style.strokeDashoffset = length;
+        return { path, length };
+      });
+      const leaves = [
+        ['cotyledons', 494, 420, .24, .41],
+        ['leaf-one', 501, 384, .37, .56],
+        ['leaf-two', 509, 338, .46, .64],
+        ['leaf-three', 516, 287, .55, .73],
+        ['leaf-four', 518, 253, .63, .79]
+      ];
+      const stages = [
+        { at: 0, name: 'Hạt giống', text: 'Một hạt bé xíu nằm yên dưới lớp đất ấm, chờ nước và ánh sáng đánh thức sự sống.' },
+        { at: .19, name: 'Nảy mầm', text: 'Vỏ hạt hé mở. Chiếc rễ đầu tiên len sâu vào đất, tìm nguồn nước để nuôi cây.' },
+        { at: .39, name: 'Mầm non', text: 'Một chồi xanh vươn lên khỏi mặt đất, đón những tia nắng đầu tiên.' },
+        { at: .61, name: 'Ra lá', text: 'Thân cây cao dần, những chiếc lá xòe rộng để hấp thụ ánh sáng.' },
+        { at: .83, name: 'Nở hoa', text: 'Nụ hoa bung cánh vàng rực rỡ. Từ một hạt nhỏ, một mặt trời đã nở.' }
+      ];
+      const stageButtons = [...document.querySelectorAll('.milestone')];
+      const slider = $('scrubber');
+      const playButton = $('play-button');
+      let progress = 0;
+      let playing = false;
+      let previousFrame = null;
+      const duration = 14000;
+
+      function render(p) {
+        progress = clamp(p);
+        slider.value = Math.round(progress * 1000);
+        slider.style.setProperty('--fill', `${progress * 100}%`);
+        $('progress-label').textContent = `${Math.round(progress * 100)}% hoàn thành`;
+        $('day-label').textContent = `NGÀY ${String(Math.round(progress * 90)).padStart(2, '0')} / 90`;
+
+        const rootGrowth = smooth(.09, .37, progress);
+        roots.forEach(({ path, length }, i) => {
+          path.style.strokeDashoffset = length * (1 - smooth(i ? .19 : .09, i ? .45 : .37, progress));
+        });
+        $('root-system').style.opacity = rootGrowth;
+        const seedGone = smooth(.24, .42, progress);
+        $('seed').style.opacity = 1 - seedGone;
+        $('split-seed').style.opacity = smooth(.20, .29, progress) * (1 - smooth(.40, .58, progress));
+        const stemGrowth = smooth(.19, .78, progress);
+        stem.style.strokeDashoffset = stemLength * (1 - stemGrowth);
+        stemShadow.style.strokeDashoffset = stemLength * (1 - stemGrowth);
+        leaves.forEach(([id, x, y, from, to], index) => {
+          const size = smooth(from, to, progress) * (index === 0 ? 1 - .3 * smooth(.65, .83, progress) : 1);
+          $(id).setAttribute('transform', `translate(${x} ${y}) scale(${size.toFixed(3)})`);
+        });
+        const budSize = smooth(.67, .81, progress) * (1 - smooth(.82, .93, progress));
+        $('bud').setAttribute('transform', `translate(520 217) scale(${budSize.toFixed(3)})`);
+        const bloom = smooth(.80, 1, progress);
+        const flowerSize = .28 + .72 * bloom;
+        $('flower').setAttribute('transform', `translate(520 217) scale(${flowerSize.toFixed(3)})`);
+        $('flower').style.opacity = smooth(.78, .87, progress);
+        petals.forEach(({ element, angle, delay, back }) => {
+          const spread = smooth(.81 + delay, back ? .96 : 1, progress);
+          element.setAttribute('transform', `rotate(${angle}) scale(${(.2 + .8 * spread).toFixed(3)} ${(.16 + .84 * spread).toFixed(3)})`);
+        });
+        frontPetals.querySelectorAll('path:nth-child(even)').forEach(line => {
+          line.style.opacity = bloom * .45;
+        });
+        let active = 0;
+        for (let i = 1; i < stages.length; i++) if (progress >= stages[i].at) active = i;
+        $('stage-number').textContent = String(active + 1).padStart(2, '0');
+        $('stage-name').textContent = stages[active].name;
+        $('stage-description').textContent = stages[active].text;
+        stageButtons.forEach((button, i) => {
+          button.classList.toggle('active', i === active);
+          if (i === active) button.setAttribute('aria-current', 'step');
+          else button.removeAttribute('aria-current');
+        });
+      }
+
+      function setPlaying(value) {
+        playing = value;
+        previousFrame = null;
+        playButton.classList.toggle('is-playing', value);
+        $('play-text').textContent = value ? 'Tạm dừng' : progress >= 1 ? 'Xem lại từ đầu' : 'Phát hành trình';
+        playButton.setAttribute('aria-label', value ? 'Tạm dừng' : progress >= 1 ? 'Xem lại từ đầu' : 'Phát hành trình');
+        if (value) requestAnimationFrame(tick);
+      }
+      function tick(timestamp) {
+        if (!playing) return;
+        if (previousFrame !== null) render(progress + Math.min(timestamp - previousFrame, 100) / duration);
+        previousFrame = timestamp;
+        if (progress >= 1) setPlaying(false);
+        else requestAnimationFrame(tick);
+      }
+      playButton.addEventListener('click', () => {
+        if (playing) setPlaying(false);
+        else {
+          if (progress >= 1) render(0);
+          setPlaying(true);
+        }
+      });
+      slider.addEventListener('input', () => {
+        if (playing) setPlaying(false);
+        render(Number(slider.value) / 1000);
+      });
+      stageButtons.forEach(button => button.addEventListener('click', () => {
+        if (playing) setPlaying(false);
+        render(Number(button.dataset.progress));
+      }));
+      render(0);
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) setPlaying(true);
+    })();
+  </script>
+</body>
+</html>

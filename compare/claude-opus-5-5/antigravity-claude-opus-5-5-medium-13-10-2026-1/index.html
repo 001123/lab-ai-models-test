@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hoa hướng dương — từ hạt tới hoa</title>
+<style>
+  :root { --ink:#2b2a26; --panel:rgba(255,255,255,.82); --accent:#f2a900; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; font-family: "Segoe UI", system-ui, -apple-system, sans-serif; color:var(--ink); background:#1d2a33; }
+  .wrap { max-width:1100px; margin:0 auto; padding:18px; display:flex; flex-direction:column; gap:12px; min-height:100%; }
+  h1 { margin:0; font-size:22px; color:#fff; font-weight:600; letter-spacing:.3px; }
+  h1 span { color:var(--accent); }
+  .stage-box { position:relative; border-radius:16px; overflow:hidden; box-shadow:0 12px 40px rgba(0,0,0,.45); }
+  svg { display:block; width:100%; height:auto; }
+  .hud { position:absolute; top:14px; left:14px; background:var(--panel); backdrop-filter:blur(6px); padding:10px 14px; border-radius:12px; min-width:210px; }
+  .hud .day { font-size:12px; text-transform:uppercase; letter-spacing:1px; opacity:.7; }
+  .hud .name { font-size:20px; font-weight:700; margin-top:2px; }
+  .hud .desc { font-size:13px; margin-top:4px; max-width:260px; line-height:1.35; }
+  .controls { display:flex; align-items:center; gap:12px; flex-wrap:wrap; background:#26363f; padding:12px 14px; border-radius:12px; color:#e9eef1; }
+  button { background:var(--accent); color:#2b2a26; border:0; padding:8px 16px; border-radius:8px; font-weight:700; cursor:pointer; font-size:14px; }
+  button.ghost { background:#3a4d58; color:#e9eef1; }
+  button:hover { filter:brightness(1.08); }
+  input[type=range] { flex:1; min-width:180px; accent-color:var(--accent); }
+  select { background:#3a4d58; color:#e9eef1; border:0; padding:7px 8px; border-radius:8px; }
+  .timeline { display:flex; justify-content:space-between; font-size:11px; color:#a9bac3; padding:0 4px; }
+  .timeline span { cursor:pointer; }
+  .timeline span.active { color:var(--accent); font-weight:700; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🌻 Vòng đời <span>hoa hướng dương</span> — từ hạt tới lớn</h1>
+
+  <div class="stage-box">
+    <svg id="scene" viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg" aria-label="Mô phỏng hoa hướng dương lớn lên">
+      <defs>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+          <stop id="skyTop" offset="0" stop-color="#7ec8f0"/>
+          <stop id="skyBot" offset="1" stop-color="#e8f6ff"/>
+        </linearGradient>
+        <linearGradient id="soil" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#6b4528"/>
+          <stop offset="0.35" stop-color="#553620"/>
+          <stop offset="1" stop-color="#2e1d11"/>
+        </linearGradient>
+        <linearGradient id="grass" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#7cbf4a"/>
+          <stop offset="1" stop-color="#4f8f2e"/>
+        </linearGradient>
+        <radialGradient id="sunGlow">
+          <stop offset="0" stop-color="#fff7c2"/>
+          <stop offset="0.35" stop-color="#ffe066"/>
+          <stop offset="1" stop-color="#ffe066" stop-opacity="0"/>
+        </radialGradient>
+        <linearGradient id="stemGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#3f7d24"/>
+          <stop offset="0.5" stop-color="#6cae3e"/>
+          <stop offset="1" stop-color="#3f7d24"/>
+        </linearGradient>
+        <linearGradient id="leafGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#5fa83a"/>
+          <stop offset="1" stop-color="#2f6e1d"/>
+        </linearGradient>
+        <linearGradient id="petalGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#e88a00"/>
+          <stop offset="0.35" stop-color="#ffc21a"/>
+          <stop offset="1" stop-color="#ffd84a"/>
+        </linearGradient>
+        <linearGradient id="petalGradBack" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#c86f00"/>
+          <stop offset="0.4" stop-color="#f0a800"/>
+          <stop offset="1" stop-color="#f7c22c"/>
+        </linearGradient>
+        <radialGradient id="diskGrad">
+          <stop offset="0" stop-color="#3b2410"/>
+          <stop offset="0.7" stop-color="#4f2f12"/>
+          <stop offset="1" stop-color="#6b4a14"/>
+        </radialGradient>
+        <path id="petalShape" d="M0,0 C0.22,-0.24 0.68,-0.26 1,0 C0.68,0.26 0.22,0.24 0,0Z"/>
+        <path id="leafShape" d="M0,0 C8,-20 48,-36 82,-6 C62,18 22,24 0,0Z"/>
+        <path id="cotyShape" d="M0,0 C6,-10 26,-11 34,0 C26,11 6,10 0,0Z"/>
+      </defs>
+
+      <!-- Sky -->
+      <rect width="900" height="420" fill="url(#sky)"/>
+      <g id="sun">
+        <circle r="90" fill="url(#sunGlow)"/>
+        <circle r="30" fill="#ffd93b"/>
+      </g>
+      <g id="clouds" fill="#fff" opacity="0.9"></g>
+      <!-- distant hills -->
+      <path d="M0,380 C120,330 220,360 320,345 C430,328 520,370 640,350 C760,330 830,355 900,340 L900,420 L0,420Z" fill="#a8d38a" opacity="0.7"/>
+      <path d="M0,400 C150,370 260,392 420,380 C580,368 700,398 900,378 L900,420 L0,420Z" fill="#8cc46a"/>
+
+      <!-- Soil cross-section -->
+      <rect y="420" width="900" height="180" fill="url(#soil)"/>
+      <g id="stones"></g>
+      <rect y="414" width="900" height="10" fill="url(#grass)"/>
+      <g id="grassTufts" fill="#5e9f36"></g>
+
+      <!-- Roots -->
+      <g id="roots" fill="none" stroke="#e9d8b4" stroke-linecap="round"></g>
+
+      <!-- Seed -->
+      <g id="seed" transform="translate(450,478)">
+        <g id="seedL">
+          <path d="M0,-16 C-9,-12 -10,6 0,16 Z" fill="#1f1a17"/>
+          <path d="M-3,-13 C-5,-6 -5,6 -3,12" stroke="#e8e2d6" stroke-width="1.6" fill="none"/>
+          <path d="M-6.5,-8 C-7.5,-2 -7.5,4 -6,8" stroke="#bfb6a6" stroke-width="1.1" fill="none"/>
+        </g>
+        <g id="seedR">
+          <path d="M0,-16 C9,-12 10,6 0,16 Z" fill="#2a2420"/>
+          <path d="M3,-13 C5,-6 5,6 3,12" stroke="#e8e2d6" stroke-width="1.6" fill="none"/>
+          <path d="M6.5,-8 C7.5,-2 7.5,4 6,8" stroke="#bfb6a6" stroke-width="1.1" fill="none"/>
+        </g>
+      </g>
+
+      <!-- Plant -->
+      <g id="plant">
+        <g id="leavesBack"></g>
+        <path id="stem" fill="none" stroke="url(#stemGrad)" stroke-linecap="round"/>
+        <path id="stemHair" fill="none" stroke="#9fd07a" stroke-opacity="0.35" stroke-dasharray="1 5" stroke-linecap="round"/>
+        <g id="cotys"></g>
+        <g id="leavesFront"></g>
+        <g id="head"></g>
+      </g>
+
+      <!-- Bee -->
+      <g id="bee" opacity="0">
+        <ellipse cx="0" cy="0" rx="9" ry="6" fill="#f5c400"/>
+        <path d="M-3,-5.6 L-3,5.6 M2,-5.8 L2,5.8" stroke="#222" stroke-width="2.4"/>
+        <circle cx="9" cy="-1" r="3.6" fill="#222"/>
+        <ellipse id="wing1" cx="-1" cy="-8" rx="6" ry="4" fill="#dff3ff" opacity="0.85"/>
+        <ellipse id="wing2" cx="3" cy="-8" rx="5" ry="3.4" fill="#dff3ff" opacity="0.7"/>
+      </g>
+    </svg>
+
+    <div class="hud">
+      <div class="day" id="dayLabel">Ngày 0</div>
+      <div class="name" id="stageName">Hạt giống</div>
+      <div class="desc" id="stageDesc"></div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button id="playBtn">⏸ Tạm dừng</button>
+    <button id="restartBtn" class="ghost">↺ Từ đầu</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tiến trình">
+    <label>Tốc độ
+      <select id="speed">
+        <option value="0.5">0.5×</option>
+        <option value="1" selected>1×</option>
+        <option value="2">2×</option>
+        <option value="4">4×</option>
+      </select>
+    </label>
+  </div>
+  <div class="timeline" id="timeline"></div>
+</div>
+
+<script>
+(() => {
+  const NS = "http://www.w3.org/2000/svg";
+  const $ = id => document.getElementById(id);
+  const mk = (tag, attrs = {}, parent) => {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  };
+
+  // ---------- math helpers ----------
+  const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+  const lerp = (a, b, k) => a + (b - a) * k;
+  const smooth = (a, b, x) => { const k = clamp((x - a) / (b - a)); return k * k * (3 - 2 * k); };
+  const easeOut = (a, b, x) => { const k = clamp((x - a) / (b - a)); return 1 - Math.pow(1 - k, 3); };
+  const mixHex = (h1, h2, k) => {
+    const p = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+    const a = p(h1), b = p(h2);
+    return "#" + a.map((v, i) => Math.round(lerp(v, b[i], k)).toString(16).padStart(2, "0")).join("");
+  };
+
+  // ---------- constants ----------
+  const GROUND = 420;
+  const BASE = { x: 450, y: 470 };     // where shoot leaves the seed
+  const MAX_LEN = 395;                  // final stem length (from seed)
+  const DURATION = 30;                  // seconds for full cycle at 1x
+  const TOTAL_DAYS = 90;
+
+  const STAGES = [
+    { at: 0.00, name: "Hạt giống", desc: "Hạt nằm trong đất ẩm, hút nước và trương phồng lên." },
+    { at: 0.08, name: "Nảy mầm", desc: "Vỏ hạt nứt ra, rễ mầm đâm xuống đất trước tiên." },
+    { at: 0.17, name: "Vươn lên mặt đất", desc: "Thân mầm uốn cong như móc câu, đội đất trồi lên." },
+    { at: 0.27, name: "Lá mầm xoè", desc: "Hai lá mầm mở ra, bắt đầu quang hợp." },
+    { at: 0.38, name: "Lá thật & thân", desc: "Thân vươn cao, các cặp lá thật hình tim mọc dần." },
+    { at: 0.70, name: "Hình thành nụ", desc: "Nụ hoa xanh xuất hiện trên ngọn, được lá bắc bao bọc." },
+    { at: 0.82, name: "Nở hoa", desc: "Cánh hoa vàng bung ra, đĩa hoa xếp xoắn ốc Fibonacci." },
+    { at: 0.95, name: "Trưởng thành", desc: "Hoa nở rộ, ong tới thụ phấn — hạt mới sẽ hình thành." }
+  ];
+
+  // ---------- static decoration ----------
+  const stones = $("stones");
+  const rnd = (() => { let s = 7; return () => (s = (s * 16807) % 2147483647) / 2147483647; })();
+  for (let i = 0; i < 46; i++) {
+    const x = rnd() * 900, y = 432 + rnd() * 160;
+    if (Math.abs(x - 450) < 70 && y < 560) continue;
+    mk("ellipse", { cx: x, cy: y, rx: 2 + rnd() * 6, ry: 1.5 + rnd() * 3.5,
+      fill: mixHex("#7a5a3e", "#9a8468", rnd()), opacity: 0.55 + rnd() * 0.35 }, stones);
+  }
+  const tufts = $("grassTufts");
+  for (let i = 0; i < 70; i++) {
+    const x = rnd() * 900; if (Math.abs(x - 450) < 25) continue;
+    const h = 5 + rnd() * 9;
+    mk("path", { d: `M${x - 3},418 Q${x - 1},${418 - h} ${x + 1 + rnd() * 3},${418 - h - 2} Q${x + 1},${418 - h / 2} ${x + 3},418Z` }, tufts);
+  }
+  const cloudsG = $("clouds");
+  const clouds = [0, 1, 2, 3].map(i => {
+    const g = mk("g", {}, cloudsG);
+    const s = 0.7 + rnd() * 0.7;
+    [[0, 0, 26], [24, -10, 22], [46, 2, 20], [22, 8, 24]].forEach(([x, y, r]) => mk("circle", { cx: x * s, cy: y * s, r: r * s }, g));
+    return { g, x: rnd() * 1000, y: 50 + rnd() * 120, v: 6 + rnd() * 10 };
+  });
+
+  // ---------- head (flower) elements, built once ----------
+  const head = $("head");
+  const budBall = mk("circle", { r: 20, fill: "#4e8f2c" }, head);
+  const bracts = [], petalsBack = [], petalsFront = [], seeds = [];
+  const bractG = mk("g", {}, head);
+  for (let i = 0; i < 26; i++) {
+    bracts.push({ a: i * 360 / 26 + (i % 2) * 4, el: mk("use", { href: "#petalShape", fill: i % 2 ? "#3f7d24" : "#56982f", stroke: "#2c5e18", "stroke-width": 0.6, "vector-effect": "non-scaling-stroke" }, bractG) });
+  }
+  const pbG = mk("g", {}, head), pfG = mk("g", {}, head);
+  for (let i = 0; i < 21; i++) {
+    petalsBack.push({ a: i * 360 / 21 + 8.5, d: (i * 7) % 21 / 21, el: mk("use", { href: "#petalShape", fill: "url(#petalGradBack)", stroke: "#c77d00", "stroke-width": 0.6, "vector-effect": "non-scaling-stroke" }, pbG) });
+    petalsFront.push({ a: i * 360 / 21, d: (i * 13) % 21 / 21, el: mk("use", { href: "#petalShape", fill: "url(#petalGrad)", stroke: "#d48b00", "stroke-width": 0.6, "vector-effect": "non-scaling-stroke" }, pfG) });
+  }
+  const diskG = mk("g", {}, head);
+  mk("circle", { r: 40, fill: "url(#diskGrad)" }, diskG);
+  const GOLDEN = Math.PI * (3 - Math.sqrt(5));
+  const N_SEEDS = 320;
+  for (let i = 1; i <= N_SEEDS; i++) {
+    const r = 38.5 * Math.sqrt(i / N_SEEDS), a = i * GOLDEN;
+    const k = i / N_SEEDS;
+    seeds.push({ k, el: mk("circle", { cx: (r * Math.cos(a)).toFixed(2), cy: (r * Math.sin(a)).toFixed(2), r: (0.9 + 1.0 * k).toFixed(2), fill: "#2a1708" }, diskG) });
+  }
+  const sheen = mk("ellipse", { cx: -12, cy: -14, rx: 16, ry: 10, fill: "#fff", opacity: 0.06 }, diskG);
+
+  // ---------- leaves ----------
+  const LEAF_DEFS = [
+    { d: 120, side: 1, size: 1.25 }, { d: 150, side: -1, size: 1.2 },
+    { d: 195, side: -1, size: 1.1 }, { d: 225, side: 1, size: 1.05 },
+    { d: 265, side: 1, size: 0.92 }, { d: 292, side: -1, size: 0.88 },
+    { d: 330, side: -1, size: 0.72 }, { d: 350, side: 1, size: 0.66 }
+  ];
+  const leaves = LEAF_DEFS.map((L, i) => {
+    const parent = i % 3 === 1 ? $("leavesBack") : $("leavesFront");
+    const g = mk("g", {}, parent);
+    mk("path", { d: "M-10,0 L2,0", stroke: "#3f7d24", "stroke-width": 3, "stroke-linecap": "round" }, g);
+    const blade = mk("use", { href: "#leafShape", fill: "url(#leafGrad)", stroke: "#2b5f19", "stroke-width": 1, "vector-effect": "non-scaling-stroke" }, g);
+    mk("path", { d: "M0,0 Q40,-8 78,-6 M24,-4 L36,-17 M24,-4 L34,7 M48,-6 L60,-19 M48,-6 L58,5", stroke: "#9fd07a", "stroke-width": 1, fill: "none", opacity: 0.7, "vector-effect": "non-scaling-stroke" }, g);
+    return { ...L, g, blade, phase: i * 1.7 };
+  });
+
+  // ---------- cotyledons ----------
+  const cotys = [-1, 1].map(side => {
+    const g = mk("g", {}, $("cotys"));
+    const u = mk("use", { href: "#cotyShape", fill: "#7fbf4d", stroke: "#3f7d24", "stroke-width": 1, "vector-effect": "non-scaling-stroke" }, g);
+    return { side, g, u };
+  });
+
+  // ---------- roots ----------
+  const rootsG = $("roots");
+  const taproot = mk("path", { "stroke-width": 3 }, rootsG);
+  const ROOT_LATS = [];
+  for (let i = 0; i < 12; i++) {
+    ROOT_LATS.push({ f: 0.12 + i * 0.07, side: i % 2 ? 1 : -1, len: 30 + rnd() * 45, curl: rnd() * 14 - 7,
+      el: mk("path", { "stroke-width": 1.4 }, rootsG) });
+  }
+  const hairs = mk("path", { "stroke-width": 0.6, opacity: 0.6 }, rootsG);
+
+  // ---------- refs ----------
+  const stem = $("stem"), stemHair = $("stemHair");
+  const seedL = $("seedL"), seedR = $("seedR"), seedG = $("seed");
+  const sun = $("sun"), bee = $("bee");
+  const skyTop = $("skyTop"), skyBot = $("skyBot");
+
+  // timeline labels
+  const tl = $("timeline");
+  const tlSpans = STAGES.map(s => {
+    const sp = document.createElement("span");
+    sp.textContent = s.name;
+    sp.onclick = () => { t = s.at + 0.001; render(); };
+    tl.appendChild(sp);
+    return sp;
+  });
+
+  // ---------- state ----------
+  let t = 0, playing = true, speed = 1, last = performance.now(), clock = 0, endHold = 0;
+
+  const quad = (S, C, T, u) => ({
+    x: (1 - u) * (1 - u) * S.x + 2 * (1 - u) * u * C.x + u * u * T.x,
+    y: (1 - u) * (1 - u) * S.y + 2 * (1 - u) * u * C.y + u * u * T.y
+  });
+  const quadAngle = (S, C, T, u) => {
+    const dx = 2 * (1 - u) * (C.x - S.x) + 2 * u * (T.x - C.x);
+    const dy = 2 * (1 - u) * (C.y - S.y) + 2 * u * (T.y - C.y);
+    return Math.atan2(dy, dx) * 180 / Math.PI;
+  };
+
+  function render() {
+    const time = clock;
+
+    // ---- sky & sun ----
+    const sunA = lerp(Math.PI * 0.92, Math.PI * 0.25, t);
+    sun.setAttribute("transform", `translate(${450 + Math.cos(sunA) * 380},${330 - Math.sin(sunA) * 260})`);
+    skyTop.setAttribute("stop-color", mixHex("#f3b27a", "#5fb4e8", smooth(0, 0.35, t)));
+    skyBot.setAttribute("stop-color", mixHex("#ffe3c2", "#e3f4ff", smooth(0, 0.35, t)));
+    clouds.forEach(c => {
+      const x = ((c.x + time * c.v) % 1100) - 120;
+      c.g.setAttribute("transform", `translate(${x},${c.y})`);
+    });
+
+    // ---- seed ----
+    const swell = 1 + 0.18 * smooth(0, 0.07, t);
+    const split = smooth(0.07, 0.16, t);
+    const husk = 1 - smooth(0.45, 0.6, t);
+    seedG.setAttribute("transform", `translate(450,478) rotate(${-8 + split * 4}) scale(${swell})`);
+    seedL.setAttribute("transform", `translate(${-split * 7},${split * 3}) rotate(${-split * 32},0,16)`);
+    seedR.setAttribute("transform", `translate(${split * 7},${split * 3}) rotate(${split * 32},0,16)`);
+    seedG.setAttribute("opacity", husk.toFixed(3));
+
+    // ---- roots ----
+    const rootK = easeOut(0.07, 0.75, t);
+    const rootLen = rootK * 115;
+    const RS = { x: 450, y: 488 };
+    const RE = { x: 450 + Math.sin(rootK * 3) * 6, y: RS.y + rootLen };
+    const RC = { x: 444, y: RS.y + rootLen * 0.5 };
+    taproot.setAttribute("d", rootLen > 0.5 ? `M${RS.x},${RS.y} Q${RC.x},${RC.y} ${RE.x},${RE.y}` : "");
+    taproot.setAttribute("stroke-width", (1.5 + rootK * 3).toFixed(2));
+    let hairD = "";
+    ROOT_LATS.forEach(L => {
+      const grow = clamp((rootK - L.f) / 0.35);
+      if (grow <= 0) { L.el.setAttribute("d", ""); return; }
+      const p = quad(RS, RC, RE, clamp(L.f / Math.max(rootK, 0.01), 0, 1));
+      const len = L.len * grow * (1 - L.f * 0.5);
+      const ex = p.x + L.side * len, ey = p.y + len * 0.45;
+      L.el.setAttribute("d", `M${p.x},${p.y} Q${p.x + L.side * len * 0.5},${p.y + L.curl} ${ex},${ey}`);
+      L.el.setAttribute("stroke-width", (0.6 + grow * 1.2).toFixed(2));
+      hairD += `M${ex},${ey} l${L.side * 6},${3} M${(p.x + ex) / 2},${(p.y + ey) / 2 + 2} l${L.side * 3},${6} `;
+    });
+    hairs.setAttribute("d", hairD);
+
+    // ---- stem ----
+    const growK = smooth(0.11, 0.86, t);
+    const len = Math.pow(growK, 0.85) * MAX_LEN;
+    const hook = len > 1 ? 1 - smooth(0.2, 0.28, t) : 0;
+    const lenN = len / MAX_LEN;
+    const wind = Math.sin(time * 1.1) * 0.6 + Math.sin(time * 2.3 + 1) * 0.4;
+    const sway = wind * 7 * lenN * lenN;
+    const S = { x: BASE.x, y: BASE.y };
+    const T = { x: BASE.x + sway + lenN * 6, y: BASE.y - len };
+    const C = { x: BASE.x - 8 * lenN + sway * 0.25, y: (S.y + T.y) / 2 };
+    const width = 2.4 + 9 * Math.pow(lenN, 0.9);
+
+    // hook (hypocotyl arch) — tip bends down while pushing through soil
+    const hk = hook * clamp(len / 25);
+    const HE = { x: T.x + 13 * hk, y: T.y + 2 * hk };
+    let d = "";
+    if (len > 0.5) {
+      d = `M${S.x},${S.y} Q${C.x},${C.y} ${T.x},${T.y}`;
+      if (hk > 0.01) d += ` Q${T.x + 2 * hk},${T.y - 12 * hk} ${HE.x},${HE.y}`;
+    }
+    stem.setAttribute("d", d);
+    stem.setAttribute("stroke-width", width.toFixed(2));
+    stemHair.setAttribute("d", len > 60 ? `M${S.x - width * 0.35},${S.y} Q${C.x - width * 0.35},${C.y} ${T.x - width * 0.3},${T.y}` : "");
+    stemHair.setAttribute("stroke-width", (width * 0.25).toFixed(2));
+
+    // ---- cotyledons ----
+    const open = smooth(0.24, 0.34, t);
+    const cotyD = Math.min(len, 62);
+    const cu = len > 0 ? cotyD / len : 1;
+    const cp = hk > 0.01 ? HE : quad(S, C, T, cu);
+    const cotyScale = (0.45 + 0.55 * smooth(0.18, 0.4, t)) * (1 - 0.35 * smooth(0.75, 0.95, t));
+    const cotyColor = mixHex("#7fbf4d", "#c9b648", smooth(0.72, 0.95, t));
+    cotys.forEach(c => {
+      if (len < 2) { c.g.setAttribute("opacity", 0); return; }
+      c.g.setAttribute("opacity", 1);
+      const base = c.side > 0 ? lerp(-90, -18, open) : lerp(-90, -162, open);
+      const ang = lerp(base, 75 + c.side * 8, hk);
+      c.g.setAttribute("transform", `translate(${cp.x},${cp.y}) rotate(${ang + wind * 2})  scale(${cotyScale})`);
+      c.u.setAttribute("fill", cotyColor);
+    });
+
+    // ---- true leaves ----
+    leaves.forEach(L => {
+      const grow = clamp((len - L.d) / 70);
+      if (grow <= 0 || len < L.d) { L.g.setAttribute("opacity", 0); return; }
+      L.g.setAttribute("opacity", 1);
+      const u = L.d / len;
+      const p = quad(S, C, T, u);
+      const stemAng = quadAngle(S, C, T, u); // ~ -90
+      const flutter = Math.sin(time * 1.6 + L.phase) * 3 + wind * 2;
+      const droop = 18 * smooth(0.5, 1, grow);
+      const s = L.size * (0.25 + 0.75 * easeOut(0, 1, grow));
+      const ang = (L.side > 0 ? stemAng + 90 - 60 + droop : stemAng - 90 + 60 - droop) + flutter;
+      L.g.setAttribute("transform", `translate(${p.x + L.side * width * 0.4},${p.y}) rotate(${ang}) scale(${s},${s * L.side})`);
+    });
+
+    // ---- head: bud -> bloom ----
+    const bud = smooth(0.68, 0.8, t);
+    const bloom = smooth(0.82, 0.97, t);
+    if (bud <= 0.001) {
+      head.setAttribute("opacity", 0);
+    } else {
+      head.setAttribute("opacity", 1);
+      const hs = 0.35 + 0.65 * bud;
+      const nod = wind * 3 + lerp(0, -6, bloom);
+      head.setAttribute("transform", `translate(${T.x},${T.y - 4 * hs}) rotate(${nod}) scale(${hs})`);
+
+      budBall.setAttribute("r", (18 + 12 * bloom).toFixed(2));
+      budBall.setAttribute("opacity", (1 - smooth(0.85, 0.95, t)).toFixed(3));
+
+      bracts.forEach((b, i) => {
+        // closed: bracts point inward & overlap like a bud; open: lie flat behind petals
+        const L = lerp(26, 22 + 10 * (i % 2), bloom);
+        const W = lerp(30, 22, bloom);
+        const r0 = lerp(2, 30, bloom);
+        b.el.setAttribute("transform", `rotate(${b.a + bloom * 6}) translate(${r0},0) scale(${L},${W})`);
+      });
+
+      const petalFor = (arr, rStart, maxLen, wid, delay) => arr.forEach(p => {
+        const k = smooth(delay + p.d * 0.25, delay + p.d * 0.25 + 0.55, bloom);
+        const L = lerp(4, maxLen, k);
+        const W = lerp(8, wid, k);
+        const sw = Math.sin(time * 1.4 + p.a) * 1.5 * k;
+        p.el.setAttribute("transform", `rotate(${p.a + sw}) translate(${lerp(4, rStart, bloom)},0) scale(${L},${W})`);
+        p.el.setAttribute("opacity", k > 0.01 ? 1 : 0);
+      });
+      petalFor(petalsBack, 34, 58, 44, 0.0);
+      petalFor(petalsFront, 34, 54, 40, 0.15);
+
+      diskG.setAttribute("transform", `scale(${(0.2 + 0.8 * bloom).toFixed(3)})`);
+      diskG.setAttribute("opacity", smooth(0.82, 0.9, t).toFixed(3));
+      // florets ripen from outside -> inside
+      const ripe = smooth(0.9, 1, t);
+      seeds.forEach(s => {
+        const on = s.k > 1 - ripe * 0.85;
+        s.el.setAttribute("fill", on ? "#d9a41a" : "#2a1708");
+      });
+    }
+
+    // ---- bee ----
+    const beeK = smooth(0.93, 0.98, t);
+    if (beeK > 0) {
+      const a = time * 1.2;
+      const bx = T.x + Math.cos(a) * 110 * (1.4 - beeK * 0.4) + 20;
+      const by = T.y - 30 + Math.sin(a * 2) * 40;
+      bee.setAttribute("transform", `translate(${bx},${by}) scale(${Math.cos(a) > 0 ? -1 : 1},1)`);
+      bee.setAttribute("opacity", beeK);
+      const f = Math.sin(time * 60) > 0 ? 1 : 0.6;
+      $("wing1").setAttribute("ry", 4 * f); $("wing2").setAttribute("ry", 3.4 * f);
+    } else bee.setAttribute("opacity", 0);
+
+    // ---- HUD ----
+    let si = 0; STAGES.forEach((s, i) => { if (t >= s.at) si = i; });
+    $("stageName").textContent = STAGES[si].name;
+    $("stageDesc").textContent = STAGES[si].desc;
+    $("dayLabel").textContent = `Ngày ${Math.round(t * TOTAL_DAYS)} / ${TOTAL_DAYS}`;
+    tlSpans.forEach((sp, i) => sp.classList.toggle("active", i === si));
+    $("scrub").value = Math.round(t * 1000);
+  }
+
+  function frame(now) {
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    clock += dt;
+    if (playing) {
+      if (t < 1) t = Math.min(1, t + dt * speed / DURATION);
+      else { endHold += dt; if (endHold > 6) { t = 0; endHold = 0; } }
+    }
+    render();
+    requestAnimationFrame(frame);
+  }
+
+  // ---------- controls ----------
+  const playBtn = $("playBtn");
+  const setPlaying = v => { playing = v; playBtn.textContent = v ? "⏸ Tạm dừng" : "▶ Chạy"; };
+  playBtn.onclick = () => { if (t >= 1) { t = 0; endHold = 0; } setPlaying(!playing); };
+  $("restartBtn").onclick = () => { t = 0; endHold = 0; setPlaying(true); };
+  $("scrub").addEventListener("input", e => { t = e.target.value / 1000; endHold = 0; setPlaying(false); });
+  $("speed").onchange = e => { speed = parseFloat(e.target.value); };
+  document.addEventListener("keydown", e => { if (e.code === "Space") { e.preventDefault(); playBtn.click(); } });
+
+  render();
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

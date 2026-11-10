@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f5f3ea">
+  <title>Helia — From seed to sun</title>
+  <style>
+    :root {
+      --paper: #f5f3ea;
+      --ink: #24382b;
+      --muted: #748074;
+      --green: #345b3b;
+      --green-dark: #24462e;
+      --line: #dcded1;
+      --sun: #efbd3f;
+      --white: #fffef9;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { background: var(--paper); }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 7% 0%, rgba(239, 189, 63, .08), transparent 28rem),
+        var(--paper);
+      font-family: "Avenir Next", Avenir, "Segoe UI", Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button, input { font: inherit; }
+    button { -webkit-tap-highlight-color: transparent; }
+    button:focus-visible, input:focus-visible {
+      outline: 3px solid rgba(239, 189, 63, .65);
+      outline-offset: 4px;
+    }
+
+    .app {
+      width: min(100%, 1500px);
+      min-height: 100svh;
+      margin: 0 auto;
+      padding: 26px 42px 20px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .masthead {
+      min-height: 44px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      width: max-content;
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .brand-mark {
+      width: 30px;
+      height: 30px;
+      color: var(--sun);
+    }
+
+    .brand-name {
+      font-family: "Iowan Old Style", Baskerville, Georgia, serif;
+      font-size: 29px;
+      font-weight: 700;
+      letter-spacing: -.8px;
+      line-height: 1;
+    }
+
+    .masthead-label,
+    .study-number,
+    .eyebrow,
+    .stage-heading,
+    .specimen-meta span,
+    .timeline-label,
+    .scene-badge,
+    .scene-note,
+    .footer-note {
+      font-size: 10px;
+      font-weight: 650;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+    }
+
+    .masthead-label { color: var(--muted); }
+
+    .study-number {
+      justify-self: end;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--muted);
+    }
+
+    .study-number b { color: var(--ink); font-weight: 700; }
+    .study-number .sun-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--sun);
+      box-shadow: 0 0 0 4px rgba(239, 189, 63, .14);
+    }
+
+    .workspace {
+      flex: 1;
+      display: grid;
+      grid-template-columns: minmax(270px, .76fr) minmax(0, 1.7fr);
+      align-items: center;
+      gap: clamp(30px, 4vw, 68px);
+      padding: 26px 0 22px;
+    }
+
+    .intro { max-width: 390px; }
+
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      color: var(--green);
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 26px;
+      height: 1px;
+      background: var(--green);
+    }
+
+    h1 {
+      margin: 0;
+      font-family: "Iowan Old Style", Baskerville, Georgia, serif;
+      font-size: clamp(54px, 5.25vw, 82px);
+      font-weight: 500;
+      line-height: .94;
+      letter-spacing: -3.6px;
+    }
+
+    h1 em {
+      color: var(--green);
+      font-weight: 400;
+    }
+
+    .intro-copy {
+      max-width: 340px;
+      margin: 24px 0 0;
+      color: #6d786f;
+      font-size: 14px;
+      line-height: 1.75;
+    }
+
+    .stage-card {
+      margin-top: 34px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+    }
+
+    .stage-heading {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      color: var(--muted);
+      letter-spacing: 1.35px;
+    }
+
+    #phaseCount { color: var(--green); }
+
+    .stage-title-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: 11px;
+    }
+
+    .stage-title-row h2 {
+      margin: 0;
+      font-family: "Iowan Old Style", Baskerville, Georgia, serif;
+      font-size: 29px;
+      font-weight: 500;
+      letter-spacing: -.6px;
+    }
+
+    #dayReadout {
+      flex: none;
+      color: var(--green);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    #stageDescription {
+      min-height: 48px;
+      margin: 9px 0 0;
+      color: #6d786f;
+      font-size: 13px;
+      line-height: 1.65;
+    }
+
+    .specimen-meta {
+      display: flex;
+      gap: 34px;
+      margin-top: 23px;
+    }
+
+    .specimen-meta div { display: grid; gap: 4px; }
+    .specimen-meta span { color: #929a90; font-size: 8px; letter-spacing: 1.3px; }
+    .specimen-meta strong { font-family: Georgia, serif; font-size: 13px; font-weight: 400; font-style: italic; }
+
+    .visual-column { min-width: 0; }
+
+    .visual-shell {
+      position: relative;
+      width: 100%;
+      max-width: 860px;
+      aspect-ratio: 860 / 640;
+      margin-left: auto;
+      overflow: hidden;
+      isolation: isolate;
+      border: 1px solid rgba(52, 91, 59, .12);
+      border-radius: 26px;
+      background: #edf0dc;
+      box-shadow: 0 20px 60px rgba(46, 66, 40, .07);
+    }
+
+    .garden {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .scene-toolbar {
+      position: absolute;
+      z-index: 3;
+      top: 0;
+      left: 0;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 20px 22px;
+      pointer-events: none;
+    }
+
+    .scene-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 12px;
+      border: 1px solid rgba(52, 91, 59, .12);
+      border-radius: 999px;
+      color: var(--green);
+      background: rgba(255, 254, 249, .64);
+      backdrop-filter: blur(8px);
+      letter-spacing: 1.25px;
+      font-size: 8px;
+    }
+
+    .live-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #6b8a4d;
+      box-shadow: 0 0 0 3px rgba(107, 138, 77, .12);
+    }
+
+    .is-playing .live-dot { animation: breathe 1.8s ease-in-out infinite; }
+
+    .species-tag {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: rgba(52, 91, 59, .65);
+      font-family: Georgia, serif;
+      font-size: 12px;
+      font-style: italic;
+    }
+
+    .species-tag svg { width: 16px; height: 16px; }
+
+    .scene-note {
+      position: absolute;
+      z-index: 3;
+      right: 21px;
+      bottom: 18px;
+      left: 21px;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      color: rgba(255, 248, 226, .72);
+      font-size: 8px;
+      letter-spacing: 1.5px;
+      pointer-events: none;
+    }
+
+    .scene-note span:first-child { display: flex; align-items: center; gap: 8px; }
+    .scene-note svg { width: 13px; height: 13px; }
+
+    .root-path,
+    #mainStem,
+    #stemHighlight,
+    #shootLink {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+    }
+
+    #sunRays { transform-origin: 696px 110px; }
+    #flowerSway, #flowerTilt, #flowerScale, #diskGrowth, #budGrowth { transform-origin: 0 0; }
+
+    .controls {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 24px;
+      padding: 17px 21px;
+      border: 1px solid var(--line);
+      border-radius: 19px;
+      background: rgba(255, 254, 249, .7);
+      box-shadow: 0 8px 30px rgba(46, 66, 40, .035);
+    }
+
+    .play-actions { display: flex; align-items: center; gap: 10px; }
+
+    .icon-button {
+      display: inline-grid;
+      place-items: center;
+      flex: none;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: transform .2s ease, background .2s ease, box-shadow .2s ease;
+    }
+
+    .icon-button:hover { transform: translateY(-2px); }
+    .icon-button:active { transform: translateY(0) scale(.96); }
+    .icon-button svg { width: 18px; height: 18px; }
+
+    .play-button {
+      width: 49px;
+      height: 49px;
+      color: #fffdf4;
+      background: var(--green-dark);
+      box-shadow: 0 6px 16px rgba(36, 70, 46, .18);
+    }
+
+    .play-button:hover { background: #173923; box-shadow: 0 8px 20px rgba(36, 70, 46, .24); }
+    .play-button svg { width: 19px; height: 19px; }
+
+    .restart-button {
+      width: 37px;
+      height: 37px;
+      color: var(--green);
+      border: 1px solid var(--line);
+      background: transparent;
+    }
+
+    .restart-button:hover { background: #eef0e5; }
+    .restart-button svg { width: 15px; height: 15px; }
+
+    .timeline { min-width: 0; }
+
+    .timeline-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .timeline-label { color: var(--muted); font-size: 8px; letter-spacing: 1.4px; }
+    #timeReadout { color: var(--muted); font-size: 10px; font-variant-numeric: tabular-nums; }
+
+    .range-wrap { position: relative; height: 16px; display: flex; align-items: center; }
+
+    #growthRange {
+      --progress: 0%;
+      width: 100%;
+      height: 4px;
+      margin: 0;
+      appearance: none;
+      -webkit-appearance: none;
+      border-radius: 99px;
+      background: linear-gradient(to right, var(--green) 0 var(--progress), #dcdfd3 var(--progress) 100%);
+      cursor: pointer;
+    }
+
+    #growthRange::-webkit-slider-thumb {
+      width: 15px;
+      height: 15px;
+      appearance: none;
+      -webkit-appearance: none;
+      border: 3px solid var(--white);
+      border-radius: 50%;
+      background: var(--sun);
+      box-shadow: 0 1px 5px rgba(50, 60, 36, .25);
+    }
+
+    #growthRange::-moz-range-thumb {
+      width: 10px;
+      height: 10px;
+      border: 3px solid var(--white);
+      border-radius: 50%;
+      background: var(--sun);
+      box-shadow: 0 1px 5px rgba(50, 60, 36, .25);
+    }
+
+    .timeline-stages {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      margin-top: 6px;
+    }
+
+    .stage-marker {
+      display: grid;
+      gap: 2px;
+      padding: 3px 0;
+      border: 0;
+      color: #92998f;
+      background: none;
+      text-align: left;
+      font-size: 9px;
+      line-height: 1.2;
+      cursor: pointer;
+      transition: color .2s ease;
+    }
+
+    .stage-marker:last-child { text-align: right; }
+    .stage-marker small { font-size: 7px; letter-spacing: .7px; text-transform: uppercase; }
+    .stage-marker:hover { color: var(--green); }
+    .stage-marker.active { color: var(--green); font-weight: 700; }
+
+    .speed-control {
+      display: grid;
+      justify-items: center;
+      gap: 5px;
+      padding-left: 20px;
+      border-left: 1px solid var(--line);
+    }
+
+    .speed-control span { color: #92998f; font-size: 7px; font-weight: 700; letter-spacing: 1.3px; }
+
+    #speedButton {
+      min-width: 45px;
+      padding: 6px 8px;
+      border: 1px solid var(--line);
+      border-radius: 99px;
+      color: var(--green);
+      background: transparent;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .2s ease;
+    }
+
+    #speedButton:hover { background: #eef0e5; }
+
+    .footer-note {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 14px 2px 0;
+      color: #9ba196;
+      font-size: 7px;
+      letter-spacing: 1.4px;
+    }
+
+    .footer-note span:first-child { display: flex; align-items: center; gap: 7px; }
+    .footer-note i { width: 4px; height: 4px; border-radius: 50%; background: var(--sun); }
+
+    @keyframes breathe {
+      0%, 100% { opacity: .55; transform: scale(.85); }
+      50% { opacity: 1; transform: scale(1.15); }
+    }
+
+    @media (min-width: 1000px) and (max-height: 850px) {
+      .app { padding-top: 20px; }
+      .masthead { padding-bottom: 15px; }
+      .workspace { padding: 20px 0 17px; }
+      .visual-shell { max-width: 750px; }
+      h1 { font-size: clamp(52px, 5vw, 70px); }
+      .intro-copy { margin-top: 18px; }
+      .stage-card { margin-top: 23px; }
+      .specimen-meta { margin-top: 16px; }
+    }
+
+    @media (max-width: 980px) {
+      .app { padding: 22px 26px; }
+      .workspace { grid-template-columns: minmax(230px, .75fr) minmax(0, 1.35fr); gap: 28px; }
+      h1 { font-size: 58px; }
+      .intro-copy { font-size: 13px; }
+      .controls { gap: 16px; }
+      .scene-note span:first-child { display: none; }
+      .scene-note { justify-content: flex-end; }
+    }
+
+    @media (max-width: 760px) {
+      .app { padding: 18px 18px 22px; }
+      .masthead { grid-template-columns: 1fr auto; padding-bottom: 15px; }
+      .masthead-label { display: none; }
+      .brand-name { font-size: 26px; }
+      .brand-mark { width: 27px; height: 27px; }
+      .study-number { font-size: 8px; }
+      .workspace { display: flex; flex-direction: column; align-items: stretch; gap: 25px; padding: 28px 0 22px; }
+      .intro { max-width: none; }
+      .eyebrow { margin-bottom: 14px; }
+      h1 { font-size: clamp(52px, 14vw, 72px); letter-spacing: -2.8px; }
+      h1 br { display: none; }
+      .intro-copy { max-width: 520px; margin-top: 17px; }
+      .stage-card { margin-top: 23px; }
+      #stageDescription { min-height: 0; }
+      .specimen-meta { display: none; }
+      .visual-shell { max-width: none; border-radius: 20px; }
+      .scene-toolbar { padding: 14px; }
+      .scene-note { right: 15px; bottom: 12px; }
+      .controls { grid-template-columns: auto 1fr auto; gap: 13px; padding: 14px; border-radius: 16px; }
+      .restart-button { display: none; }
+      .play-button { width: 43px; height: 43px; }
+      .speed-control { padding-left: 12px; }
+      .stage-marker { font-size: 7px; }
+      .stage-marker small { display: none; }
+      .timeline-label { font-size: 7px; }
+      .footer-note span:last-child { display: none; }
+    }
+
+    @media (max-width: 430px) {
+      h1 br { display: initial; }
+      .intro-copy { font-size: 12px; }
+      .stage-title-row h2 { font-size: 25px; }
+      .species-tag { display: none; }
+      .controls { grid-template-columns: auto minmax(0, 1fr); }
+      .speed-control { display: none; }
+      .stage-marker { font-size: 6.5px; }
+      .timeline-stages { margin-top: 5px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="masthead">
+      <a class="brand" href="#" aria-label="Helia home" onclick="return false">
+        <svg class="brand-mark" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+          <g stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+            <path d="M20 2v5M20 33v5M2 20h5M33 20h5M7.3 7.3l3.6 3.6M29.1 29.1l3.6 3.6M32.7 7.3l-3.6 3.6M10.9 29.1l-3.6 3.6"/>
+          </g>
+          <circle cx="20" cy="20" r="8" fill="currentColor"/>
+          <circle cx="20" cy="20" r="3.2" fill="#74542d"/>
+        </svg>
+        <span class="brand-name">helia</span>
+      </a>
+      <div class="masthead-label">The botanical time-lapse</div>
+      <div class="study-number"><span class="sun-dot"></span><span>Field study</span><b>№ 001</b></div>
+    </header>
+
+    <main class="workspace">
+      <section class="intro" aria-labelledby="pageTitle">
+        <div class="eyebrow">The life of a sunflower</div>
+        <h1 id="pageTitle">From seed,<br> <em>to sun.</em></h1>
+        <p class="intro-copy">A quiet, extraordinary journey. Watch one small seed follow the light and unfold into a sky full of gold.</p>
+
+        <div class="stage-card" aria-live="polite">
+          <div class="stage-heading">
+            <span id="phaseCount">Phase 01 / 06</span>
+            <span>Current phase</span>
+          </div>
+          <div class="stage-title-row">
+            <h2 id="stageTitle">Seed</h2>
+            <span id="dayReadout">Day 00 / 65</span>
+          </div>
+          <p id="stageDescription">Everything begins in the dark. Inside one small seed, an entire sunflower is waiting.</p>
+        </div>
+
+        <div class="specimen-meta" aria-label="Species information">
+          <div><span>Species</span><strong>Helianthus annuus</strong></div>
+          <div><span>Family</span><strong>Asteraceae</strong></div>
+        </div>
+      </section>
+
+      <section class="visual-column" aria-label="Animated sunflower growth study">
+        <div class="visual-shell" id="visualShell">
+          <div class="scene-toolbar">
+            <div class="scene-badge"><span class="live-dot"></span><span id="liveStatus">Growing</span></div>
+            <div class="species-tag">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="currentColor"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M19.8 4.2l-2.1 2.1M6.3 17.7l-2.1 2.1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+              Helianthus annuus
+            </div>
+          </div>
+
+          <svg class="garden" id="garden" viewBox="0 0 860 640" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="gardenTitle gardenDescription">
+            <title id="gardenTitle">A sunflower growing from a seed to full bloom</title>
+            <desc id="gardenDescription">An interactive botanical time-lapse showing roots germinating underground, a sprout emerging, leaves opening on a rising stem, and a golden sunflower blooming.</desc>
+            <defs>
+              <linearGradient id="skyGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#f1f2df"/>
+                <stop offset="1" stop-color="#e3e9cf"/>
+              </linearGradient>
+              <radialGradient id="sunGlow">
+                <stop offset="0" stop-color="#f6d36c" stop-opacity=".35"/>
+                <stop offset=".55" stop-color="#f6d36c" stop-opacity=".12"/>
+                <stop offset="1" stop-color="#f6d36c" stop-opacity="0"/>
+              </radialGradient>
+              <linearGradient id="soilGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#9b7d58"/>
+                <stop offset="1" stop-color="#72583f"/>
+              </linearGradient>
+              <linearGradient id="stemGradient" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stop-color="#2f5636"/>
+                <stop offset=".55" stop-color="#537a45"/>
+                <stop offset="1" stop-color="#345b38"/>
+              </linearGradient>
+              <linearGradient id="leafGradient" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#64854c"/>
+                <stop offset=".55" stop-color="#456e3f"/>
+                <stop offset="1" stop-color="#315938"/>
+              </linearGradient>
+              <linearGradient id="petalGradient" gradientUnits="userSpaceOnUse" x1="0" y1="-110" x2="0" y2="-28">
+                <stop offset="0" stop-color="#ffd85a"/>
+                <stop offset=".58" stop-color="#f4bc32"/>
+                <stop offset="1" stop-color="#db8f1d"/>
+              </linearGradient>
+              <linearGradient id="innerPetalGradient" gradientUnits="userSpaceOnUse" x1="0" y1="-95" x2="0" y2="-28">
+                <stop offset="0" stop-color="#ffcf42"/>
+                <stop offset="1" stop-color="#e39a20"/>
+              </linearGradient>
+              <radialGradient id="diskGradient" cx="38%" cy="32%" r="70%">
+                <stop offset="0" stop-color="#9c7539"/>
+                <stop offset=".52" stop-color="#71502d"/>
+                <stop offset="1" stop-color="#403622"/>
+              </radialGradient>
+              <filter id="flowerShadow" x="-40%" y="-40%" width="180%" height="180%">
+                <feDropShadow dx="0" dy="7" stdDeviation="7" flood-color="#38492b" flood-opacity=".14"/>
+              </filter>
+              <filter id="softBlur"><feGaussianBlur stdDeviation="10"/></filter>
+
+              <g id="leafShape">
+                <path d="M0 0 C18-47 69-80 121-60 C124-18 77 25 0 0Z" fill="url(#leafGradient)" stroke="#365d38" stroke-width="1"/>
+                <path d="M2-1 Q59-23 111-53" fill="none" stroke="#a5b977" stroke-width="1.5" stroke-linecap="round" opacity=".65"/>
+                <g fill="none" stroke="#a5b977" stroke-width="1" stroke-linecap="round" opacity=".35">
+                  <path d="M37-15 Q38-37 51-49M57-25 Q66-5 79 2M70-31 Q75-53 88-62M88-40 Q96-23 105-18"/>
+                </g>
+              </g>
+              <g id="cotyledonShape">
+                <path d="M0 0 C8-25 40-31 56-15 C49 10 20 17 0 0Z" fill="#759456" stroke="#4e733f" stroke-width="1"/>
+                <path d="M3 0 Q28-6 49-15" fill="none" stroke="#bed095" stroke-width="1.2" opacity=".65"/>
+              </g>
+            </defs>
+
+            <!-- The field -->
+            <rect width="860" height="640" fill="url(#skyGradient)"/>
+            <circle cx="696" cy="110" r="105" fill="url(#sunGlow)"/>
+            <g id="sunRays" stroke="#d9b957" stroke-width="2" stroke-linecap="round" opacity=".55"></g>
+            <circle cx="696" cy="110" r="38" fill="#f2cc68" opacity=".9"/>
+            <circle cx="686" cy="99" r="24" fill="#f8dc8b" opacity=".32"/>
+
+            <g id="clouds" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity=".48">
+              <path d="M104 137h73c13 0 14-19 2-21-3-17-29-19-37-5-15-8-32 2-31 15"/>
+              <path d="M593 224h48c11 0 12-14 2-17-4-12-23-12-28-2-11-4-22 3-22 12" opacity=".65"/>
+            </g>
+
+            <path d="M0 438 Q116 385 237 442 T477 429 T710 434 T900 410 V506H0Z" fill="#d9e1c3" opacity=".72"/>
+            <path d="M0 469 Q119 430 240 470 T478 458 T704 465 T900 444 V510H0Z" fill="#cdd8b5" opacity=".68"/>
+            <g fill="none" stroke="#b5c69c" stroke-width="1.2" opacity=".55">
+              <path d="M89 477v-26m0 13-8-9m8 2 8-10M749 475v-31m0 15-10-11m10 4 9-12M182 481v-18m0 9-7-7M649 481v-20m0 8 8-9"/>
+            </g>
+
+            <!-- Soil cross-section -->
+            <path d="M0 496 C95 488 164 500 249 493 C335 486 386 500 477 493 C573 485 658 500 742 492 C790 488 824 490 860 494 V640H0Z" fill="url(#soilGradient)"/>
+            <path d="M0 496 C95 488 164 500 249 493 C335 486 386 500 477 493 C573 485 658 500 742 492 C790 488 824 490 860 494" fill="none" stroke="#5e6f42" stroke-width="5"/>
+            <path d="M0 568 C114 550 203 580 315 563 S523 578 633 561 S776 570 860 557" fill="none" stroke="#c2a77b" stroke-width="1.2" opacity=".17"/>
+            <path d="M0 608 C105 591 190 618 292 604 S489 618 612 601 S772 611 860 600" fill="none" stroke="#4f3f30" stroke-width="1" opacity=".18"/>
+            <g id="soilTexture"></g>
+            <g id="surfaceGrasses" fill="none" stroke="#61764a" stroke-width="2" stroke-linecap="round"></g>
+
+            <!-- Underground life -->
+            <g id="roots" fill="none" stroke="#d6bd8d" stroke-linecap="round" stroke-linejoin="round">
+              <path class="root-path" data-start=".07" data-end=".29" pathLength="1" d="M430 537 C426 562 442 585 434 626" stroke-width="3.2"/>
+              <path class="root-path" data-start=".12" data-end=".32" pathLength="1" d="M430 548 C408 558 399 582 373 596 C363 601 359 610 355 616" stroke-width="2.2"/>
+              <path class="root-path" data-start=".15" data-end=".35" pathLength="1" d="M432 560 C458 568 474 590 492 607 C498 612 504 614 510 615" stroke-width="2.1"/>
+              <path class="root-path" data-start=".18" data-end=".37" pathLength="1" d="M435 584 C417 593 412 611 406 629" stroke-width="1.7"/>
+              <path class="root-path" data-start=".2" data-end=".39" pathLength="1" d="M434 599 C451 606 456 618 463 630" stroke-width="1.6"/>
+              <path class="root-path" data-start=".22" data-end=".4" pathLength="1" d="M402 574 C386 568 375 571 363 577M469 585 C481 579 491 581 500 585" stroke-width="1.3" opacity=".8"/>
+            </g>
+
+            <g transform="translate(430 529) rotate(-18)">
+              <circle id="seedPulse" r="31" fill="none" stroke="#d8bd82" stroke-width="1" opacity=".18"/>
+              <g id="seedBody">
+                <path d="M0-20 C12-15 18-2 12 11 C8 20 0 25 0 25 C0 25-9 19-13 10 C-19-3-12-16 0-20Z" fill="#c6a06a" stroke="#6e563d" stroke-width="1.5"/>
+                <path d="M-5-14 C-11-2-7 12 0 20M3-14 C10-2 7 10 2 18" fill="none" stroke="#e3c58d" stroke-width="2" stroke-linecap="round" opacity=".65"/>
+                <path id="seedCrack" d="M1-18 L-3-9 L2-3 L-2 5" fill="none" stroke="#5d4935" stroke-width="1.7" stroke-linecap="round" opacity="0"/>
+              </g>
+            </g>
+
+            <!-- Stem and leaves -->
+            <path id="shootLink" pathLength="1" d="M430 526 C422 514 434 505 430 492" fill="none" stroke="#527546" stroke-width="5" stroke-linecap="round"/>
+            <path id="mainStem" pathLength="1" d="M430 496 C426 446 438 391 441 333 C445 272 440 213 452 157" fill="none" stroke="url(#stemGradient)" stroke-width="12" stroke-linecap="round"/>
+            <path id="stemHighlight" pathLength="1" d="M427 493 C425 444 436 390 439 332 C443 272 438 213 449 160" fill="none" stroke="#8da269" stroke-width="2" stroke-linecap="round" opacity=".5"/>
+
+            <g class="leaf" data-start=".29" data-end=".43" transform="translate(430 466) rotate(8) scale(-.72 .72)">
+              <g class="leaf-growth" opacity="0"><use href="#cotyledonShape"/></g>
+            </g>
+            <g class="leaf" data-start=".31" data-end=".45" transform="translate(430 466) rotate(-8) scale(.72)">
+              <g class="leaf-growth" opacity="0"><use href="#cotyledonShape"/></g>
+            </g>
+
+            <g class="leaf" data-start=".39" data-end=".57" transform="translate(431 448) rotate(-7) scale(-1 1)">
+              <g class="leaf-growth" opacity="0"><use href="#leafShape"/></g>
+            </g>
+            <g class="leaf" data-start=".45" data-end=".63" transform="translate(434 405) rotate(4) scale(.96)">
+              <g class="leaf-growth" opacity="0"><use href="#leafShape"/></g>
+            </g>
+            <g class="leaf" data-start=".51" data-end=".69" transform="translate(438 356) rotate(7) scale(-.86 .86)">
+              <g class="leaf-growth" opacity="0"><use href="#leafShape"/></g>
+            </g>
+            <g class="leaf" data-start=".58" data-end=".74" transform="translate(442 310) rotate(-5) scale(.75)">
+              <g class="leaf-growth" opacity="0"><use href="#leafShape"/></g>
+            </g>
+            <g class="leaf" data-start=".64" data-end=".79" transform="translate(446 263) rotate(-4) scale(-.63 .63)">
+              <g class="leaf-growth" opacity="0"><use href="#leafShape"/></g>
+            </g>
+            <g class="leaf" data-start=".69" data-end=".82" transform="translate(449 218) rotate(2) scale(.52)">
+              <g class="leaf-growth" opacity="0"><use href="#leafShape"/></g>
+            </g>
+
+            <!-- A bud becomes a flower -->
+            <g transform="translate(452 155)">
+              <g id="budGrowth" opacity="0">
+                <path d="M0 19 C-25 17-34-3-24-24 C-17-38 0-46 0-46 C0-46 18-38 25-23 C35-2 25 17 0 19Z" fill="#587640" stroke="#395b36" stroke-width="1.5"/>
+                <path d="M0 15 C-13 5-14-20 0-40 C14-20 13 5 0 15Z" fill="#80934c"/>
+                <g fill="#3e6439">
+                  <path d="M-2 18-33-8-19 24Z"/><path d="M2 18 33-8 19 24Z"/><path d="M0 17 0-27 10 22Z"/>
+                </g>
+                <path d="M-13-23 Q0-34 13-23" fill="none" stroke="#a8a653" stroke-width="3" stroke-linecap="round" opacity=".75"/>
+              </g>
+            </g>
+
+            <g transform="translate(452 137)">
+              <g id="flowerSway">
+                <g id="flowerTilt">
+                  <g id="flowerScale" opacity="0" filter="url(#flowerShadow)">
+                    <g id="bracts" fill="#41683a"></g>
+                    <g id="outerPetals"></g>
+                    <g id="innerPetals"></g>
+                    <g id="diskGrowth">
+                      <circle r="47" fill="#5a4829" stroke="#36492b" stroke-width="2"/>
+                      <circle r="43.5" fill="url(#diskGradient)"/>
+                      <g id="seedPattern"></g>
+                      <circle cx="-13" cy="-15" r="23" fill="#d1a24e" opacity=".06"/>
+                    </g>
+                  </g>
+                </g>
+              </g>
+            </g>
+
+            <g id="bloomNote" opacity="0" fill="#526c48">
+              <path d="M566 183h64" stroke="#748765" stroke-width="1" stroke-dasharray="2 4"/>
+              <circle cx="564" cy="183" r="2.5"/>
+              <text x="640" y="179" font-family="Avenir Next, Segoe UI, sans-serif" font-size="8" letter-spacing="1.4">TURNING TO</text>
+              <text x="640" y="194" font-family="Georgia, serif" font-size="13" font-style="italic">the light</text>
+            </g>
+          </svg>
+
+          <div class="scene-note">
+            <span><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor"/><circle cx="8" cy="8" r="3" stroke="currentColor"/></svg>65 days, one remarkable becoming</span>
+            <span>Fig. 01 — Growth study</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <section class="controls" aria-label="Time-lapse controls">
+      <div class="play-actions">
+        <button class="icon-button play-button" id="playButton" type="button" aria-label="Pause growth">
+          <svg id="playIcon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+        </button>
+        <button class="icon-button restart-button" id="restartButton" type="button" aria-label="Restart from seed" title="Restart from seed">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v6h6M5.5 15a7 7 0 1 0 .5-7L4 10"/></svg>
+        </button>
+      </div>
+
+      <div class="timeline">
+        <div class="timeline-top">
+          <span class="timeline-label">Growth cycle</span>
+          <span id="timeReadout">00:00 / 00:18</span>
+        </div>
+        <div class="range-wrap">
+          <input id="growthRange" type="range" min="0" max="1000" value="0" step="1" aria-label="Growth timeline">
+        </div>
+        <div class="timeline-stages" aria-label="Jump to a growth phase">
+          <button class="stage-marker active" type="button" data-progress="0" data-stage="0"><span>Seed</span><small>Day 00</small></button>
+          <button class="stage-marker" type="button" data-progress=".22" data-stage="1"><span>Germinate</span><small>Day 07</small></button>
+          <button class="stage-marker" type="button" data-progress=".39" data-stage="2"><span>Sprout</span><small>Day 16</small></button>
+          <button class="stage-marker" type="button" data-progress=".62" data-stage="3"><span>Grow</span><small>Day 34</small></button>
+          <button class="stage-marker" type="button" data-progress=".80" data-stage="4"><span>Bud</span><small>Day 49</small></button>
+          <button class="stage-marker" type="button" data-progress="1" data-stage="5"><span>Bloom</span><small>Day 65</small></button>
+        </div>
+      </div>
+
+      <div class="speed-control">
+        <span>Speed</span>
+        <button id="speedButton" type="button" aria-label="Playback speed: 1 times. Click to change.">1×</button>
+      </div>
+    </section>
+
+    <footer class="footer-note">
+      <span><i></i>A study in sunlight &amp; patience</span>
+      <span>Interactive botanical illustration · 2026</span>
+    </footer>
+  </div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const $ = (selector) => document.querySelector(selector);
+      const $$ = (selector) => [...document.querySelectorAll(selector)];
+      const svgNS = "http://www.w3.org/2000/svg";
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const duration = 18000;
+      const speeds = [0.5, 1, 2];
+
+      let progress = 0;
+      let playing = !reduceMotion;
+      let speedIndex = 1;
+      let lastTime = performance.now();
+      let activeStage = -1;
+
+      const range = $("#growthRange");
+      const playButton = $("#playButton");
+      const playIcon = $("#playIcon");
+      const visualShell = $("#visualShell");
+      const stageTitle = $("#stageTitle");
+      const stageDescription = $("#stageDescription");
+      const stageMarkers = $$(".stage-marker");
+      const petals = [];
+
+      const stages = [
+        {
+          start: 0,
+          title: "Seed",
+          description: "Everything begins in the dark. Inside one small seed, an entire sunflower is waiting."
+        },
+        {
+          start: .14,
+          title: "Germination",
+          description: "The seed wakes. A first root reaches down, anchoring the life that will soon reach up."
+        },
+        {
+          start: .31,
+          title: "First sprout",
+          description: "A tender shoot breaks the surface. Two small leaves open to catch their first light."
+        },
+        {
+          start: .50,
+          title: "Reaching up",
+          description: "The stem stretches skyward. Leaf by leaf, the young plant turns sunlight into strength."
+        },
+        {
+          start: .75,
+          title: "The bud",
+          description: "At the very top, a green bud gathers itself — a quiet promise of the color to come."
+        },
+        {
+          start: .86,
+          title: "Full bloom",
+          description: "Golden petals unfold around hundreds of tiny florets. The sunflower finally meets the sun."
+        }
+      ];
+
+      const clamp = (value) => Math.max(0, Math.min(1, value));
+      const ease = (value) => {
+        const x = clamp(value);
+        return x * x * (3 - 2 * x);
+      };
+      const between = (value, start, end) => ease((value - start) / (end - start));
+
+      function svgElement(tag, attributes = {}) {
+        const element = document.createElementNS(svgNS, tag);
+        Object.entries(attributes).forEach(([key, value]) => element.setAttribute(key, value));
+        return element;
+      }
+
+      // Deterministic details keep the illustration organic without external assets.
+      let randomSeed = 41;
+      function random() {
+        randomSeed = (randomSeed * 16807) % 2147483647;
+        return (randomSeed - 1) / 2147483646;
+      }
+
+      function buildScene() {
+        const rays = $("#sunRays");
+        for (let i = 0; i < 16; i++) {
+          const angle = i * 22.5 * Math.PI / 180;
+          const inner = 51;
+          const outer = i % 2 ? 61 : 66;
+          rays.appendChild(svgElement("line", {
+            x1: 696 + Math.cos(angle) * inner,
+            y1: 110 + Math.sin(angle) * inner,
+            x2: 696 + Math.cos(angle) * outer,
+            y2: 110 + Math.sin(angle) * outer
+          }));
+        }
+
+        const texture = $("#soilTexture");
+        for (let i = 0; i < 92; i++) {
+          const x = 15 + random() * 830;
+          const y = 510 + random() * 119;
+          const radius = .7 + random() * 2.2;
+          texture.appendChild(svgElement(random() > .24 ? "circle" : "ellipse", {
+            cx: x,
+            cy: y,
+            r: radius,
+            rx: radius * 1.8,
+            ry: radius * .65,
+            fill: random() > .5 ? "#d1b88d" : "#4f4031",
+            opacity: .12 + random() * .18,
+            transform: `rotate(${random() * 150} ${x} ${y})`
+          }));
+        }
+
+        const grasses = $("#surfaceGrasses");
+        [54, 128, 220, 292, 568, 621, 716, 795].forEach((x, index) => {
+          const height = 9 + (index % 3) * 4;
+          const y = 494 + (index % 2);
+          const path = svgElement("path", {
+            d: `M${x} ${y}q-2-${height * .55}-7-${height}M${x} ${y}q2-${height * .7} 5-${height * 1.15}M${x} ${y}v-${height * .75}`,
+            opacity: .65
+          });
+          grasses.appendChild(path);
+        });
+
+        const bracts = $("#bracts");
+        for (let i = 0; i < 18; i++) {
+          const wrapper = svgElement("g", { transform: `rotate(${i * 20})` });
+          wrapper.appendChild(svgElement("path", { d: "M-8-31 Q-10-51 0-72 Q10-51 8-31Z" }));
+          bracts.appendChild(wrapper);
+        }
+
+        function addPetals(containerId, count, inner) {
+          const container = $(containerId);
+          for (let i = 0; i < count; i++) {
+            const wrapper = svgElement("g", {
+              transform: `rotate(${i * (360 / count) + (inner ? 360 / count / 2 : 0)})`
+            });
+            const path = svgElement("path", {
+              d: inner
+                ? "M-9-32 C-20-51-16-78 0-93 C16-78 20-51 9-32 Q0-25-9-32Z"
+                : "M-11-34 C-25-57-19-92 0-110 C19-92 25-57 11-34 Q0-26-11-34Z",
+              fill: inner ? "url(#innerPetalGradient)" : "url(#petalGradient)",
+              stroke: inner ? "#dfa024" : "#dda12b",
+              "stroke-width": .65,
+              "stroke-linejoin": "round"
+            });
+            wrapper.appendChild(path);
+            container.appendChild(wrapper);
+            petals.push({
+              element: path,
+              start: (inner ? .805 : .765) + (i % 8) * .005,
+              end: (inner ? .925 : .885) + (i % 8) * .004
+            });
+          }
+        }
+
+        addPetals("#outerPetals", 28, false);
+        addPetals("#innerPetals", 21, true);
+
+        const seedPattern = $("#seedPattern");
+        const floretCount = 220;
+        const goldenAngle = Math.PI * (3 - Math.sqrt(5));
+        for (let i = 0; i < floretCount; i++) {
+          const radius = 40 * Math.sqrt((i + .5) / floretCount);
+          const angle = i * goldenAngle;
+          const x = Math.cos(angle) * radius;
+          const y = Math.sin(angle) * radius;
+          const size = 1.05 + (i / floretCount) * .75;
+          seedPattern.appendChild(svgElement("circle", {
+            cx: x.toFixed(2),
+            cy: y.toFixed(2),
+            r: size.toFixed(2),
+            fill: i % 4 === 0 ? "#d0a24e" : i % 3 === 0 ? "#3e3422" : "#a27a3d",
+            opacity: i % 4 === 0 ? .8 : .72
+          }));
+        }
+      }
+
+      function setDash(element, value) {
+        element.style.strokeDashoffset = String(1 - clamp(value));
+      }
+
+      function currentStageIndex() {
+        let index = 0;
+        stages.forEach((stage, i) => {
+          if (progress >= stage.start) index = i;
+        });
+        return index;
+      }
+
+      function updateStage(index) {
+        if (index === activeStage) return;
+        activeStage = index;
+        const stage = stages[index];
+        stageTitle.textContent = stage.title;
+        stageDescription.textContent = stage.description;
+        $("#phaseCount").textContent = `Phase ${String(index + 1).padStart(2, "0")} / 06`;
+        stageMarkers.forEach((marker, i) => {
+          marker.classList.toggle("active", i === index);
+          if (i === index) marker.setAttribute("aria-current", "step");
+          else marker.removeAttribute("aria-current");
+        });
+      }
+
+      function updatePlaybackUI() {
+        visualShell.classList.toggle("is-playing", playing);
+        $("#liveStatus").textContent = playing ? "Growing" : progress >= 1 ? "Full bloom" : "Paused";
+
+        if (playing) {
+          playIcon.innerHTML = '<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>';
+          playButton.setAttribute("aria-label", "Pause growth");
+        } else if (progress >= 1) {
+          playIcon.innerHTML = '<path d="M4 4v6h6M5.5 15a7 7 0 1 0 .5-7L4 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
+          playButton.setAttribute("aria-label", "Replay from seed");
+        } else {
+          playIcon.innerHTML = '<path d="M8 5.5v13l10-6.5z"/>';
+          playButton.setAttribute("aria-label", "Play growth");
+        }
+      }
+
+      function render() {
+        const p = progress;
+        const day = Math.min(65, Math.round(p * 65));
+        const stageIndex = currentStageIndex();
+
+        $$(".root-path").forEach((root) => {
+          setDash(root, between(p, Number(root.dataset.start), Number(root.dataset.end)));
+        });
+
+        const seedWake = between(p, .08, .25);
+        $("#seedBody").setAttribute("transform", `scale(${1 + seedWake * .08})`);
+        $("#seedBody").setAttribute("opacity", 1 - between(p, .31, .52) * .78);
+        $("#seedCrack").setAttribute("opacity", between(p, .1, .16));
+        $("#seedPulse").setAttribute("r", 31 + seedWake * 9);
+        $("#seedPulse").setAttribute("opacity", .18 * (1 - between(p, .14, .3)));
+
+        setDash($("#shootLink"), between(p, .16, .32));
+        const stemGrowth = between(p, .24, .76);
+        setDash($("#mainStem"), stemGrowth);
+        setDash($("#stemHighlight"), stemGrowth);
+
+        $$(".leaf").forEach((leaf) => {
+          const growth = between(p, Number(leaf.dataset.start), Number(leaf.dataset.end));
+          const inner = leaf.querySelector(".leaf-growth");
+          inner.setAttribute("transform", `scale(${growth})`);
+          inner.setAttribute("opacity", growth);
+        });
+
+        const budGrowth = between(p, .62, .76);
+        const budOpacity = budGrowth * (1 - between(p, .79, .865));
+        $("#budGrowth").setAttribute("transform", `scale(${budGrowth}) rotate(${-9 + budGrowth * 9})`);
+        $("#budGrowth").setAttribute("opacity", budOpacity);
+
+        const flowerVisibility = between(p, .765, .835);
+        const flowerScale = .28 + between(p, .765, .97) * .72;
+        $("#flowerScale").setAttribute("opacity", flowerVisibility);
+        $("#flowerScale").setAttribute("transform", `scale(${flowerScale})`);
+        $("#flowerTilt").setAttribute("transform", `rotate(${-14 + between(p, .77, .97) * 14})`);
+
+        petals.forEach((petal) => {
+          const opening = between(p, petal.start, petal.end);
+          petal.element.setAttribute("transform", `scale(${.04 + opening * .96})`);
+          petal.element.setAttribute("opacity", opening);
+        });
+
+        const diskGrowth = between(p, .785, .9);
+        $("#diskGrowth").setAttribute("transform", `scale(${diskGrowth})`);
+        $("#bloomNote").setAttribute("opacity", between(p, .93, 1) * .8);
+
+        range.value = Math.round(p * 1000);
+        range.style.setProperty("--progress", `${p * 100}%`);
+        range.setAttribute("aria-valuetext", `Day ${day} of 65, ${stages[stageIndex].title}`);
+        $("#dayReadout").textContent = `Day ${String(day).padStart(2, "0")} / 65`;
+        const elapsed = Math.min(18, Math.floor(p * 18));
+        $("#timeReadout").textContent = `00:${String(elapsed).padStart(2, "0")} / 00:18`;
+
+        updateStage(stageIndex);
+        updatePlaybackUI();
+      }
+
+      function animate(now) {
+        const delta = Math.min(now - lastTime, 60);
+        lastTime = now;
+
+        if (playing) {
+          progress += (delta * speeds[speedIndex]) / duration;
+          if (progress >= 1) {
+            progress = 1;
+            playing = false;
+          }
+          render();
+        }
+
+        if (!reduceMotion) {
+          $("#sunRays").setAttribute("transform", `rotate(${(now / 420) % 360} 696 110)`);
+          $("#clouds").setAttribute("transform", `translate(${Math.sin(now / 9000) * 9} 0)`);
+          const sway = Math.sin(now / 1700) * 1.4 * between(progress, .86, 1);
+          $("#flowerSway").setAttribute("transform", `rotate(${sway})`);
+        }
+
+        requestAnimationFrame(animate);
+      }
+
+      playButton.addEventListener("click", () => {
+        if (progress >= 1) {
+          progress = 0;
+          playing = true;
+        } else {
+          playing = !playing;
+        }
+        lastTime = performance.now();
+        render();
+      });
+
+      $("#restartButton").addEventListener("click", () => {
+        progress = 0;
+        playing = !reduceMotion;
+        lastTime = performance.now();
+        render();
+      });
+
+      range.addEventListener("input", (event) => {
+        progress = Number(event.target.value) / 1000;
+        playing = false;
+        lastTime = performance.now();
+        render();
+      });
+
+      stageMarkers.forEach((marker) => {
+        marker.addEventListener("click", () => {
+          progress = Number(marker.dataset.progress);
+          playing = false;
+          lastTime = performance.now();
+          render();
+        });
+      });
+
+      $("#speedButton").addEventListener("click", (event) => {
+        speedIndex = (speedIndex + 1) % speeds.length;
+        const speed = speeds[speedIndex];
+        event.currentTarget.textContent = `${speed}×`;
+        event.currentTarget.setAttribute("aria-label", `Playback speed: ${speed} times. Click to change.`);
+      });
+
+      document.addEventListener("keydown", (event) => {
+        const tag = document.activeElement.tagName;
+        if (event.code === "Space" && tag !== "INPUT" && tag !== "BUTTON" && tag !== "A") {
+          event.preventDefault();
+          playButton.click();
+        }
+      });
+
+      buildScene();
+      render();
+      requestAnimationFrame(animate);
+    })();
+  </script>
+</body>
+</html>

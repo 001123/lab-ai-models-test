@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mô Phỏng Sinh Trưởng Hoa Hướng Dương (Helianthus annuus)</title>
+  <style>
+    :root {
+      --bg-panel: rgba(15, 23, 42, 0.82);
+      --border-panel: rgba(255, 255, 255, 0.14);
+      --accent: #f59e0b;
+      --accent-glow: rgba(245, 158, 11, 0.35);
+      --green: #22c55e;
+      --text-main: #f8fafc;
+      --text-sub: #cbd5e1;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+      background: #090d16;
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    .app-layout {
+      display: grid;
+      grid-template-columns: 1fr 370px;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    @media (max-width: 960px) {
+      .app-layout {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr auto;
+        overflow-y: auto;
+      }
+    }
+
+    /* Stage Viewport */
+    .viewport {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    svg#scene {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Top HUD Overlay */
+    .top-hud {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      right: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      pointer-events: none;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .badge-card {
+      pointer-events: auto;
+      background: var(--bg-panel);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--border-panel);
+      border-radius: 16px;
+      padding: 14px 18px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+    }
+
+    .title-group h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #fde68a;
+    }
+
+    .title-group p {
+      font-size: 0.8rem;
+      color: var(--text-sub);
+      margin-top: 3px;
+    }
+
+    .metrics-bar {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .metric {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .metric-label {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #94a3b8;
+    }
+
+    .metric-val {
+      font-size: 1.1rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      color: #fff;
+    }
+
+    .metric-val span {
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: #fbbf24;
+    }
+
+    /* Bottom Timeline Scrubber */
+    .bottom-hud {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+      background: var(--bg-panel);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-panel);
+      border-radius: 18px;
+      padding: 14px 20px;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .controls-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      background: rgba(255, 255, 255, 0.09);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: #fff;
+      border-radius: 10px;
+      padding: 8px 14px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.18s ease;
+    }
+
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.16);
+      transform: translateY(-1px);
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      border-color: #fbbf24;
+      color: #0f172a;
+      box-shadow: 0 0 18px var(--accent-glow);
+    }
+
+    .btn.primary:hover {
+      filter: brightness(1.08);
+    }
+
+    .slider-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 8px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #78350f 0%, #15803d 45%, #eab308 82%, #a16207 100%);
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #fde047;
+      border: 3px solid #0f172a;
+      box-shadow: 0 0 12px rgba(250, 204, 21, 0.9);
+      cursor: grab;
+      transition: transform 0.12s ease;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+
+    .stage-pills {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+    }
+
+    .stage-pill {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 6px 4px;
+      text-align: center;
+      font-size: 0.72rem;
+      color: #94a3b8;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .stage-pill:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #f8fafc;
+    }
+
+    .stage-pill.active {
+      background: rgba(245, 158, 11, 0.22);
+      border-color: #f59e0b;
+      color: #fde68a;
+      font-weight: 600;
+    }
+
+    /* Right Sidebar */
+    .sidebar {
+      background: #0f172a;
+      border-left: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 22px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      overflow-y: auto;
+    }
+
+    .sidebar-section {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    .stage-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .stage-tag {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: rgba(245, 158, 11, 0.2);
+      color: #fcd34d;
+    }
+
+    .stage-days {
+      font-size: 0.78rem;
+      color: #94a3b8;
+    }
+
+    .stage-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .stage-desc {
+      font-size: 0.85rem;
+      line-height: 1.55;
+      color: var(--text-sub);
+    }
+
+    .bio-list {
+      margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      font-size: 0.8rem;
+      color: #e2e8f0;
+    }
+
+    .bio-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .bio-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #f59e0b;
+      flex-shrink: 0;
+    }
+
+    .section-title {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #94a3b8;
+      margin-bottom: 12px;
+      font-weight: 700;
+    }
+
+    .env-control {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .env-control:last-child {
+      margin-bottom: 0;
+    }
+
+    .env-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      color: #e2e8f0;
+    }
+
+    .toggle-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .toggle-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #cbd5e1;
+      padding: 8px 10px;
+      border-radius: 9px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.15s ease;
+    }
+
+    .toggle-btn.on {
+      background: rgba(34, 197, 94, 0.16);
+      border-color: #22c55e;
+      color: #dcfce7;
+    }
+
+    .fibonacci-box {
+      font-size: 0.79rem;
+      color: #cbd5e1;
+      line-height: 1.5;
+      background: rgba(245, 158, 11, 0.07);
+      border-left: 3px solid #f59e0b;
+      padding: 10px 12px;
+      border-radius: 6px;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Main Interactive SVG Viewport -->
+    <div class="viewport">
+      <svg id="scene" viewBox="0 0 1000 760" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <!-- Sky & Sun Gradients -->
+          <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop id="skyStop1" offset="0%" stop-color="#1e3a8a" />
+            <stop id="skyStop2" offset="55%" stop-color="#38bdf8" />
+            <stop id="skyStop3" offset="100%" stop-color="#fef08a" />
+          </linearGradient>
+
+          <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#fffbeb" stop-opacity="1" />
+            <stop offset="25%" stop-color="#fde047" stop-opacity="0.9" />
+            <stop offset="60%" stop-color="#f59e0b" stop-opacity="0.35" />
+            <stop offset="100%" stop-color="#f59e0b" stop-opacity="0" />
+          </radialGradient>
+
+          <!-- Soil Gradients -->
+          <linearGradient id="soilGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#3f271d" />
+            <stop offset="25%" stop-color="#2b1912" />
+            <stop offset="100%" stop-color="#140b07" />
+          </linearGradient>
+
+          <linearGradient id="stemGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#14532d" />
+            <stop offset="45%" stop-color="#22c55e" />
+            <stop offset="100%" stop-color="#166534" />
+          </linearGradient>
+
+          <linearGradient id="leafGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#4ade80" />
+            <stop offset="55%" stop-color="#16a34a" />
+            <stop offset="100%" stop-color="#14532d" />
+          </linearGradient>
+
+          <linearGradient id="petalGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#fef08a" />
+            <stop offset="45%" stop-color="#facc15" />
+            <stop offset="85%" stop-color="#eab308" />
+            <stop offset="100%" stop-color="#ca8a04" />
+          </linearGradient>
+
+          <radialGradient id="discGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#1c1917" />
+            <stop offset="65%" stop-color="#422006" />
+            <stop offset="90%" stop-color="#713f12" />
+            <stop offset="100%" stop-color="#3f271d" />
+          </radialGradient>
+
+          <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="4" result="blur" />
+            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+          </filter>
+        </defs>
+
+        <!-- Sky Background -->
+        <rect width="1000" height="540" fill="url(#skyGrad)" />
+
+        <!-- Stars (visible when sun is low) -->
+        <g id="starsLayer" opacity="0"></g>
+
+        <!-- Sun & Rays -->
+        <g id="sunGroup" transform="translate(220, 120)">
+          <circle r="135" fill="url(#sunGlow)" />
+          <circle r="38" fill="#fef9c3" />
+        </g>
+
+        <!-- Soft Distant Hills -->
+        <path d="M0,540 Q180,475 410,515 T830,490 L1000,520 L1000,540 Z" fill="#14532d" opacity="0.45" />
+        <path d="M0,540 Q260,500 550,525 T1000,505 L1000,540 Z" fill="#166534" opacity="0.65" />
+
+        <!-- Background Meadow Grass -->
+        <g id="meadowGrass"></g>
+
+        <!-- Soil Cross-Section -->
+        <g id="soilLayer">
+          <path d="M0,535 Q250,528 500,535 T1000,533 L1000,760 L0,760 Z" fill="url(#soilGrad)" />
+          <!-- Soil surface rim -->
+          <path d="M0,535 Q250,528 500,535 T1000,533" fill="none" stroke="#5c3a28" stroke-width="4" />
+          <!-- Soil pebbles & organic strata -->
+          <g id="soilParticles" opacity="0.55"></g>
+        </g>
+
+        <!-- Root System (Underground) -->
+        <g id="rootGroup"></g>
+
+        <!-- Plant Stem, Cotyledons & True Leaves -->
+        <g id="plantBodyGroup"></g>
+
+        <!-- Seed Coat (Hull) -->
+        <g id="seedGroup"></g>
+
+        <!-- Flower Head (Receptacle, Bracts, Ray Petals, Fibonacci Seeds) -->
+        <g id="flowerHeadGroup"></g>
+
+        <!-- Pollinators & Atmospheric Pollen -->
+        <g id="pollinatorGroup"></g>
+
+        <!-- Rain / Watering Drops -->
+        <g id="rainLayer"></g>
+
+        <!-- Scientific Callout Overlay Inside SVG -->
+        <g id="annotationLayer"></g>
+      </svg>
+
+      <!-- Top HUD -->
+      <div class="top-hud">
+        <div class="badge-card title-group">
+          <h1>🌻 Helianthus annuus — Mô Phỏng Sinh Trưởng</h1>
+          <p>Từ hạt giống ngủ nghỉ, nảy mầm, hướng dương (heliotropism) đến nở rộ xoắn ốc vàng Fibonacci</p>
+        </div>
+
+        <div class="badge-card metrics-bar">
+          <div class="metric">
+            <span class="metric-label">Ngày tuổi</span>
+            <div class="metric-val" id="metricDay">Ngày 0 <span>/ 110</span></div>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Chiều cao thân</span>
+            <div class="metric-val" id="metricHeight">0.0 <span>cm</span></div>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Đường kính rễ</span>
+            <div class="metric-val" id="metricRoot">0.0 <span>cm</span></div>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Số hạt xoắn ốc</span>
+            <div class="metric-val" id="metricSeeds">0 <span>hạt</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Timeline Scrubber -->
+      <div class="bottom-hud">
+        <div class="controls-row">
+          <button class="btn primary" id="playBtn">⏸ Tạm dừng</button>
+          <button class="btn" id="resetBtn">↺ Hạt giống</button>
+          <button class="btn" id="speedBtn">1.0x</button>
+
+          <div class="slider-wrap">
+            <input type="range" id="growthSlider" min="0" max="100" step="0.1" value="0" />
+          </div>
+        </div>
+
+        <div class="stage-pills" id="stagePills">
+          <div class="stage-pill active" data-val="2">1. Hạt giống</div>
+          <div class="stage-pill" data-val="14">2. Nảy mầm</div>
+          <div class="stage-pill" data-val="28">3. Cây mầm</div>
+          <div class="stage-pill" data-val="48">4. Vươn lóng</div>
+          <div class="stage-pill" data-val="68">5. Đóng nụ</div>
+          <div class="stage-pill" data-val="85">6. Nở hoa</div>
+          <div class="stage-pill" data-val="98">7. Tạo hạt</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Scientific Details & Controls Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="stage-header">
+          <span class="stage-tag" id="stageTag">Giai đoạn 1 / 7</span>
+          <span class="stage-days" id="stageDays">Ngày 0 – 3</span>
+        </div>
+        <div class="stage-title" id="stageTitle">Hạt giống ngủ nghỉ (Achene)</div>
+        <p class="stage-desc" id="stageDesc">
+          Hạt hướng dương nằm dưới lớp đất ẩm ấm. Vỏ hạt sọc đen trắng bảo vệ phôi bên trong chờ đủ độ ẩm và nhiệt độ để kích hoạt enzyme thủy phân tinh bột.
+        </p>
+        <div class="bio-list" id="stageBullets"></div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="section-title">Điều Kiện Môi Trường</div>
+
+        <div class="env-control">
+          <div class="env-label">
+            <span>☀️ Vị trí Mặt Trời (Heliotropism)</span>
+            <strong id="sunAngleVal">Trưa (90°)</strong>
+          </div>
+          <input type="range" id="sunSlider" min="0" max="100" step="1" value="50" />
+        </div>
+
+        <div class="env-control">
+          <div class="env-label">
+            <span>💨 Gió đồng nội</span>
+            <strong id="windVal">Nhẹ</strong>
+          </div>
+          <input type="range" id="windSlider" min="0" max="100" step="1" value="25" />
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="section-title">Lớp Hiển Thị Sinh Học</div>
+        <div class="toggle-grid">
+          <button class="toggle-btn on" id="toggleRoots">🌱 Hệ rễ ngầm <span>ON</span></button>
+          <button class="toggle-btn on" id="toggleLabels">🔬 Nhãn giải phẫu <span>ON</span></button>
+          <button class="toggle-btn" id="toggleRain">🌧️ Tưới mưa <span>OFF</span></button>
+          <button class="toggle-btn on" id="toggleFibo">🌀 Xoắn ốc vàng <span>ON</span></button>
+        </div>
+
+        <div class="fibonacci-box">
+          <strong>Quy luật góc vàng Vogel (137.5077°):</strong><br />
+          Các hoa nhỏ trong đĩa hoa hướng dương mọc theo công thức
+          <code>r = c · √n</code> và <code>θ = n × 137.5°</code>, tạo ra 34 và 55 cánh xoắn Fibonacci tối ưu hóa diện tích đóng hạt.
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    // =========================================================================
+    // 1. BIOLOGICAL STAGES DATA
+    // =========================================================================
+    const STAGES = [
+      {
+        min: 0,
+        max: 9,
+        tag: "Giai đoạn 1 / 7",
+        days: "Ngày 0 – 4",
+        title: "Hạt giống hấp thụ nước (Imbibition)",
+        desc: "Hạt hướng dương (quả bế - achene) nằm ở độ sâu 3–5 cm dưới lòng đất. Khi hút nước, phôi bên trong trương nở làm nứt vỏ hạt sọc đen trắng.",
+        bullets: [
+          "Vỏ hạt (Pericarp) mềm dần nhờ độ ẩm đất",
+          "Phôi kích hoạt quá trình hô hấp tế bào",
+          "Mầm rễ (Radicle) chuẩn bị chui qua lỗ noãn"
+        ]
+      },
+      {
+        min: 9,
+        max: 21,
+        tag: "Giai đoạn 2 / 7",
+        days: "Ngày 5 – 11",
+        title: "Nảy mầm & Đâm rễ cọc (Germination)",
+        desc: "Rễ mầm (Radicle) đâm thẳng xuống đất theo hướng địa tính dương để neo giữ cây và hút khoáng. Trục hạ diệp (Hypocotyl) uốn cong dạng móc đẩy hạt lên mặt đất.",
+        bullets: [
+          "Rễ cọc phát triển nhanh kèm các rễ bên sơ cấp",
+          "Trục hạ diệp vươn lên phá vỡ bề mặt đất",
+          "Vỏ hạt vẫn ôm lấy hai lá mầm ở đỉnh"
+        ]
+      },
+      {
+        min: 21,
+        max: 37,
+        tag: "Giai đoạn 3 / 7",
+        days: "Ngày 12 – 24",
+        title: "Cây mầm & Lá mầm (Seedling / Cotyledons)",
+        desc: "Khi tiếp xúc ánh sáng mặt trời, hai lá mầm (Cotyledons) bung mở xanh mướt, làm rụng vỏ hạt khô và bắt đầu quang hợp nuôi đỉnh sinh trưởng.",
+        bullets: [
+          "Hai lá mầm đối xứng mở rộng đón nắng",
+          "Cặp lá thật đầu tiên xuất hiện ở chồi đỉnh",
+          "Hệ rễ chùm phân nhánh mạnh ở tầng đất mặt"
+        ]
+      },
+      {
+        min: 37,
+        max: 58,
+        tag: "Giai đoạn 4 / 7",
+        days: "Ngày 25 – 50",
+        title: "Phát triển thân lá mạnh (Vegetative Growth)",
+        desc: "Thân cây vươn cao nhanh chóng, phủ lông nhám bảo vệ. Các phiến lá hình tim cỡ lớn mọc so le giúp tối ưu hóa khả năng thu nhận bức xạ mặt trời.",
+        bullets: [
+          "Thân hóa gỗ nhẹ, đường kính tăng nhanh",
+          "Lá thật bản rộng có gân chân vịt rõ nét",
+          "Đỉnh ngọn theo dõi mặt trời từ Đông sang Tây"
+        ]
+      },
+      {
+        min: 58,
+        max: 74,
+        tag: "Giai đoạn 5 / 7",
+        days: "Ngày 51 – 68",
+        title: "Hình thành nụ sao (Budding Stage - R1/R3)",
+        desc: "Đỉnh sinh trưởng phân hóa thành cụm hoa đầu được bao bọc bởi nhiều lá bắc xanh nhọn (Involucral bracts) trông như một ngôi sao xanh.",
+        bullets: [
+          "Tính hướng dương (Heliotropism) đạt mức mạnh nhất",
+          "Cánh hoa lưỡi (Ray florets) vàng tươi hé lộ dần",
+          "Cây tích lũy dinh dưỡng tối đa cho quá trình nở hoa"
+        ]
+      },
+      {
+        min: 74,
+        max: 91,
+        tag: "Giai đoạn 6 / 7",
+        days: "Ngày 69 – 90",
+        title: "Nở hoa rực rỡ (Anthesis / Full Bloom - R5)",
+        desc: "Cụm hoa hướng dương bung mở hoàn toàn. Vòng ngoài là các hoa lưỡi bất thụ màu vàng rực thu hút ong mật; tâm là hàng trăm hoa ống lưỡng tính xếp xoắn ốc vàng 137.5°.",
+        bullets: [
+          "Đĩa hoa mở từng vòng từ ngoài vào tâm",
+          "Cấu trúc Phyllotaxis tuân theo dãy số Fibonacci (34, 55)",
+          "Thân cây cố định hướng Đông để sưởi ấm buổi sáng"
+        ]
+      },
+      {
+        min: 91,
+        max: 100.1,
+        tag: "Giai đoạn 7 / 7",
+        days: "Ngày 91 – 110",
+        title: "Chín sinh lý & Tạo hạt (Seed Maturity - R9)",
+        desc: "Sau khi thụ phấn, cánh hoa vàng khô dần và cụp xuống. Đầu hoa nặng trĩu hàng trăm hạt chắc mẩy hơi cúi xuống đất, khép lại vòng đời rực rỡ.",
+        bullets: [
+          "Hạt (Achene) cứng cáp với vỏ sọc đen – trắng",
+          "Đầu hoa hơi nghiêng xuống do sức nặng của hạt",
+          "Sẵn sàng phát tán hạt cho thế hệ tiếp theo"
+        ]
+      }
+    ];
+
+    // =========================================================================
+    // 2. SIMULATION STATE
+    // =========================================================================
+    const state = {
+      progress: 0,       // 0 -> 100
+      playing: true,
+      speed: 1.0,
+      sunPos: 50,        // 0 (East/Dawn) -> 50 (Noon) -> 100 (West/Dusk)
+      wind: 25,          // 0 -> 100
+      showRoots: true,
+      showLabels: true,
+      showRain: false,
+      showFibo: true,
+      time: 0
+    };
+
+    const GOLDEN_ANGLE = 137.50776405003785 * (Math.PI / 180);
+    const MAX_SEEDS = 260;
+
+    // Pre-generate Fibonacci seed positions
+    const fiboSeeds = [];
+    for (let i = 0; i < MAX_SEEDS; i++) {
+      const r = Math.sqrt(i + 0.5) / Math.sqrt(MAX_SEEDS);
+      const theta = i * GOLDEN_ANGLE;
+      fiboSeeds.push({
+        index: i,
+        rNorm: r,
+        theta,
+        cos: Math.cos(theta),
+        sin: Math.sin(theta),
+        isSpiralHighlight: (i % 21 === 0) || (i % 34 === 0)
+      });
+    }
+
+    // Pre-generate Root branches (deterministic fractal structure)
+    const rootBranches = [
+      // Main taproot segments
+      { x1: 500, y1: 545, cx: 497, cy: 615, x2: 503, y2: 730, start: 6, end: 55, w: 6.5, depth: 0 },
+      // Primary lateral roots
+      { x1: 500, y1: 565, cx: 455, cy: 575, x2: 390, y2: 610, start: 12, end: 52, w: 3.6, depth: 1 },
+      { x1: 500, y1: 572, cx: 550, cy: 580, x2: 620, y2: 620, start: 13, end: 55, w: 3.6, depth: 1 },
+      { x1: 499, y1: 595, cx: 440, cy: 615, x2: 365, y2: 665, start: 18, end: 62, w: 3.2, depth: 1 },
+      { x1: 501, y1: 602, cx: 560, cy: 625, x2: 640, y2: 670, start: 20, end: 65, w: 3.2, depth: 1 },
+      { x1: 500, y1: 632, cx: 450, cy: 660, x2: 405, y2: 708, start: 26, end: 70, w: 2.6, depth: 1 },
+      { x1: 502, y1: 640, cx: 548, cy: 668, x2: 595, y2: 718, start: 28, end: 72, w: 2.6, depth: 1 },
+      { x1: 502, y1: 675, cx: 470, cy: 700, x2: 445, y2: 735, start: 35, end: 78, w: 2.0, depth: 1 },
+      { x1: 502, y1: 682, cx: 530, cy: 705, x2: 558, y2: 738, start: 37, end: 80, w: 2.0, depth: 1 },
+      // Secondary fine roots
+      { x1: 445, y1: 583, cx: 420, cy: 608, x2: 398, y2: 635, start: 25, end: 65, w: 1.6, depth: 2 },
+      { x1: 558, y1: 590, cx: 575, cy: 618, x2: 598, y2: 644, start: 26, end: 66, w: 1.6, depth: 2 },
+      { x1: 425, y1: 625, cx: 390, cy: 630, x2: 345, y2: 638, start: 32, end: 72, w: 1.5, depth: 2 },
+      { x1: 575, y1: 632, cx: 610, cy: 638, x2: 655, y2: 645, start: 34, end: 74, w: 1.5, depth: 2 },
+      { x1: 445, y1: 672, cx: 420, cy: 695, x2: 382, y2: 722, start: 40, end: 80, w: 1.4, depth: 2 },
+      { x1: 555, y1: 678, cx: 580, cy: 702, x2: 615, y2: 728, start: 42, end: 82, w: 1.4, depth: 2 }
+    ];
+
+    // True leaves schedule along the stem
+    const trueLeavesConfig = [
+      { id: 0, hRatio: 0.22, side: -1, appearAt: 24, fullAt: 46, maxScale: 0.72 },
+      { id: 1, hRatio: 0.25, side: 1,  appearAt: 25, fullAt: 48, maxScale: 0.75 },
+      { id: 2, hRatio: 0.38, side: -1, appearAt: 33, fullAt: 56, maxScale: 0.95 },
+      { id: 3, hRatio: 0.42, side: 1,  appearAt: 36, fullAt: 59, maxScale: 0.98 },
+      { id: 4, hRatio: 0.55, side: -1, appearAt: 43, fullAt: 66, maxScale: 1.08 },
+      { id: 5, hRatio: 0.60, side: 1,  appearAt: 46, fullAt: 69, maxScale: 1.06 },
+      { id: 6, hRatio: 0.72, side: -1, appearAt: 52, fullAt: 74, maxScale: 0.90 },
+      { id: 7, hRatio: 0.77, side: 1,  appearAt: 55, fullAt: 76, maxScale: 0.86 },
+      { id: 8, hRatio: 0.87, side: -1, appearAt: 60, fullAt: 80, maxScale: 0.65 },
+      { id: 9, hRatio: 0.90, side: 1,  appearAt: 62, fullAt: 82, maxScale: 0.62 }
+    ];
+
+    // =========================================================================
+    // 3. HELPER MATH UTILITIES
+    // =========================================================================
+    const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+    const norm = (v, a, b) => clamp((v - a) / (b - a), 0, 1);
+    const lerp = (a, b, t) => a + (b - a) * t;
+    const smoothstep = (a, b, v) => {
+      const t = norm(v, a, b);
+      return t * t * (3 - 2 * t);
+    };
+
+    // Quadratic Bezier point & tangent evaluation
+    function evalQuadBezier(p0, p1, p2, t) {
+      const mt = 1 - t;
+      const x = mt * mt * p0.x + 2 * mt * t * p1.x + t * t * p2.x;
+      const y = mt * mt * p0.y + 2 * mt * t * p1.y + t * t * p2.y;
+      const dx = 2 * mt * (p1.x - p0.x) + 2 * t * (p2.x - p1.x);
+      const dy = 2 * mt * (p1.y - p0.y) + 2 * t * (p2.y - p1.y);
+      const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+      return { x, y, angle };
+    }
+
+    // =========================================================================
+    // 4. STATIC SCENE INITIALIZATION
+    // =========================================================================
+    function initStaticDecor() {
+      // Soil particles
+      const soilG = document.getElementById("soilParticles");
+      let soilHTML = "";
+      for (let i = 0; i < 65; i++) {
+        const x = (i * 157) % 980 + 10;
+        const y = 545 + ((i * 83) % 205);
+        const r = 1.5 + (i % 4) * 1.3;
+        const col = i % 3 === 0 ? "#78350f" : i % 2 === 0 ? "#451a03" : "#a16207";
+        soilHTML += `<circle cx="${x}" cy="${y}" r="${r}" fill="${col}" opacity="${0.35 + (i % 5) * 0.1}" />`;
+      }
+      soilG.innerHTML = soilHTML;
+
+      // Meadow blades
+      const grassG = document.getElementById("meadowGrass");
+      let grassHTML = "";
+      for (let i = 0; i < 48; i++) {
+        const gx = (i * 23) % 1000;
+        if (Math.abs(gx - 500) < 42) continue; // Clear space around sunflower stem
+        const gh = 14 + (i % 5) * 6;
+        const lean = ((i % 7) - 3) * 3;
+        grassHTML += `<path d="M${gx},535 Q${gx + lean},${535 - gh * 0.6} ${gx + lean * 1.8},${535 - gh}" stroke="#15803d" stroke-width="2.2" fill="none" stroke-linecap="round" opacity="0.7" />`;
+      }
+      grassG.innerHTML = grassHTML;
+
+      // Stars
+      const starsG = document.getElementById("starsLayer");
+      let starsHTML = "";
+      for (let i = 0; i < 40; i++) {
+        const sx = (i * 193) % 980 + 10;
+        const sy = (i * 71) % 340 + 15;
+        const sr = 0.8 + (i % 3) * 0.6;
+        starsHTML += `<circle cx="${sx}" cy="${sy}" r="${sr}" fill="#fff" opacity="${0.4 + (i % 4) * 0.15}" />`;
+      }
+      starsG.innerHTML = starsHTML;
+    }
+
+    // =========================================================================
+    // 5. DYNAMIC SVG RENDERING PIPELINE
+    // =========================================================================
+    function renderScene() {
+      const p = state.progress;
+      const t = state.time;
+
+      // 5.1 Environment & Sun Position (Heliotropism)
+      const sunNorm = state.sunPos / 100; // 0 = East, 0.5 = Noon, 1 = West
+      const sunX = lerp(120, 880, sunNorm);
+      const sunArc = Math.sin(sunNorm * Math.PI); // 0 at horizon, 1 at zenith
+      const sunY = lerp(320, 78, sunArc);
+
+      const sunGroup = document.getElementById("sunGroup");
+      sunGroup.setAttribute("transform", `translate(${sunX.toFixed(1)}, ${sunY.toFixed(1)})`);
+
+      // Dynamic Sky palette based on sun elevation
+      const stop1 = document.getElementById("skyStop1");
+      const stop2 = document.getElementById("skyStop2");
+      const stop3 = document.getElementById("skyStop3");
+      const starsLayer = document.getElementById("starsLayer");
+
+      if (sunArc < 0.35) {
+        // Golden hour / Twilight
+        stop1.setAttribute("stop-color", "#0f172a");
+        stop2.setAttribute("stop-color", "#7c2d12");
+        stop3.setAttribute("stop-color", "#f97316");
+        starsLayer.setAttribute("opacity", (1 - sunArc / 0.35).toFixed(2));
+      } else {
+        stop1.setAttribute("stop-color", "#1d4ed8");
+        stop2.setAttribute("stop-color", "#38bdf8");
+        stop3.setAttribute("stop-color", "#fef9c3");
+        starsLayer.setAttribute("opacity", "0");
+      }
+
+      // 5.2 Render Underground Root System
+      const rootGroup = document.getElementById("rootGroup");
+      if (!state.showRoots || p < 5) {
+        rootGroup.innerHTML = "";
+      } else {
+        let rootsSVG = "";
+        for (const r of rootBranches) {
+          const rProg = smoothstep(r.start, r.end, p);
+          if (rProg <= 0.01) continue;
+          const curX = lerp(r.x1, r.x2, rProg);
+          const curY = lerp(r.y1, r.y2, rProg);
+          const curCX = lerp(r.x1, r.cx, rProg);
+          const curCY = lerp(r.y1, r.cy, rProg);
+          const strokeW = (r.w * (0.35 + 0.65 * rProg)).toFixed(2);
+          const col = r.depth === 0 ? "#d6bfa3" : r.depth === 1 ? "#b89b7a" : "#9c7e5e";
+          rootsSVG += `<path d="M${r.x1},${r.y1} Q${curCX.toFixed(1)},${curCY.toFixed(1)} ${curX.toFixed(1)},${curY.toFixed(1)}" fill="none" stroke="${col}" stroke-width="${strokeW}" stroke-linecap="round" opacity="0.88" />`;
+        }
+        rootGroup.innerHTML = rootsSVG;
+      }
+
+      // 5.3 Compute Stem Geometry & Heliotropic Bend
+      const plantBodyGroup = document.getElementById("plantBodyGroup");
+      const seedGroup = document.getElementById("seedGroup");
+      const flowerHeadGroup = document.getElementById("flowerHeadGroup");
+
+      // Stem base is anchored in soil at (500, 548) until sprout emerges at p=11
+      const baseP0 = { x: 500, y: 542 };
+
+      // Stem height progression
+      let stemHeight = 0;
+      if (p > 8) {
+        const h1 = smoothstep(8, 25, p) * 75;
+        const h2 = smoothstep(25, 68, p) * 245;
+        const h3 = smoothstep(68, 86, p) * 45;
+        stemHeight = h1 + h2 + h3;
+      }
+
+      // Wind oscillation + Heliotropism (tracking sun during vegetative & budding stages)
+      const windAmp = (state.wind / 100) * (8 + (stemHeight / 365) * 22);
+      const windSway = Math.sin(t * 2.1) * windAmp + Math.cos(t * 3.4) * (windAmp * 0.35);
+
+      // Heliotropism is strongest between p=25 and p=80; mature flower settles slightly East/downward
+      const helioActive = smoothstep(20, 55, p) * (1 - smoothstep(78, 95, p) * 0.65);
+      const sunInfluence = (sunNorm - 0.5) * 65 * helioActive;
+
+      // Maturity droop (stage 7: head becomes heavy with seeds)
+      const maturityDroop = smoothstep(88, 100, p);
+
+      const tipX = 500 + windSway + sunInfluence + maturityDroop * 22;
+      const tipY = 542 - stemHeight + maturityDroop * 18;
+
+      const ctrlX = 500 + (windSway + sunInfluence) * 0.42 - maturityDroop * 8;
+      const ctrlY = lerp(542, tipY, 0.52);
+
+      const p0 = baseP0;
+      const p1 = { x: ctrlX, y: ctrlY };
+      const p2 = { x: tipX, y: tipY };
+
+      let plantSVG = "";
+
+      // Draw Stem if sprouted
+      if (p > 8) {
+        const stemBaseWidth = lerp(3.5, 16, smoothstep(8, 75, p));
+        const stemTipWidth = lerp(2.5, 9, smoothstep(8, 75, p));
+
+        // Build tapered stem polygon along the quadratic bezier
+        const steps = 16;
+        const leftPts = [];
+        const rightPts = [];
+        for (let i = 0; i <= steps; i++) {
+          const s = i / steps;
+          const pt = evalQuadBezier(p0, p1, p2, s);
+          const rad = (pt.angle - 90) * (Math.PI / 180);
+          const w = lerp(stemBaseWidth, stemTipWidth, s) * 0.5;
+          const nx = -Math.sin(rad);
+          const ny = Math.cos(rad);
+          leftPts.push(`${(pt.x - nx * w).toFixed(1)},${(pt.y - ny * w).toFixed(1)}`);
+          rightPts.unshift(`${(pt.x + nx * w).toFixed(1)},${(pt.y + ny * w).toFixed(1)}`);
+        }
+        plantSVG += `<polygon points="${leftPts.join(" ")} ${rightPts.join(" ")}" fill="url(#stemGrad)" />`;
+
+        // Cotyledons (Seed Leaves) appear at p=15, senescence after p=55
+        if (p > 14 && p < 68) {
+          const cotOpen = smoothstep(14, 26, p);
+          const cotFade = 1 - smoothstep(50, 66, p);
+          const cotS = Math.min(1, sCotRatio(stemHeight));
+          const cotPt = evalQuadBezier(p0, p1, p2, cotS);
+          const scale = cotOpen * (0.65 + 0.35 * cotFade);
+          const col = p > 48 ? "#a3e635" : "#4ade80";
+
+          plantSVG += `
+            <g transform="translate(${cotPt.x.toFixed(1)}, ${cotPt.y.toFixed(1)}) opacity="${cotFade.toFixed(2)}">
+              <g transform="rotate(${(-45 * cotOpen).toFixed(1)}) scale(${scale.toFixed(2)})">
+                <path d="M0,0 C-12,-14 -32,-12 -36,-2 C-32,8 -12,8 0,0 Z" fill="${col}" stroke="#15803d" stroke-width="1" />
+              </g>
+              <g transform="rotate(${(45 * cotOpen).toFixed(1)}) scale(${scale.toFixed(2)})">
+                <path d="M0,0 C12,-14 32,-12 36,-2 C32,8 12,8 0,0 Z" fill="${col}" stroke="#15803d" stroke-width="1" />
+              </g>
+            </g>
+          `;
+        }
+
+        // True Broad Heart-Shaped Leaves
+        for (const lf of trueLeavesConfig) {
+          if (p < lf.appearAt) continue;
+          const lfGrowth = smoothstep(lf.appearAt, lf.fullAt, p);
+          const pt = evalQuadBezier(p0, p1, p2, lf.hRatio);
+
+          // Lower leaves yellowing slightly in late maturity (R9)
+          const isLower = lf.hRatio < 0.45;
+          const senesce = isLower ? smoothstep(88, 100, p) : smoothstep(94, 100, p) * 0.5;
+          const droopAngle = senesce * 28 * lf.side;
+
+          const leafWind = Math.sin(t * 2.8 + lf.id * 1.1) * (state.wind / 100) * 9;
+          const baseAngle = lf.side === -1 ? -32 : 32;
+          const totalRot = baseAngle + droopAngle + leafWind;
+          const sc = lfGrowth * lf.maxScale;
+
+          const fillCol = senesce > 0.4 ? "#ca8a04" : "url(#leafGrad)";
+          const veinCol = senesce > 0.4 ? "#fef08a" : "#86efac";
+
+          plantSVG += `
+            <g transform="translate(${pt.x.toFixed(1)}, ${pt.y.toFixed(1)}) rotate(${totalRot.toFixed(1)}) scale(${(lf.side * sc).toFixed(2)}, ${sc.toFixed(2)})">
+              <!-- Petiole (Cuống lá) -->
+              <path d="M0,0 Q14,-6 26,-4" stroke="#15803d" stroke-width="3.2" fill="none" stroke-linecap="round" />
+              <!-- Cordate Sunflower Leaf Blade -->
+              <path d="M22,-4 C28,-26 58,-34 86,-16 C98,-8 106,-2 114,4 C104,12 94,18 82,22 C54,30 26,18 22,-4 Z"
+                    fill="${fillCol}" stroke="#14532d" stroke-width="1.2" />
+              <!-- Leaf Venation -->
+              <path d="M24,-3 Q65,-2 108,4 M44,-2 Q58,-14 76,-16 M48,-1 Q64,12 80,15 M68,0 Q80,-9 92,-9"
+                    stroke="${veinCol}" stroke-width="1.1" fill="none" opacity="0.65" stroke-linecap="round" />
+            </g>
+          `;
+        }
+      }
+
+      plantBodyGroup.innerHTML = plantSVG;
+
+      // 5.4 Seed Hull (Achene) from Dormancy through Lifting off Cotyledons
+      if (p < 27) {
+        const seedLift = smoothstep(9, 20, p);
+        const seedDrop = smoothstep(21, 27, p);
+        let sx = 500;
+        let sy = 562;
+        let sRot = 18;
+
+        if (p >= 9 && p <= 21) {
+          sx = p2.x;
+          sy = p2.y;
+          sRot = lerp(18, -35, seedLift);
+        } else if (p > 21) {
+          sx = p2.x - seedDrop * 26;
+          sy = lerp(p2.y, 534, seedDrop * seedDrop);
+          sRot = -35 - seedDrop * 75;
+        }
+
+        const swell = 1 + smoothstep(0, 9, p) * 0.16;
+        const opacity = 1 - smoothstep(24, 27, p);
+
+        seedGroup.innerHTML = `
+          <g transform="translate(${sx.toFixed(1)}, ${sy.toFixed(1)}) rotate(${sRot.toFixed(1)}) scale(${swell.toFixed(2)})" opacity="${opacity.toFixed(2)}">
+            <!-- Sunflower Striped Seed (Achene) -->
+            <path d="M0,-12 C8,-11 11,-2 8,9 C5,15 -5,15 -8,9 C-11,-2 -8,-11 0,-12 Z"
+                  fill="#1c1917" stroke="#e7e5e4" stroke-width="1.4" />
+            <path d="M-3,-10 C-5,-1 -4,7 -2,12 M3,-10 C5,-1 4,7 2,12 M0,-11 L0,13"
+                  stroke="#d6d3d1" stroke-width="1.1" fill="none" opacity="0.85" />
+          </g>
+        `;
+      } else {
+        seedGroup.innerHTML = "";
+      }
+
+      // 5.5 Render Flower Head (Bud -> Anthesis -> Seed Head)
+      if (p < 54) {
+        flowerHeadGroup.innerHTML = "";
+      } else {
+        const budScale = smoothstep(54, 72, p);
+        const bloomOpen = smoothstep(68, 84, p);
+        const seedMaturation = smoothstep(88, 100, p);
+
+        // Head orientation: tracks sun when blooming, tilts down when mature
+        const headHelioTilt = (sunNorm - 0.5) * 28 * (1 - seedMaturation * 0.7);
+        const headDroopTilt = seedMaturation * 38;
+        const headAngle = headHelioTilt + headDroopTilt + Math.sin(t * 2.1) * (state.wind / 100) * 6;
+
+        const discRadius = lerp(14, 58, smoothstep(56, 84, p));
+        let headSVG = `<g transform="translate(${p2.x.toFixed(1)}, ${p2.y.toFixed(1)}) rotate(${headAngle.toFixed(1)})">`;
+
+        // A. Outer Involucral Bracts (Green star calyx)
+        const numBracts = 24;
+        for (let i = 0; i < numBracts; i++) {
+          const angle = (i * 360) / numBracts;
+          const bractLen = lerp(16, 26, budScale) * (1 - bloomOpen * 0.15);
+          const rOffset = discRadius * lerp(0.55, 0.92, bloomOpen);
+          const bractCol = seedMaturation > 0.6 ? "#65a30d" : "#15803d";
+          headSVG += `
+            <g transform="rotate(${angle.toFixed(1)}) translate(0, ${(-rOffset).toFixed(1)})">
+              <path d="M-5,2 Q0,${(-bractLen).toFixed(1)} 5,2 Z" fill="${bractCol}" stroke="#14532d" stroke-width="0.9" />
+            </g>
+          `;
+        }
+
+        // B. Golden Ray Florets (Cánh hoa lưỡi vàng)
+        if (p > 64) {
+          const rayGrow = smoothstep(64, 83, p);
+          const rayWilt = smoothstep(90, 100, p);
+          const numRays = 34; // Fibonacci number of petals!
+
+          for (let i = 0; i < numRays; i++) {
+            const isOuterRing = i % 2 === 0;
+            const angle = (i * 360) / numRays + Math.sin(t * 3 + i) * (state.wind / 100) * 2.2;
+            const pLen = lerp(4, isOuterRing ? 54 : 46, rayGrow) * (1 - rayWilt * 0.38);
+            const pWid = lerp(2.5, isOuterRing ? 10.5 : 8.5, rayGrow) * (1 - rayWilt * 0.3);
+            const baseR = discRadius * 0.88;
+            const wiltBend = rayWilt * (i % 3 - 1) * 8;
+            const opacity = 1 - rayWilt * 0.35;
+
+            headSVG += `
+              <g transform="rotate(${angle.toFixed(1)}) translate(0, ${(-baseR).toFixed(1)})" opacity="${opacity.toFixed(2)}">
+                <path d="M0,0 C${(-pWid).toFixed(1)},${(-pLen * 0.35).toFixed(1)} ${(-pWid * 0.85).toFixed(1)},${(-pLen * 0.82).toFixed(1)} ${wiltBend.toFixed(1)},${(-pLen).toFixed(1)} C${(pWid * 0.85).toFixed(1)},${(-pLen * 0.82).toFixed(1)} ${pWid.toFixed(1)},${(-pLen * 0.35).toFixed(1)} 0,0 Z"
+                      fill="url(#petalGrad)" stroke="#d97706" stroke-width="0.6" />
+              </g>
+            `;
+          }
+        }
+
+        // C. Central Disc Receptacle
+        headSVG += `<circle cx="0" cy="0" r="${discRadius.toFixed(1)}" fill="url(#discGrad)" stroke="#451a03" stroke-width="2" />`;
+
+        // D. Vogel's Fibonacci Phyllotaxis Florets / Seeds (θ = n * 137.5077°)
+        if (p > 60) {
+          const visibleRatio = smoothstep(60, 86, p);
+          const count = Math.floor(MAX_SEEDS * visibleRatio);
+          const maxR = discRadius * 0.91;
+
+          for (let i = 0; i < count; i++) {
+            const s = fiboSeeds[i];
+            const sx = s.cos * s.rNorm * maxR;
+            const sy = s.sin * s.rNorm * maxR;
+
+            // Anthesis wave moves from outer rim (rNorm ~ 1) to center (rNorm ~ 0)
+            let seedColor = "#f59e0b";
+            let radius = lerp(1.3, 2.5, s.rNorm) * (discRadius / 58);
+
+            if (seedMaturation > 0.15) {
+              // Developing dark striped achene seeds
+              seedColor = i % 2 === 0 ? "#1c1917" : "#44403c";
+              radius *= 1.12;
+            } else if (state.showFibo && s.isSpiralHighlight) {
+              seedColor = "#fef08a";
+              radius *= 1.22;
+            } else {
+              // Outer ring florets open golden, inner center still tight bronze/greenish
+              const ringThreshold = 1 - smoothstep(70, 88, p);
+              seedColor = s.rNorm > ringThreshold ? "#fbbf24" : "#78350f";
+            }
+
+            headSVG += `<circle cx="${sx.toFixed(1)}" cy="${sy.toFixed(1)}" r="${Math.max(0.9, radius).toFixed(2)}" fill="${seedColor}" />`;
+          }
+        }
+
+        // E. Closing green bracts folded over young bud (when p between 54 and 72)
+        if (p < 74) {
+          const coverOpacity = 1 - smoothstep(65, 74, p);
+          const coverR = discRadius * 0.95;
+          headSVG += `<circle cx="0" cy="0" r="${coverR.toFixed(1)}" fill="#166534" opacity="${(coverOpacity * 0.75).toFixed(2)}" />`;
+        }
+
+        headSVG += `</g>`;
+        flowerHeadGroup.innerHTML = headSVG;
+      }
+
+      // 5.6 Render Pollinators (Bees & Floating Pollen during Full Bloom)
+      const pollinatorGroup = document.getElementById("pollinatorGroup");
+      if (p >= 72 && p <= 93) {
+        const beeAlpha = smoothstep(72, 77, p) * (1 - smoothstep(89, 93, p));
+        const bx1 = p2.x + Math.cos(t * 1.9) * 85;
+        const by1 = p2.y - 25 + Math.sin(t * 3.4) * 35;
+        const bDir1 = Math.sin(t * 1.9) > 0 ? -1 : 1;
+
+        const bx2 = p2.x + Math.sin(t * 1.4 + 2) * 110;
+        const by2 = p2.y + 10 + Math.cos(t * 2.6) * 40;
+        const bDir2 = Math.cos(t * 1.4 + 2) > 0 ? 1 : -1;
+
+        pollinatorGroup.innerHTML = `
+          <g opacity="${beeAlpha.toFixed(2)}">
+            ${renderBee(bx1, by1, bDir1, t)}
+            ${renderBee(bx2, by2, bDir2, t + 1.5)}
+          </g>
+        `;
+      } else {
+        pollinatorGroup.innerHTML = "";
+      }
+
+      // 5.7 Render Rain if Toggled
+      const rainLayer = document.getElementById("rainLayer");
+      if (state.showRain) {
+        let rainSVG = "";
+        for (let i = 0; i < 36; i++) {
+          const rx = ((i * 97 + t * 180) % 1000);
+          const ry = ((i * 131 + t * 520) % 540);
+          rainSVG += `<line x1="${rx.toFixed(1)}" y1="${ry.toFixed(1)}" x2="${(rx - 6).toFixed(1)}" y2="${(ry + 18).toFixed(1)}" stroke="#7dd3fc" stroke-width="1.5" stroke-linecap="round" opacity="0.55" />`;
+        }
+        rainLayer.innerHTML = rainSVG;
+      } else {
+        rainLayer.innerHTML = "";
+      }
+
+      // 5.8 Render Anatomical Callout Labels
+      renderAnnotations(p, p0, p1, p2);
+
+      // 5.9 Update HUD Metrics & Sidebar Info
+      updateHUD(p, stemHeight);
+    }
+
+    function sCotRatio(stemHeight) {
+      if (stemHeight <= 10) return 0.9;
+      return clamp(48 / stemHeight, 0.14, 0.88);
+    }
+
+    function renderBee(x, y, dir, t) {
+      const wingFlutter = Math.sin(t * 35) * 18;
+      return `
+        <g transform="translate(${x.toFixed(1)}, ${y.toFixed(1)}) scale(${dir}, 1)">
+          <ellipse cx="-2" cy="-6" rx="5" ry="3" fill="#e0f2fe" opacity="0.8" transform="rotate(${wingFlutter.toFixed(1)})" />
+          <ellipse cx="2" cy="-6" rx="4.5" ry="2.6" fill="#bae6fd" opacity="0.8" transform="rotate(${(-wingFlutter).toFixed(1)})" />
+          <ellipse cx="0" cy="0" rx="7" ry="4.8" fill="#facc15" stroke="#1c1917" stroke-width="1" />
+          <path d="M-2,-4.5 L-2,4.5 M2,-4.5 L2,4.5" stroke="#1c1917" stroke-width="2" />
+          <circle cx="5.5" cy="-1" r="1.2" fill="#1c1917" />
+        </g>
+      `;
+    }
+
+    function renderAnnotations(p, p0, p1, p2) {
+      const layer = document.getElementById("annotationLayer");
+      if (!state.showLabels) {
+        layer.innerHTML = "";
+        return;
+      }
+
+      const callouts = [];
+
+      if (p < 12) {
+        callouts.push({ x: 500, y: 562, lx: 610, ly: 560, text: "Quả bế (Achene / Hạt giống)" });
+      }
+      if (p >= 8 && p < 45 && state.showRoots) {
+        callouts.push({ x: 502, y: 625, lx: 625, ly: 635, text: "Rễ cọc (Taproot) & Rễ bên" });
+      }
+      if (p >= 15 && p < 48) {
+        const cotPt = evalQuadBezier(p0, p1, p2, Math.min(1, sCotRatio(542 - p2.y)));
+        callouts.push({ x: cotPt.x - 24, y: cotPt.y, lx: 340, ly: cotPt.y - 15, text: "Hai lá mầm (Cotyledons)" });
+      }
+      if (p >= 35) {
+        const midPt = evalQuadBezier(p0, p1, p2, 0.55);
+        callouts.push({ x: midPt.x + 55, y: midPt.y - 5, lx: 690, ly: midPt.y - 20, text: "Phiến lá thật hình tim (Cordate Leaf)" });
+      }
+      if (p >= 56 && p < 74) {
+        callouts.push({ x: p2.x, y: p2.y - 18, lx: p2.x - 165, ly: p2.y - 55, text: "Lá bắc tổng bao (Involucral Bracts)" });
+      }
+      if (p >= 74 && p < 91) {
+        callouts.push({ x: p2.x - 45, y: p2.y - 45, lx: p2.x - 210, ly: p2.y - 80, text: "Hoa lưỡi vàng (Ray Florets)" });
+        callouts.push({ x: p2.x, y: p2.y, lx: p2.x + 150, ly: p2.y - 55, text: "Đĩa hoa xoắn Fibonacci 137.5°" });
+      }
+      if (p >= 91) {
+        callouts.push({ x: p2.x, y: p2.y, lx: p2.x - 195, ly: p2.y - 60, text: "Đầu hạt chín sinh lý (R9 Achene Head)" });
+      }
+
+      let svg = "";
+      for (const c of callouts) {
+        const isRight = c.lx >= c.x;
+        const anchor = isRight ? "start" : "end";
+        const padX = isRight ? 8 : -8;
+        svg += `
+          <g opacity="0.92">
+            <line x1="${c.x.toFixed(1)}" y1="${c.y.toFixed(1)}" x2="${c.lx.toFixed(1)}" y2="${c.ly.toFixed(1)}"
+                  stroke="#fde047" stroke-width="1.3" stroke-dasharray="3,3" />
+            <circle cx="${c.x.toFixed(1)}" cy="${c.y.toFixed(1)}" r="3.5" fill="#fde047" />
+            <text x="${(c.lx + padX).toFixed(1)}" y="${(c.ly + 4).toFixed(1)}"
+                  fill="#fef9c3" font-size="12.5" font-weight="600" text-anchor="${anchor}"
+                  style="text-shadow: 0 2px 6px rgba(0,0,0,0.85);">${c.text}</text>
+          </g>
+        `;
+      }
+      layer.innerHTML = svg;
+    }
+
+    // =========================================================================
+    // 6. UI & METRICS SYNCHRONIZATION
+    // =========================================================================
+    let lastStageIdx = -1;
+
+    function updateHUD(p, stemHeight) {
+      const day = Math.round((p / 100) * 110);
+      const heightCm = ((stemHeight / 365) * 245).toFixed(1);
+      const rootCm = (smoothstep(5, 85, p) * 140).toFixed(1);
+      const seedsCount = p > 60 ? Math.floor(smoothstep(60, 88, p) * 1280) : 0;
+
+      document.getElementById("metricDay").innerHTML = `Ngày ${day} <span>/ 110</span>`;
+      document.getElementById("metricHeight").innerHTML = `${heightCm} <span>cm</span>`;
+      document.getElementById("metricRoot").innerHTML = `${rootCm} <span>cm</span>`;
+      document.getElementById("metricSeeds").innerHTML = `${seedsCount} <span>hạt</span>`;
+
+      // Find current biological stage
+      const stageIdx = STAGES.findIndex(s => p >= s.min && p <= s.max);
+      if (stageIdx !== -1 && stageIdx !== lastStageIdx) {
+        lastStageIdx = stageIdx;
+        const st = STAGES[stageIdx];
+        document.getElementById("stageTag").textContent = st.tag;
+        document.getElementById("stageDays").textContent = st.days;
+        document.getElementById("stageTitle").textContent = st.title;
+        document.getElementById("stageDesc").textContent = st.desc;
+
+        document.getElementById("stageBullets").innerHTML = st.bullets
+          .map(b => `<div class="bio-item"><span class="bio-dot"></span><span>${b}</span></div>`)
+          .join("");
+
+        const pills = document.querySelectorAll(".stage-pill");
+        pills.forEach((pill, i) => {
+          pill.classList.toggle("active", i === stageIdx);
+        });
+      }
+    }
+
+    // =========================================================================
+    // 7. INTERACTIVE CONTROLS & ANIMATION LOOP
+    // =========================================================================
+    const growthSlider = document.getElementById("growthSlider");
+    const playBtn = document.getElementById("playBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const speedBtn = document.getElementById("speedBtn");
+    const sunSlider = document.getElementById("sunSlider");
+    const windSlider = document.getElementById("windSlider");
+
+    growthSlider.addEventListener("input", e => {
+      state.progress = parseFloat(e.target.value);
+    });
+
+    playBtn.addEventListener("click", () => {
+      state.playing = !state.playing;
+      if (state.playing && state.progress >= 100) {
+        state.progress = 0;
+      }
+      playBtn.textContent = state.playing ? "⏸ Tạm dừng" : "▶ Phát tiếp";
+    });
+
+    resetBtn.addEventListener("click", () => {
+      state.progress = 0;
+      growthSlider.value = 0;
+      state.playing = true;
+      playBtn.textContent = "⏸ Tạm dừng";
+    });
+
+    const speeds = [0.5, 1.0, 2.0, 4.0];
+    let speedIdx = 1;
+    speedBtn.addEventListener("click", () => {
+      speedIdx = (speedIdx + 1) % speeds.length;
+      state.speed = speeds[speedIdx];
+      speedBtn.textContent = `${state.speed.toFixed(1)}x`;
+    });
+
+    document.querySelectorAll(".stage-pill").forEach(pill => {
+      pill.addEventListener("click", () => {
+        state.progress = parseFloat(pill.dataset.val);
+        growthSlider.value = state.progress;
+      });
+    });
+
+    sunSlider.addEventListener("input", e => {
+      state.sunPos = parseFloat(e.target.value);
+      const deg = Math.round(lerp(15, 165, state.sunPos / 100));
+      const label = state.sunPos < 30 ? "Bình minh (Đông)" : state.sunPos > 70 ? "Hoàng hôn (Tây)" : "Trưa";
+      document.getElementById("sunAngleVal").textContent = `${label} (${deg}°)`;
+    });
+
+    windSlider.addEventListener("input", e => {
+      state.wind = parseFloat(e.target.value);
+      const wLabel = state.wind < 15 ? "Lặng gió" : state.wind < 50 ? "Nhẹ" : state.wind < 80 ? "Vừa" : "Mạnh";
+      document.getElementById("windVal").textContent = wLabel;
+    });
+
+    function setupToggle(btnId, key) {
+      const btn = document.getElementById(btnId);
+      btn.addEventListener("click", () => {
+        state[key] = !state[key];
+        btn.classList.toggle("on", state[key]);
+        btn.querySelector("span").textContent = state[key] ? "ON" : "OFF";
+      });
+    }
+
+    setupToggle("toggleRoots", "showRoots");
+    setupToggle("toggleLabels", "showLabels");
+    setupToggle("toggleRain", "showRain");
+    setupToggle("toggleFibo", "showFibo");
+
+    // Main RAF Loop
+    let lastTime = performance.now();
+    function tick(now) {
+      const dt = Math.min((now - lastTime) / 1000, 0.1);
+      lastTime = now;
+      state.time += dt;
+
+      if (state.playing) {
+        state.progress += dt * 4.2 * state.speed;
+        if (state.progress >= 100) {
+          state.progress = 100;
+          state.playing = false;
+          playBtn.textContent = "▶ Phát lại";
+        }
+        growthSlider.value = state.progress;
+      }
+
+      renderScene();
+      requestAnimationFrame(tick);
+    }
+
+    initStaticDecor();
+    requestAnimationFrame(tick);
+  </script>
+</body>
+</html>
